@@ -31,6 +31,8 @@ Full docs live under [`docs/`](docs/). Pick a topic by what you want to do:
 | List skills and deferred tools available to a session | [docs/skills-and-deferred-tools.md](docs/skills-and-deferred-tools.md) |
 | Look up the exact shape of any exported type | [docs/types.md](docs/types.md) |
 
+`docs/types.md` is generated from JSDoc via `npm run types:sync` — do not hand-edit the TypeScript fences inside it.
+
 ### Supported message types
 
 The parser recognizes every entry type observed across hundreds of real session logs:
