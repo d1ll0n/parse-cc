@@ -28,6 +28,12 @@ jobs:
 
       - run: npm run coverage
 
+      - name: Build
+        run: npm run build
+
+      - name: Verify tarball contents
+        run: npm pack --dry-run 2>&1 | tee /tmp/pack.txt && ! grep -E '(tests/|scripts/|docs/|CLAUDE\.md|biome\.json|\.husky|vitest\.config|tsconfig\.json|\.github/)' /tmp/pack.txt
+
       # Post a coverage summary comment on PRs and annotate changed files
       - uses: davelosert/vitest-coverage-report-action@v2
         if: always()
