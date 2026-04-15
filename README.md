@@ -3,17 +3,7 @@
 [![CI](https://github.com/d1ll0n/cc-logs/actions/workflows/ci.yml/badge.svg)](https://github.com/d1ll0n/cc-logs/actions/workflows/ci.yml)
 [![coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/d1ll0n/cc-logs/badges/coverage-badge.json)](https://github.com/d1ll0n/cc-logs/actions/workflows/ci.yml)
 
-TypeScript library and CLI for parsing Claude Code session log files (`.jsonl`). Exposes a `Session` class with lazy-cached getters for metrics, tool calls, skill listings, subagents, persisted-output references, and more. The CLI condenses a session into a compact JSON representation suitable for downstream analysis by smaller models.
-
-## Purpose
-
-Claude Code sessions generate large `.jsonl` log files (often 5-30MB) containing conversation history, tool use, thinking blocks, file contents, screenshots, and infrastructure metadata. This tool strips the bulk while preserving the conversational structure:
-
-- User messages (prompts and tool results)
-- Assistant messages (text, thinking summaries, tool use)
-- Tool call metadata (what was called, key inputs, condensed results)
-
-Typical reduction: **~97%** (27MB -> 800KB).
+TypeScript library for parsing Claude Code session log files (`.jsonl`). Exposes a `Session` class with lazy-cached getters for metrics, tool calls, skill listings, subagents, persisted-output references, file history, and more.
 
 ## Library API
 
@@ -59,50 +49,6 @@ Unknown future types are preserved as `UnknownEntry` with their raw fields intac
 npm install cc-logs
 ```
 
-## CLI
-
-```bash
-# Output to stdout
-cc-logs <session.jsonl>
-
-# Output to file
-cc-logs <session.jsonl> -o condensed.json
-
-# With custom thresholds
-cc-logs <session.jsonl> \
-  --thinking-max 500 \
-  --tool-input-max 500 \
-  --result-max 1000
-```
-
-### Options
-
-| Flag | Default | Description |
-|---|---|---|
-| `-o, --output <file>` | stdout | Write output to file |
-| `--thinking-max <n>` | 500 | Max chars for thinking block summaries |
-| `--tool-input-max <n>` | 500 | Max chars for large tool input fields (file content, commands, prompts) |
-| `--result-max <n>` | 1000 | Max chars for tool result content |
-
-## What gets preserved vs dropped
-
-### Preserved
-- User text messages (full)
-- Assistant text responses (full)
-- Thinking blocks (truncated to `--thinking-max`, empty blocks dropped)
-- Tool use: tool name + inputs (large values like file content truncated to `--tool-input-max`)
-- Tool results: content (truncated to `--result-max`)
-- Tool metadata for Write (filePath, type), Read (filePath), Agent (status, agentId, token counts), Glob/Grep/Skill (as-is)
-
-### Dropped
-- Edit `toolUseResult` metadata (redundant with tool_use input)
-- Bash `toolUseResult` metadata (identical to tool_result content)
-- Write file content and originalFile from metadata
-- Read file content from metadata (filePath preserved)
-- Base64 image data (replaced with `[image: mime/type]`)
-- Non-conversational log types: `progress`, `system`, `file-history-snapshot`, `queue-operation`, `permission-mode`, `last-prompt`, `attachment`
-- `<system-reminder>` text blocks injected into user messages
-
 ## Log file locations
 
 Claude Code stores session logs at:
@@ -143,11 +89,11 @@ The script reads only from your local `~/.claude`, so it's not wired into CI —
 ```
 src/
   index.ts              Public library entry point (exports Session + types)
-  cli.ts                CLI entry point (condenser)
   session.ts            Session class with lazy getters
-  truncate.ts           String truncation utility
   persisted-output.ts   <persisted-output> wrapper parser + loader
   subagents.ts          Subagent file locator (new + legacy layouts)
+  discover.ts           Project + session discovery helpers
+  file-history.ts       Pre-edit backup blob reader
   types/
     entries.ts          LogEntry discriminated union
     content.ts          ContentBlock types
@@ -166,16 +112,10 @@ src/
     tool-calls.ts       Tool call/result flat extractors
     skills.ts           Skill listing aggregation
     deferred-tools.ts   Deferred tools aggregation
-  handlers/             Condenser (used by the CLI)
-    types.ts            CondensedMessage shapes
-    assistant.ts        Condenses assistant entries
-    user.ts             Condenses user entries
-    tool-results.ts     Per-tool metadata rules
 tests/
   fixtures/             JSONL fixtures and persisted-output samples
                         (includes log-schema-baseline.json for drift detection)
   parse/, derive/       Unit tests per module
-  handlers/             Condenser tests
   audit/                Schema inventory walker + diff tests
   integration/          Real-session E2E
 scripts/
