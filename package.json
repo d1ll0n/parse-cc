@@ -1,8 +1,44 @@
 {
   "name": "cc-logs",
   "version": "0.1.0",
+  "description": "Parse Claude Code session .jsonl logs into typed entries, metrics, tool calls, subagents, and more.",
+  "keywords": [
+    "claude",
+    "claude-code",
+    "logs",
+    "jsonl",
+    "session",
+    "parser",
+    "typescript"
+  ],
+  "author": "Dillon",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/d1ll0n/cc-logs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/d1ll0n/cc-logs/issues"
+  },
+  "homepage": "https://github.com/d1ll0n/cc-logs#readme",
   "type": "module",
   "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
@@ -15,7 +51,8 @@
     "types:check": "node --experimental-strip-types scripts/sync-types-md.ts --verbose --check",
     "audit:logs": "tsx scripts/audit-log-schema.ts",
     "audit:logs:update": "tsx scripts/audit-log-schema.ts --update-baseline",
-    "prepare": "husky"
+    "prepare": "husky",
+    "prepublishOnly": "npm run lint && npm run types:check && npm test && npm run build"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.12",
