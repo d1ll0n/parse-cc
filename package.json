@@ -3,12 +3,8 @@
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
-  "bin": {
-    "cc-logs": "./dist/cli.js"
-  },
   "scripts": {
     "build": "tsc",
-    "dev": "tsx src/cli.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",

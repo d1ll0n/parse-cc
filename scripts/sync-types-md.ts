@@ -257,23 +257,7 @@ function main(): void {
   // Split missingInDoc into public API types (must document) vs internal (warn only).
   const publicNames = getPublicTypeNames("src/index.ts");
   const missingPublic = missingInDoc.filter((m) => publicNames.has(m.split(" ")[0]));
-  const missingInternal = missingInDoc.filter((m) => !publicNames.has(m.split(" ")[0]));
-
-  // Intentional: internal CLI condenser types, not part of the public API surface.
-  // These live in src/handlers/ and are deliberately excluded from docs/types.md.
-  const KNOWN_INTERNAL = new Set([
-    "AssistantOptions",
-    "ToolResultOptions",
-    "CondensedText",
-    "CondensedThinking",
-    "CondensedToolUse",
-    "CondensedContentBlock",
-    "CondensedPersistedOutput",
-    "CondensedToolResult",
-    "CondensedMessage",
-    "UserOptions",
-  ]);
-  const unexpectedInternal = missingInternal.filter((m) => !KNOWN_INTERNAL.has(m.split(" ")[0]));
+  const unexpectedInternal = missingInDoc.filter((m) => !publicNames.has(m.split(" ")[0]));
 
   if (missingPublic.length > 0) {
     console.error(
