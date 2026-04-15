@@ -1,0 +1,1 @@
+{"type":"user","uuid":"u1","parentUuid":null,"timestamp":"2026-04-09T09:00:00Z","sessionId":"sess-3","version":"2.1.98","gitBranch":"dev","cwd":"/other","message":{"role":"user","content":"third prompt"}}

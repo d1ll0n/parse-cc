@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write      # push badges branch on main
+      pull-requests: write # post coverage comment on PRs
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run coverage
+
+      # Post a coverage summary comment on PRs and annotate changed files
+      - uses: davelosert/vitest-coverage-report-action@v2
+        if: always()
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          json-summary-path: coverage/coverage-summary.json
+          json-final-path: coverage/coverage-final.json
+
+      # Update the coverage badge on the badges branch (main only)
+      - name: Update coverage badge
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        run: |
+          PCT=$(node -p "require('./coverage/coverage-summary.json').total.statements.pct")
+          COLOR=$(node -p "
+            const p = require('./coverage/coverage-summary.json').total.statements.pct;
+            p >= 90 ? 'brightgreen' : p >= 75 ? 'yellow' : 'red'
+          ")
+          echo "{\"schemaVersion\":1,\"label\":\"coverage\",\"message\":\"${PCT}%\",\"color\":\"${COLOR}\"}" > coverage-badge.json
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git fetch origin badges --depth=1 2>/dev/null && git checkout badges || git checkout --orphan badges
+          git rm -rf . --quiet 2>/dev/null || true
+          mv $GITHUB_WORKSPACE/coverage-badge.json ./coverage-badge.json
+          git add coverage-badge.json
+          git diff --cached --quiet || git commit -m "chore: update coverage badge [skip ci]"
+          git push origin badges
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

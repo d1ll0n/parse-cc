@@ -1,0 +1,3 @@
+{"type":"user","uuid":"u1","parentUuid":null,"timestamp":"2026-04-10T10:00:00Z","sessionId":"sess-missing-blob","version":"2.1.101","message":{"role":"user","content":"edit a file"}}
+{"type":"file-history-snapshot","messageId":"m1","snapshot":{"messageId":"m1","trackedFileBackups":{"notes.md":{"backupFileName":"deadbeef@v1","version":1,"backupTime":"2026-04-10T10:00:05Z"},"README.md":{"backupFileName":"aabbcc@v1","version":1,"backupTime":"2026-04-10T10:00:05Z"}},"timestamp":"2026-04-10T10:00:04Z"},"isSnapshotUpdate":false}
+{"type":"file-history-snapshot","messageId":"m2","snapshot":{"messageId":"m2","timestamp":"2026-04-10T10:00:06Z"},"isSnapshotUpdate":false}

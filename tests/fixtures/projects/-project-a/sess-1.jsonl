@@ -1,0 +1,2 @@
+{"type":"user","uuid":"u1","parentUuid":null,"timestamp":"2026-04-10T10:00:00Z","sessionId":"sess-1","version":"2.1.101","gitBranch":"main","cwd":"/repo","message":{"role":"user","content":"first prompt"}}
+{"type":"assistant","uuid":"a1","parentUuid":"u1","timestamp":"2026-04-10T10:00:05Z","sessionId":"sess-1","message":{"role":"assistant","id":"m","model":"claude-sonnet-4-6","content":[{"type":"text","text":"ok"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":5,"output_tokens":2}}}
