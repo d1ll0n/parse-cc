@@ -86,6 +86,10 @@ npm run audit:logs -- -v      # verbose: per-error details + removed paths
 
 The script reads only from your local `~/.claude`, so it's not wired into CI — run it manually. New findings should either be typed properly in [`src/types/entries.ts`](src/types/entries.ts) or accepted into the baseline via `audit:logs:update`.
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for architecture notes, invariants, and the non-obvious patterns every contributor needs to know before touching this codebase.
+
 ## Project structure
 
 ```
