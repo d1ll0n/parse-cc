@@ -36,7 +36,14 @@ describe("deduplicateByRequestId", () => {
 
   it("passes through entries without a requestId", () => {
     const entries: LogEntry[] = [
-      { type: "user", uuid: "u1", parentUuid: null, timestamp: "", sessionId: "s1", message: { role: "user", content: "hi" } },
+      {
+        type: "user",
+        uuid: "u1",
+        parentUuid: null,
+        timestamp: "",
+        sessionId: "s1",
+        message: { role: "user", content: "hi" },
+      },
       assistant("a1", "req1", 10),
     ];
     const deduped = deduplicateByRequestId(entries);
@@ -45,7 +52,14 @@ describe("deduplicateByRequestId", () => {
 
   it("returns input unchanged if no requestIds present", () => {
     const entries: LogEntry[] = [
-      { type: "user", uuid: "u1", parentUuid: null, timestamp: "", sessionId: "s1", message: { role: "user", content: "hi" } },
+      {
+        type: "user",
+        uuid: "u1",
+        parentUuid: null,
+        timestamp: "",
+        sessionId: "s1",
+        message: { role: "user", content: "hi" },
+      },
     ];
     expect(deduplicateByRequestId(entries)).toEqual(entries);
   });

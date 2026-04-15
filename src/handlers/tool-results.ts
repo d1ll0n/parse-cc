@@ -35,7 +35,7 @@ export function condenseTool(
         persistedOutput: { filePath: ref.filePath, sizeLabel: ref.sizeLabel },
         metadata:
           toolUseResult && typeof toolUseResult === "object"
-            ? condenseMetadata(toolUseResult, maxLen) ?? undefined
+            ? (condenseMetadata(toolUseResult, maxLen) ?? undefined)
             : undefined,
       };
     }
@@ -47,15 +47,12 @@ export function condenseTool(
     isError: block.is_error || undefined,
     metadata:
       toolUseResult && typeof toolUseResult === "object"
-        ? condenseMetadata(toolUseResult, maxLen) ?? undefined
+        ? (condenseMetadata(toolUseResult, maxLen) ?? undefined)
         : undefined,
   };
 }
 
-function condenseContent(
-  content: string | ContentBlock[],
-  maxLen: number
-): string {
+function condenseContent(content: string | ContentBlock[], maxLen: number): string {
   if (typeof content === "string") return truncateString(content, maxLen);
 
   const parts: string[] = [];
@@ -108,10 +105,7 @@ function condenseMetadata(
   return stripLargeValues(tr, maxLen);
 }
 
-function stripLargeValues(
-  obj: Record<string, unknown>,
-  maxLen: number
-): Record<string, unknown> {
+function stripLargeValues(obj: Record<string, unknown>, maxLen: number): Record<string, unknown> {
   const result: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(obj)) {
     if (typeof value === "string") {
@@ -138,10 +132,7 @@ function stripLargeValues(
   return result;
 }
 
-function stripFields(
-  obj: Record<string, unknown>,
-  fields: string[]
-): Record<string, unknown> {
+function stripFields(obj: Record<string, unknown>, fields: string[]): Record<string, unknown> {
   const result: Record<string, unknown> = {};
   const strip = new Set(fields);
   for (const [key, value] of Object.entries(obj)) {

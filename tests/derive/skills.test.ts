@@ -33,10 +33,7 @@ describe("extractSkills", () => {
   });
 
   it("returns the first skill_listing when multiple are present", () => {
-    const r = extractSkills([
-      skillListing("- foo: f", 1),
-      skillListing("- bar: b", 1),
-    ]);
+    const r = extractSkills([skillListing("- foo: f", 1), skillListing("- bar: b", 1)]);
     expect(r.names).toEqual(["foo"]);
   });
 
@@ -51,7 +48,9 @@ describe("extractSkills", () => {
     // A line like "- malformed-no-description" has no ": " so sep = -1, skip it
     // Also include a non-bullet line (doesn't start with "- ") to hit the continue branch
     const r = extractSkills([
-      skillListing("Available skills:\n- valid-skill: has description\n- no-description\n- another-valid: yes\n"),
+      skillListing(
+        "Available skills:\n- valid-skill: has description\n- no-description\n- another-valid: yes\n"
+      ),
     ]);
     expect(r.names).toEqual(["valid-skill", "another-valid"]);
   });

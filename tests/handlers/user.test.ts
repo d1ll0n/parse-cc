@@ -60,7 +60,10 @@ describe("handleUser", () => {
 
   it("skips system-reminder text blocks", () => {
     const entry = mkUser([
-      { type: "text", text: "<system-reminder>The task tools haven't been used recently.</system-reminder>" },
+      {
+        type: "text",
+        text: "<system-reminder>The task tools haven't been used recently.</system-reminder>",
+      },
       { type: "text", text: "My actual message" },
     ]);
     const result = handleUser(entry);

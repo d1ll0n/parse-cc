@@ -49,6 +49,7 @@ The parser recognizes every entry type observed across hundreds of real session 
 - `file-history-snapshot`, `queue-operation`
 - `attachment` with subtypes: `skill_listing`, `deferred_tools_delta`, `hook_success`, `hook_additional_context`, `hook_system_message`, `command_permissions`, `opened_file_in_ide`, `selected_lines_in_ide`, `queued_command`
 - `permission-mode`, `progress`, `last-prompt`
+- `agent-name`, `custom-title`, `pr-link`, `worktree-state`
 
 Unknown future types are preserved as `UnknownEntry` with their raw fields intact.
 
@@ -120,6 +121,23 @@ npm run coverage      # run tests with coverage report
 npm run build         # compile typescript
 ```
 
+### Schema drift detection
+
+Claude Code occasionally adds new entry types or fields to its session log format. The `audit:logs` script walks every session under `~/.claude/projects` (including subagents), builds a structural inventory (path → primitive type union, discriminated by `entry.type` and content block `type`), and compares it against a committed baseline at [`tests/fixtures/log-schema-baseline.json`](tests/fixtures/log-schema-baseline.json). It also exercises every `Session` introspection method to surface any that throw on real data.
+
+```bash
+npm run audit:logs            # compare current logs to baseline (exits 1 on drift)
+npm run audit:logs:update     # regenerate the baseline after accepting drift
+npm run audit:logs -- -v      # verbose: per-error details + removed paths
+```
+
+**Run it when:**
+- You upgrade Claude Code to a new version — catches newly-emitted fields before they become silent `UnknownEntry` entries.
+- Before cutting a release — confirms the parser still resolves every session shape seen locally.
+- A user reports a session this library fails on — the audit pinpoints which shape drifted.
+
+The script reads only from your local `~/.claude`, so it's not wired into CI — run it manually. New findings should either be typed properly in [`src/types/entries.ts`](src/types/entries.ts) or accepted into the baseline via `audit:logs:update`.
+
 ## Project structure
 
 ```
@@ -155,7 +173,13 @@ src/
     tool-results.ts     Per-tool metadata rules
 tests/
   fixtures/             JSONL fixtures and persisted-output samples
+                        (includes log-schema-baseline.json for drift detection)
   parse/, derive/       Unit tests per module
   handlers/             Condenser tests
+  audit/                Schema inventory walker + diff tests
   integration/          Real-session E2E
+scripts/
+  sync-types-md.ts      Regenerates docs/types.md ts fences from JSDoc
+  audit-log-schema.ts   Walks ~/.claude, diffs schema against baseline
+  audit/                Inventory walker + comparator used by the script
 ```

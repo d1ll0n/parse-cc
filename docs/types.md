@@ -33,6 +33,10 @@ export type LogEntry =
   | PermissionModeEntry
   | ProgressEntry
   | LastPromptEntry
+  | AgentNameEntry
+  | CustomTitleEntry
+  | PrLinkEntry
+  | WorktreeStateEntry
   | UnknownEntry;
 ```
 
@@ -47,6 +51,10 @@ export type LogEntry =
 - [`PermissionModeEntry`](#permissionmodeentry) — `type: "permission-mode"`
 - [`ProgressEntry`](#progressentry) — `type: "progress"`
 - [`LastPromptEntry`](#lastpromptentry) — `type: "last-prompt"`
+- [`AgentNameEntry`](#agentnameentry) — `type: "agent-name"`
+- [`CustomTitleEntry`](#customtitleentry) — `type: "custom-title"`
+- [`PrLinkEntry`](#prlinkentry) — `type: "pr-link"`
+- [`WorktreeStateEntry`](#worktreestateentry) — `type: "worktree-state"`
 - [`UnknownEntry`](#unknownentry) — any unrecognized `type` value
 
 ---
@@ -399,6 +407,139 @@ export interface LastPromptEntry {
 
 ---
 
+### AgentNameEntry
+
+Records the display name assigned to a sub-agent for the current session — written by the harness so tooling can surface a friendly label without re-deriving it.
+
+```ts
+export interface AgentNameEntry {
+  type: "agent-name";
+  sessionId: string;
+  agentName: string;
+}
+```
+
+**Produced by:** parsed from `agent-name` entries in session JSONL logs
+
+**Example:**
+
+```json
+{
+  "type": "agent-name",
+  "sessionId": "sess-1",
+  "agentName": "code-reviewer"
+}
+```
+
+---
+
+### CustomTitleEntry
+
+Records a user- or harness-assigned custom title for a session. Used by the Claude Code UI to display a human-readable session name in place of the default first-prompt preview.
+
+```ts
+export interface CustomTitleEntry {
+  type: "custom-title";
+  sessionId: string;
+  customTitle: string;
+}
+```
+
+**Produced by:** parsed from `custom-title` entries in session JSONL logs
+
+**Example:**
+
+```json
+{
+  "type": "custom-title",
+  "sessionId": "sess-1",
+  "customTitle": "Refactor auth middleware"
+}
+```
+
+---
+
+### PrLinkEntry
+
+Records that a session was associated with a GitHub pull request — typically written when the user creates or links a PR from within Claude Code.
+
+```ts
+export interface PrLinkEntry {
+  type: "pr-link";
+  sessionId: string;
+  /** Owner/name slug of the repository the PR lives in (e.g. `"acme/app"`). */
+  prRepository: string;
+  prNumber: number;
+  prUrl: string;
+  timestamp: string;
+}
+```
+
+**Produced by:** parsed from `pr-link` entries in session JSONL logs
+
+**Example:**
+
+```json
+{
+  "type": "pr-link",
+  "sessionId": "sess-1",
+  "prRepository": "acme/app",
+  "prNumber": 42,
+  "prUrl": "https://github.com/acme/app/pull/42",
+  "timestamp": "2026-04-10T12:34:56Z"
+}
+```
+
+---
+
+### WorktreeStateEntry
+
+Records the worktree context for a session that was launched inside a disposable git worktree, preserving enough information to map results back to the original branch/checkout after the worktree is removed.
+
+```ts
+export interface WorktreeStateEntry {
+  type: "worktree-state";
+  sessionId: string;
+  worktreeSession: {
+    sessionId: string;
+    /** Short name of the worktree (typically matches the directory name). */
+    worktreeName: string;
+    /** Absolute path to the worktree checkout on disk. */
+    worktreePath: string;
+    /** Branch checked out inside the worktree. */
+    worktreeBranch: string;
+    /** Branch the parent repo had checked out when the worktree was created. */
+    originalBranch: string;
+    /** Absolute path the parent repo was in when the worktree was created. */
+    originalCwd: string;
+    /** Commit SHA of the parent repo's HEAD at worktree-creation time. */
+    originalHeadCommit: string;
+  };
+}
+```
+
+**Produced by:** parsed from `worktree-state` entries in session JSONL logs
+
+**Example:**
+
+```json
+{
+  "type": "worktree-state",
+  "sessionId": "sess-1",
+  "worktreeSession": {
+    "sessionId": "sess-1",
+    "worktreeName": "feat-auth",
+    "worktreePath": "/tmp/worktrees/feat-auth",
+    "worktreeBranch": "feat/auth",
+    "originalBranch": "main",
+    "originalCwd": "/home/user/repo",
+    "originalHeadCommit": "abc123"
+  }
+}
+```
+
+---
+
 ### UnknownEntry
 
 Fallback for entry types not recognized by the parser — the raw object is preserved verbatim so no data is silently dropped.
@@ -465,12 +606,7 @@ export interface UsageMetadata {
 Why the model stopped generating — mirrors the Anthropic API stop reason values.
 
 ```ts
-export type StopReason =
-  | "end_turn"
-  | "tool_use"
-  | "max_tokens"
-  | "stop_sequence"
-  | null;
+export type StopReason = "end_turn" | "tool_use" | "max_tokens" | "stop_sequence" | null;
 ```
 
 **Produced by:** part of `AssistantEntry.message.stop_reason`
@@ -488,12 +624,7 @@ Items inside a `message.content` array. Assistant entries always use `ContentBlo
 Discriminated union of all block types that can appear inside a message content array. Keyed on the `type` field.
 
 ```ts
-export type ContentBlock =
-  | TextBlock
-  | ThinkingBlock
-  | ToolUseBlock
-  | ToolResultBlock
-  | ImageBlock;
+export type ContentBlock = TextBlock | ThinkingBlock | ToolUseBlock | ToolResultBlock | ImageBlock;
 ```
 
 **Variants:**

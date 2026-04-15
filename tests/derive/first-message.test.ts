@@ -22,9 +22,7 @@ describe("extractFirstUserMessage", () => {
   });
 
   it("falls back to command name when no plain text is seen", () => {
-    const got = extractFirstUserMessage([
-      user("<command-name>/model</command-name>", "t1"),
-    ]);
+    const got = extractFirstUserMessage([user("<command-name>/model</command-name>", "t1")]);
     expect(got?.text).toBe("/model");
   });
 
@@ -76,7 +74,7 @@ describe("extractFirstUserMessage", () => {
 
   it("skips user entries with empty or whitespace-only content", () => {
     const got = extractFirstUserMessage([
-      user("   ", "t1"),   // whitespace only → text.trim() = "" → skipped
+      user("   ", "t1"), // whitespace only → text.trim() = "" → skipped
       user("actual content", "t2"),
     ]);
     expect(got?.text).toBe("actual content");

@@ -64,12 +64,7 @@ export interface ImageBlock {
  * occasionally `ImageBlock`. Assistant messages contain `TextBlock`,
  * `ThinkingBlock`, and `ToolUseBlock`.
  */
-export type ContentBlock =
-  | TextBlock
-  | ThinkingBlock
-  | ToolUseBlock
-  | ToolResultBlock
-  | ImageBlock;
+export type ContentBlock = TextBlock | ThinkingBlock | ToolUseBlock | ToolResultBlock | ImageBlock;
 
 /** Type guard for `TextBlock`. */
 export function isTextBlock(b: ContentBlock): b is TextBlock {

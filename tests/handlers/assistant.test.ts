@@ -31,9 +31,7 @@ describe("handleAssistant", () => {
 
   it("truncates thinking blocks and drops signature", () => {
     const longThinking = "x".repeat(5000);
-    const entry = makeEntry([
-      { type: "thinking", thinking: longThinking, signature: "abc123" },
-    ]);
+    const entry = makeEntry([{ type: "thinking", thinking: longThinking, signature: "abc123" }]);
     const result = handleAssistant(entry, { thinkingMaxLen: 200 });
     expect(result.content).toHaveLength(1);
     const block = result.content![0] as { type: "thinking"; summary: string };
@@ -43,9 +41,7 @@ describe("handleAssistant", () => {
   });
 
   it("preserves short thinking blocks", () => {
-    const entry = makeEntry([
-      { type: "thinking", thinking: "short thought", signature: "sig" },
-    ]);
+    const entry = makeEntry([{ type: "thinking", thinking: "short thought", signature: "sig" }]);
     const result = handleAssistant(entry, { thinkingMaxLen: 200 });
     const block = result.content![0] as { type: "thinking"; summary: string };
     expect(block.summary).toBe("short thought");
@@ -123,7 +119,11 @@ describe("handleAssistant", () => {
     ]);
     const result = handleAssistant(entry);
     expect(result.content).toHaveLength(1);
-    const block = result.content![0] as { type: string; name: string; input: Record<string, unknown> };
+    const block = result.content![0] as {
+      type: string;
+      name: string;
+      input: Record<string, unknown>;
+    };
     expect(block.name).toBe("Bash");
     expect(block.input).toEqual({});
   });

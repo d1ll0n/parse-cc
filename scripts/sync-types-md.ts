@@ -186,7 +186,9 @@ function syncTypesMd(docPath: string, types: ExtractedType[], check: boolean): S
     }
   }
 
-  const missingInDoc = types.filter((t) => !syncedNames.has(t.name)).map((t) => `${t.name} (${t.sourceFile})`);
+  const missingInDoc = types
+    .filter((t) => !syncedNames.has(t.name))
+    .map((t) => `${t.name} (${t.sourceFile})`);
   const missingInSource = unknownHeadings;
 
   const newContent = result.join("\n");
@@ -213,12 +215,13 @@ function getPublicTypeNames(indexPath: string): Set<string> {
   const names = new Set<string>();
   // Match all `export type { A, B, C }` and `export { A, B }` blocks (possibly multi-line)
   const blockRe = /export(?:\s+type)?\s*\{([^}]+)\}/g;
-  let m: RegExpExecArray | null;
-  while ((m = blockRe.exec(source)) !== null) {
+  let m: RegExpExecArray | null = blockRe.exec(source);
+  while (m !== null) {
     for (const entry of m[1].split(",")) {
       const name = entry.trim().split(/\s+/)[0]; // handle `Foo as Bar` — take original name
       if (name) names.add(name);
     }
+    m = blockRe.exec(source);
   }
   return names;
 }
@@ -232,14 +235,18 @@ function main(): void {
   const allTypes = srcFiles.flatMap(extractTypesFromFile);
 
   if (verbose) {
-    console.error(`[sync-types-md] scanned ${srcFiles.length} source files, found ${allTypes.length} exported types`);
+    console.error(
+      `[sync-types-md] scanned ${srcFiles.length} source files, found ${allTypes.length} exported types`
+    );
   }
 
   const { changes, missingInDoc, missingInSource } = syncTypesMd("docs/types.md", allTypes, check);
 
   if (check) {
     if (changes > 0) {
-      console.error(`[sync-types-md] ${changes} section(s) out of sync with source. Run 'npm run types:sync' to update.`);
+      console.error(
+        `[sync-types-md] ${changes} section(s) out of sync with source. Run 'npm run types:sync' to update.`
+      );
     } else {
       console.log("[sync-types-md] docs/types.md is in sync with source.");
     }
@@ -252,17 +259,39 @@ function main(): void {
   const missingPublic = missingInDoc.filter((m) => publicNames.has(m.split(" ")[0]));
   const missingInternal = missingInDoc.filter((m) => !publicNames.has(m.split(" ")[0]));
 
+  // Intentional: internal CLI condenser types, not part of the public API surface.
+  // These live in src/handlers/ and are deliberately excluded from docs/types.md.
+  const KNOWN_INTERNAL = new Set([
+    "AssistantOptions",
+    "ToolResultOptions",
+    "CondensedText",
+    "CondensedThinking",
+    "CondensedToolUse",
+    "CondensedContentBlock",
+    "CondensedPersistedOutput",
+    "CondensedToolResult",
+    "CondensedMessage",
+    "UserOptions",
+  ]);
+  const unexpectedInternal = missingInternal.filter((m) => !KNOWN_INTERNAL.has(m.split(" ")[0]));
+
   if (missingPublic.length > 0) {
-    console.error(`[sync-types-md] ${missingPublic.length} public type(s) exported from src/index.ts have no '### TypeName' section in docs/types.md:`);
+    console.error(
+      `[sync-types-md] ${missingPublic.length} public type(s) exported from src/index.ts have no '### TypeName' section in docs/types.md:`
+    );
     for (const m of missingPublic) console.error(`  - ${m}`);
     if (check) process.exitCode = 1;
   }
-  if (missingInternal.length > 0) {
-    console.warn(`[sync-types-md] WARNING: ${missingInternal.length} internal exported type(s) have no section in docs/types.md (not required):`);
-    for (const m of missingInternal) console.warn(`  - ${m}`);
+  if (unexpectedInternal.length > 0) {
+    console.warn(
+      `[sync-types-md] WARNING: ${unexpectedInternal.length} internal exported type(s) have no section in docs/types.md (not required):`
+    );
+    for (const m of unexpectedInternal) console.warn(`  - ${m}`);
   }
   if (missingInSource.length > 0) {
-    console.warn(`[sync-types-md] WARNING: ${missingInSource.length} '### ...' heading(s) in docs/types.md have no matching source type:`);
+    console.warn(
+      `[sync-types-md] WARNING: ${missingInSource.length} '### ...' heading(s) in docs/types.md have no matching source type:`
+    );
     for (const m of missingInSource) console.warn(`  - ${m}`);
   }
 
