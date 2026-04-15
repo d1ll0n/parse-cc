@@ -43,14 +43,14 @@ jobs:
             const p = require('./coverage/coverage-summary.json').total.statements.pct;
             p >= 90 ? 'brightgreen' : p >= 75 ? 'yellow' : 'red'
           ")
-          echo "{\"schemaVersion\":1,\"label\":\"coverage\",\"message\":\"${PCT}%\",\"color\":\"${COLOR}\"}" > coverage-badge.json
+          BADGE="{\"schemaVersion\":1,\"label\":\"coverage\",\"message\":\"${PCT}%\",\"color\":\"${COLOR}\"}"
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           git fetch origin badges --depth=1 2>/dev/null && git checkout badges || git checkout --orphan badges
           git rm -rf . --quiet 2>/dev/null || true
-          mv $GITHUB_WORKSPACE/coverage-badge.json ./coverage-badge.json
+          echo "$BADGE" > coverage-badge.json
           git add coverage-badge.json
           git diff --cached --quiet || git commit -m "chore: update coverage badge [skip ci]"
           git push origin badges
