@@ -23,10 +23,7 @@ export interface InventoryDiff {
  * just means the current run didn't happen to include a session that
  * exercised the path.
  */
-export function compareInventories(
-  baseline: Inventory,
-  current: Inventory
-): InventoryDiff {
+export function compareInventories(baseline: Inventory, current: Inventory): InventoryDiff {
   const newPaths: string[] = [];
   const removedPaths: string[] = [];
   const newTypes: Array<{ path: string; added: string[] }> = [];

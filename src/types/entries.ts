@@ -12,12 +12,7 @@ import type { ToolUseResultData } from "./tool-results.js";
  * - `"stop_sequence"` — a configured stop sequence was encountered.
  * - `null` — stop reason not yet available or not applicable.
  */
-export type StopReason =
-  | "end_turn"
-  | "tool_use"
-  | "max_tokens"
-  | "stop_sequence"
-  | null;
+export type StopReason = "end_turn" | "tool_use" | "max_tokens" | "stop_sequence" | null;
 
 /**
  * Token-usage breakdown attached to every assistant message.
@@ -335,8 +330,7 @@ export const isPermissionModeEntry = (e: LogEntry): e is PermissionModeEntry =>
 export const isProgressEntry = (e: LogEntry): e is ProgressEntry => e.type === "progress";
 export const isLastPromptEntry = (e: LogEntry): e is LastPromptEntry => e.type === "last-prompt";
 export const isAgentNameEntry = (e: LogEntry): e is AgentNameEntry => e.type === "agent-name";
-export const isCustomTitleEntry = (e: LogEntry): e is CustomTitleEntry =>
-  e.type === "custom-title";
+export const isCustomTitleEntry = (e: LogEntry): e is CustomTitleEntry => e.type === "custom-title";
 export const isPrLinkEntry = (e: LogEntry): e is PrLinkEntry => e.type === "pr-link";
 export const isWorktreeStateEntry = (e: LogEntry): e is WorktreeStateEntry =>
   e.type === "worktree-state";

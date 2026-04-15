@@ -1,10 +1,6 @@
 // src/handlers/assistant.ts
 import type { AssistantEntry } from "../types/entries.js";
-import {
-  isTextBlock,
-  isThinkingBlock,
-  isToolUseBlock,
-} from "../types/content.js";
+import { isTextBlock, isThinkingBlock, isToolUseBlock } from "../types/content.js";
 import { truncateString } from "../truncate.js";
 import type { CondensedContentBlock, CondensedMessage } from "./types.js";
 
@@ -18,11 +14,11 @@ const DEFAULT_TOOL_INPUT_MAX = 500;
 
 /** Keys in tool_use input that tend to contain large file content */
 const LARGE_INPUT_KEYS = new Set([
-  "content",    // Write
+  "content", // Write
   "old_string", // Edit
   "new_string", // Edit
-  "prompt",     // Agent
-  "command",    // Bash
+  "prompt", // Agent
+  "command", // Bash
 ]);
 
 export function handleAssistant(

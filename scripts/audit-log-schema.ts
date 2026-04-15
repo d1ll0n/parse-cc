@@ -33,10 +33,7 @@ import {
 import { compareInventories, driftCount } from "./audit/compare.ts";
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const BASELINE_PATH = path.resolve(
-  scriptDir,
-  "../tests/fixtures/log-schema-baseline.json"
-);
+const BASELINE_PATH = path.resolve(scriptDir, "../tests/fixtures/log-schema-baseline.json");
 
 interface CliOptions {
   updateBaseline: boolean;
@@ -183,9 +180,7 @@ async function main(): Promise<void> {
     fs.mkdirSync(path.dirname(BASELINE_PATH), { recursive: true });
     const json = `${JSON.stringify(sortedInv, null, 2)}\n`;
     fs.writeFileSync(BASELINE_PATH, json);
-    console.log(
-      `[audit] wrote baseline: ${BASELINE_PATH} (${formatBytes(json.length)})`
-    );
+    console.log(`[audit] wrote baseline: ${BASELINE_PATH} (${formatBytes(json.length)})`);
     reportErrors(stats.errors, opts.verbose);
     process.exit(stats.errors.length > 0 ? 1 : 0);
   }
@@ -222,9 +217,7 @@ async function main(): Promise<void> {
       }
     }
     console.log("");
-    console.log(
-      `[audit] to accept these changes, rerun with --update-baseline`
-    );
+    console.log(`[audit] to accept these changes, rerun with --update-baseline`);
   }
 
   if (diff.removedPaths.length > 0 && opts.verbose) {

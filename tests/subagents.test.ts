@@ -55,7 +55,10 @@ describe("findSubagentFiles", () => {
     const parentPath = `${tmpDir}/parent.jsonl`;
     const emptyAgentPath = `${tmpDir}/agent-empty.jsonl`;
     // parent has a sessionId; emptyAgent has no content — readFirstLine returns null
-    await writeFile(parentPath, '{"type":"user","uuid":"u1","parentUuid":null,"timestamp":"t","sessionId":"sess-tmp","message":{"role":"user","content":"x"}}\n');
+    await writeFile(
+      parentPath,
+      '{"type":"user","uuid":"u1","parentUuid":null,"timestamp":"t","sessionId":"sess-tmp","message":{"role":"user","content":"x"}}\n'
+    );
     await writeFile(emptyAgentPath, "");
     try {
       const files = await findSubagentFiles(parentPath);
@@ -73,7 +76,10 @@ describe("findSubagentFiles", () => {
     await mkdir(tmpDir, { recursive: true });
     const parentPath = `${tmpDir}/parent.jsonl`;
     const badAgentPath = `${tmpDir}/agent-bad.jsonl`;
-    await writeFile(parentPath, '{"type":"user","uuid":"u1","parentUuid":null,"timestamp":"t","sessionId":"sess-tmp2","message":{"role":"user","content":"x"}}\n');
+    await writeFile(
+      parentPath,
+      '{"type":"user","uuid":"u1","parentUuid":null,"timestamp":"t","sessionId":"sess-tmp2","message":{"role":"user","content":"x"}}\n'
+    );
     await writeFile(badAgentPath, "not-valid-json\n");
     try {
       const files = await findSubagentFiles(parentPath);
@@ -91,7 +97,10 @@ describe("findSubagentFiles", () => {
     await mkdir(tmpDir, { recursive: true });
     const parentPath = `${tmpDir}/parent.jsonl`;
     const noIdAgentPath = `${tmpDir}/agent-noid.jsonl`;
-    await writeFile(parentPath, '{"type":"user","uuid":"u1","parentUuid":null,"timestamp":"t","sessionId":"sess-tmp3","message":{"role":"user","content":"x"}}\n');
+    await writeFile(
+      parentPath,
+      '{"type":"user","uuid":"u1","parentUuid":null,"timestamp":"t","sessionId":"sess-tmp3","message":{"role":"user","content":"x"}}\n'
+    );
     // First line has valid JSON but no sessionId field → returns null → not matched
     await writeFile(noIdAgentPath, '{"type":"user","uuid":"x"}\n');
     try {

@@ -606,12 +606,7 @@ export interface UsageMetadata {
 Why the model stopped generating — mirrors the Anthropic API stop reason values.
 
 ```ts
-export type StopReason =
-  | "end_turn"
-  | "tool_use"
-  | "max_tokens"
-  | "stop_sequence"
-  | null;
+export type StopReason = "end_turn" | "tool_use" | "max_tokens" | "stop_sequence" | null;
 ```
 
 **Produced by:** part of `AssistantEntry.message.stop_reason`
@@ -629,12 +624,7 @@ Items inside a `message.content` array. Assistant entries always use `ContentBlo
 Discriminated union of all block types that can appear inside a message content array. Keyed on the `type` field.
 
 ```ts
-export type ContentBlock =
-  | TextBlock
-  | ThinkingBlock
-  | ToolUseBlock
-  | ToolResultBlock
-  | ImageBlock;
+export type ContentBlock = TextBlock | ThinkingBlock | ToolUseBlock | ToolResultBlock | ImageBlock;
 ```
 
 **Variants:**

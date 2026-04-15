@@ -80,7 +80,10 @@ describe("analyzeCompaction", () => {
     const base = assistant(0, 50);
     const synth: LogEntry = {
       ...base,
-      message: { ...(base as { type: "assistant"; message: Record<string, unknown> }).message, model: "<synthetic>" },
+      message: {
+        ...(base as { type: "assistant"; message: Record<string, unknown> }).message,
+        model: "<synthetic>",
+      },
     } as LogEntry;
     const r = analyzeCompaction([synth, assistant(0, 100)]);
     expect(r.contextConsumption).toBe(100);
@@ -101,7 +104,12 @@ describe("analyzeCompaction", () => {
         content: [],
         stop_reason: "end_turn",
         stop_sequence: null,
-        usage: { input_tokens: 50, output_tokens: 0 } as { input_tokens: number; output_tokens: number; cache_read_input_tokens?: number; cache_creation_input_tokens?: number },
+        usage: { input_tokens: 50, output_tokens: 0 } as {
+          input_tokens: number;
+          output_tokens: number;
+          cache_read_input_tokens?: number;
+          cache_creation_input_tokens?: number;
+        },
       },
     };
     const r = analyzeCompaction([entry]);
@@ -112,8 +120,8 @@ describe("analyzeCompaction", () => {
     // An assistant entry with all tokens = 0 is skipped by the inputTokens > 0 guard
     // followed by an entry with real tokens, ensuring the guard's false branch is covered
     const entries: LogEntry[] = [
-      assistant(0, 0, 0),   // inputTokens = 0, skipped by guard
-      assistant(0, 80),     // inputTokens = 80, processed normally
+      assistant(0, 0, 0), // inputTokens = 0, skipped by guard
+      assistant(0, 80), // inputTokens = 80, processed normally
     ];
     const r = analyzeCompaction(entries);
     expect(r.contextConsumption).toBe(80);

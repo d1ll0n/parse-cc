@@ -54,14 +54,22 @@ describe("entry type guards", () => {
   const base = { uuid: "u", parentUuid: null, timestamp: "t", sessionId: "s" };
 
   it("isQueueOperationEntry returns true for queue-operation type", () => {
-    const e: LogEntry = { ...base, type: "queue-operation", operation: "enqueue" } as unknown as LogEntry;
+    const e: LogEntry = {
+      ...base,
+      type: "queue-operation",
+      operation: "enqueue",
+    } as unknown as LogEntry;
     expect(isQueueOperationEntry(e)).toBe(true);
     const other: LogEntry = { ...base, type: "user", message: { role: "user", content: "x" } };
     expect(isQueueOperationEntry(other)).toBe(false);
   });
 
   it("isPermissionModeEntry returns true for permission-mode type", () => {
-    const e: LogEntry = { ...base, type: "permission-mode", permissionMode: "acceptEdits" } as unknown as LogEntry;
+    const e: LogEntry = {
+      ...base,
+      type: "permission-mode",
+      permissionMode: "acceptEdits",
+    } as unknown as LogEntry;
     expect(isPermissionModeEntry(e)).toBe(true);
     const other: LogEntry = { ...base, type: "user", message: { role: "user", content: "x" } };
     expect(isPermissionModeEntry(other)).toBe(false);
@@ -110,14 +118,24 @@ describe("entry type guards", () => {
       },
     };
     expect(isWorktreeStateEntry(e)).toBe(true);
-    const other: LogEntry = { type: "pr-link", sessionId: "s1", prRepository: "a/b", prNumber: 1, prUrl: "", timestamp: "" };
+    const other: LogEntry = {
+      type: "pr-link",
+      sessionId: "s1",
+      prRepository: "a/b",
+      prNumber: 1,
+      prUrl: "",
+      timestamp: "",
+    };
     expect(isWorktreeStateEntry(other)).toBe(false);
   });
 });
 
 describe("content block type guards", () => {
   it("isImageBlock returns true only for image blocks", () => {
-    const img: ContentBlock = { type: "image", source: { type: "base64", media_type: "image/png", data: "abc" } };
+    const img: ContentBlock = {
+      type: "image",
+      source: { type: "base64", media_type: "image/png", data: "abc" },
+    };
     expect(isImageBlock(img)).toBe(true);
     const txt: ContentBlock = { type: "text", text: "hello" };
     expect(isImageBlock(txt)).toBe(false);

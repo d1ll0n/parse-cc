@@ -7,10 +7,7 @@ import {
   sortInventory,
   type Inventory,
 } from "../../scripts/audit/inventory.ts";
-import {
-  compareInventories,
-  driftCount,
-} from "../../scripts/audit/compare.ts";
+import { compareInventories, driftCount } from "../../scripts/audit/compare.ts";
 
 describe("inventory walker", () => {
   it("buckets top-level entries by .type", () => {
@@ -84,12 +81,8 @@ describe("inventory walker", () => {
       },
     ]);
     expect(inv["entry[assistant].message.content[tool_use].input"]).toEqual(["object"]);
-    expect(
-      inv["entry[assistant].message.content[tool_use].input.command"]
-    ).toBeUndefined();
-    expect(
-      inv["entry[assistant].message.content[tool_use].input.timeout"]
-    ).toBeUndefined();
+    expect(inv["entry[assistant].message.content[tool_use].input.command"]).toBeUndefined();
+    expect(inv["entry[assistant].message.content[tool_use].input.timeout"]).toBeUndefined();
   });
 
   it("handles string content (not array) without crashing", () => {
@@ -129,9 +122,7 @@ describe("inventory walker", () => {
         },
       },
     ]);
-    expect(
-      inv["entry[user].message.content[tool_result].content[text].text"]
-    ).toEqual(["string"]);
+    expect(inv["entry[user].message.content[tool_result].content[text].text"]).toEqual(["string"]);
     expect(
       inv["entry[user].message.content[tool_result].content[image].source.media_type"]
     ).toEqual(["string"]);
@@ -139,12 +130,7 @@ describe("inventory walker", () => {
 
   it("falls back to [] bucket when discriminator is missing", () => {
     const inv: Inventory = {};
-    walkValue(
-      inv,
-      "entry[assistant].message.content",
-      [{ weird: true }],
-      createDefaultContext()
-    );
+    walkValue(inv, "entry[assistant].message.content", [{ weird: true }], createDefaultContext());
     expect(inv["entry[assistant].message.content[]"]).toEqual(["object"]);
     expect(inv["entry[assistant].message.content[].weird"]).toEqual(["boolean"]);
   });
@@ -173,22 +159,16 @@ describe("inventory walker", () => {
         },
       },
     ]);
-    expect(
-      inv["entry[file-history-snapshot].snapshot.trackedFileBackups"]
-    ).toEqual(["object"]);
-    expect(
-      inv["entry[file-history-snapshot].snapshot.trackedFileBackups{*}"]
-    ).toEqual(["object"]);
-    expect(
-      inv["entry[file-history-snapshot].snapshot.trackedFileBackups{*}.version"]
-    ).toEqual(["number"]);
+    expect(inv["entry[file-history-snapshot].snapshot.trackedFileBackups"]).toEqual(["object"]);
+    expect(inv["entry[file-history-snapshot].snapshot.trackedFileBackups{*}"]).toEqual(["object"]);
+    expect(inv["entry[file-history-snapshot].snapshot.trackedFileBackups{*}.version"]).toEqual([
+      "number",
+    ]);
     expect(
       inv["entry[file-history-snapshot].snapshot.trackedFileBackups{*}.backupFileName"]
     ).toEqual(["null", "string"]);
     // Dynamic per-file keys should NOT exist in the inventory
-    expect(
-      inv["entry[file-history-snapshot].snapshot.trackedFileBackups./a/b.ts"]
-    ).toBeUndefined();
+    expect(inv["entry[file-history-snapshot].snapshot.trackedFileBackups./a/b.ts"]).toBeUndefined();
   });
 
   it("uses entry[<no-type>] bucket when .type is missing", () => {

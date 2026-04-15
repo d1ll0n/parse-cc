@@ -186,7 +186,9 @@ function syncTypesMd(docPath: string, types: ExtractedType[], check: boolean): S
     }
   }
 
-  const missingInDoc = types.filter((t) => !syncedNames.has(t.name)).map((t) => `${t.name} (${t.sourceFile})`);
+  const missingInDoc = types
+    .filter((t) => !syncedNames.has(t.name))
+    .map((t) => `${t.name} (${t.sourceFile})`);
   const missingInSource = unknownHeadings;
 
   const newContent = result.join("\n");
@@ -233,14 +235,18 @@ function main(): void {
   const allTypes = srcFiles.flatMap(extractTypesFromFile);
 
   if (verbose) {
-    console.error(`[sync-types-md] scanned ${srcFiles.length} source files, found ${allTypes.length} exported types`);
+    console.error(
+      `[sync-types-md] scanned ${srcFiles.length} source files, found ${allTypes.length} exported types`
+    );
   }
 
   const { changes, missingInDoc, missingInSource } = syncTypesMd("docs/types.md", allTypes, check);
 
   if (check) {
     if (changes > 0) {
-      console.error(`[sync-types-md] ${changes} section(s) out of sync with source. Run 'npm run types:sync' to update.`);
+      console.error(
+        `[sync-types-md] ${changes} section(s) out of sync with source. Run 'npm run types:sync' to update.`
+      );
     } else {
       console.log("[sync-types-md] docs/types.md is in sync with source.");
     }
@@ -270,16 +276,22 @@ function main(): void {
   const unexpectedInternal = missingInternal.filter((m) => !KNOWN_INTERNAL.has(m.split(" ")[0]));
 
   if (missingPublic.length > 0) {
-    console.error(`[sync-types-md] ${missingPublic.length} public type(s) exported from src/index.ts have no '### TypeName' section in docs/types.md:`);
+    console.error(
+      `[sync-types-md] ${missingPublic.length} public type(s) exported from src/index.ts have no '### TypeName' section in docs/types.md:`
+    );
     for (const m of missingPublic) console.error(`  - ${m}`);
     if (check) process.exitCode = 1;
   }
   if (unexpectedInternal.length > 0) {
-    console.warn(`[sync-types-md] WARNING: ${unexpectedInternal.length} internal exported type(s) have no section in docs/types.md (not required):`);
+    console.warn(
+      `[sync-types-md] WARNING: ${unexpectedInternal.length} internal exported type(s) have no section in docs/types.md (not required):`
+    );
     for (const m of unexpectedInternal) console.warn(`  - ${m}`);
   }
   if (missingInSource.length > 0) {
-    console.warn(`[sync-types-md] WARNING: ${missingInSource.length} '### ...' heading(s) in docs/types.md have no matching source type:`);
+    console.warn(
+      `[sync-types-md] WARNING: ${missingInSource.length} '### ...' heading(s) in docs/types.md have no matching source type:`
+    );
     for (const m of missingInSource) console.warn(`  - ${m}`);
   }
 

@@ -18,7 +18,9 @@ describe("condenseTool", () => {
     });
 
     it("truncates long string content", () => {
-      const result = condenseTool("toolu_1", mkBlock("x".repeat(5000)), undefined, { resultMaxLen: 200 });
+      const result = condenseTool("toolu_1", mkBlock("x".repeat(5000)), undefined, {
+        resultMaxLen: 200,
+      });
       expect(result.content.length).toBeLessThan(5000);
       expect(result.content).toContain("[truncated");
     });
@@ -28,7 +30,10 @@ describe("condenseTool", () => {
         "toolu_1",
         mkBlock([
           { type: "text", text: "### Result\nScreenshot taken" },
-          { type: "image", source: { type: "base64", media_type: "image/png", data: "x".repeat(10000) } },
+          {
+            type: "image",
+            source: { type: "base64", media_type: "image/png", data: "x".repeat(10000) },
+          },
         ])
       );
       expect(result.content).toContain("Screenshot taken");
@@ -142,12 +147,7 @@ describe("condenseTool", () => {
 
     it("stripLargeValues: processes array values — truncates strings, recurses objects", () => {
       const result = condenseTool("toolu_1", mkBlock("ok"), {
-        items: [
-          "short",
-          "x".repeat(2000),
-          { nested: "value", big: "y".repeat(2000) },
-          42,
-        ],
+        items: ["short", "x".repeat(2000), { nested: "value", big: "y".repeat(2000) }, 42],
       });
       const items = result.metadata!.items as unknown[];
       expect(items[0]).toBe("short");
@@ -223,7 +223,7 @@ describe("condenseTool", () => {
       const result = condenseTool("toolu_1", mkBlock("ok"), {
         screen: {
           type: "image",
-          source: { data: "abc123" },  // no media_type field
+          source: { data: "abc123" }, // no media_type field
         },
       });
       expect(result.metadata!.screen).toBe("[image: unknown]");

@@ -57,9 +57,7 @@ describe("checkOngoing", () => {
   });
 
   it("treats ExitPlanMode as an ending event", () => {
-    const entries = [
-      assistant([{ type: "tool_use", id: "t1", name: "ExitPlanMode", input: {} }]),
-    ];
+    const entries = [assistant([{ type: "tool_use", id: "t1", name: "ExitPlanMode", input: {} }])];
     expect(checkOngoing(entries)).toBe(false);
   });
 
@@ -94,9 +92,7 @@ describe("checkOngoing", () => {
   });
 
   it("counts non-empty thinking blocks as ongoing activity", () => {
-    const entries = [
-      assistant([{ type: "thinking", thinking: "I am reasoning..." }]),
-    ];
+    const entries = [assistant([{ type: "thinking", thinking: "I am reasoning..." }])];
     expect(checkOngoing(entries)).toBe(true);
   });
 
@@ -111,9 +107,7 @@ describe("checkOngoing", () => {
         sessionId: "s",
         message: {
           role: "user" as const,
-          content: [
-            { type: "text", text: "[Request interrupted by user]" },
-          ],
+          content: [{ type: "text", text: "[Request interrupted by user]" }],
         },
       },
     ];

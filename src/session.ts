@@ -12,19 +12,10 @@ import {
   defaultFileHistoryDir,
   type FileHistoryVersion,
 } from "./file-history.js";
-import {
-  firstObservedMetadata,
-  type FirstObservedMetadata,
-} from "./derive/first-observed.js";
-import {
-  extractFirstUserMessage,
-  type FirstUserMessage,
-} from "./derive/first-message.js";
+import { firstObservedMetadata, type FirstObservedMetadata } from "./derive/first-observed.js";
+import { extractFirstUserMessage, type FirstUserMessage } from "./derive/first-message.js";
 import { checkOngoing } from "./derive/ongoing.js";
-import {
-  analyzeCompaction,
-  type CompactionAnalysis,
-} from "./derive/compaction.js";
+import { analyzeCompaction, type CompactionAnalysis } from "./derive/compaction.js";
 import {
   extractToolCalls,
   extractToolResults,
@@ -170,8 +161,7 @@ export class Session {
    */
   async firstUserMessage(): Promise<FirstUserMessage | null> {
     if (!this._firstUser) {
-      this._firstUser = (async () =>
-        extractFirstUserMessage(await this.messages()))();
+      this._firstUser = (async () => extractFirstUserMessage(await this.messages()))();
     }
     return this._firstUser;
   }
@@ -194,8 +184,7 @@ export class Session {
    */
   async compaction(): Promise<CompactionAnalysis> {
     if (!this._compaction) {
-      this._compaction = (async () =>
-        analyzeCompaction(await this.messages()))();
+      this._compaction = (async () => analyzeCompaction(await this.messages()))();
     }
     return this._compaction;
   }
@@ -207,8 +196,7 @@ export class Session {
    */
   async toolCalls(): Promise<ToolCall[]> {
     if (!this._toolCalls) {
-      this._toolCalls = (async () =>
-        extractToolCalls(await this.messages()))();
+      this._toolCalls = (async () => extractToolCalls(await this.messages()))();
     }
     return this._toolCalls;
   }
@@ -220,8 +208,7 @@ export class Session {
    */
   async toolResults(): Promise<ToolResult[]> {
     if (!this._toolResults) {
-      this._toolResults = (async () =>
-        extractToolResults(await this.messages()))();
+      this._toolResults = (async () => extractToolResults(await this.messages()))();
     }
     return this._toolResults;
   }
@@ -245,8 +232,7 @@ export class Session {
    */
   async deferredTools(): Promise<string[]> {
     if (!this._deferredTools) {
-      this._deferredTools = (async () =>
-        extractDeferredTools(await this.messages()))();
+      this._deferredTools = (async () => extractDeferredTools(await this.messages()))();
     }
     return this._deferredTools;
   }
@@ -290,9 +276,7 @@ export class Session {
    *
    * Thin wrapper around the module-level `loadPersistedOutput`.
    */
-  async loadPersistedOutput(
-    ref: PersistedOutputRef
-  ): Promise<string | ContentBlock[]> {
+  async loadPersistedOutput(ref: PersistedOutputRef): Promise<string | ContentBlock[]> {
     return loadPersistedOutput(ref);
   }
 
@@ -336,9 +320,7 @@ export class Session {
           for (const [filePath, info] of Object.entries(backups)) {
             const key = `${filePath}@${info.version}`;
             const blobPath =
-              info.backupFileName && dir
-                ? path.join(dir, info.backupFileName)
-                : null;
+              info.backupFileName && dir ? path.join(dir, info.backupFileName) : null;
             map.set(key, {
               filePath,
               version: info.version,

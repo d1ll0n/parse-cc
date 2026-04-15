@@ -98,12 +98,7 @@ function recordKind(inv: Inventory, path: string, kind: PrimitiveKind): void {
  * `path → kind` pair. Recursion is bounded by `ctx.stopPaths`; polymorphic
  * arrays are bucketed per `ctx.arrayDiscriminators`.
  */
-export function walkValue(
-  inv: Inventory,
-  path: string,
-  value: unknown,
-  ctx: WalkContext
-): void {
+export function walkValue(inv: Inventory, path: string, value: unknown, ctx: WalkContext): void {
   const kind = kindOf(value);
   recordKind(inv, path, kind);
 
@@ -141,11 +136,7 @@ export function walkValue(
  * Top-level entries are bucketed on the `.type` field; entries without a
  * string `type` go into `entry[<no-type>]`.
  */
-export function recordEntry(
-  inv: Inventory,
-  raw: unknown,
-  ctx: WalkContext
-): void {
+export function recordEntry(inv: Inventory, raw: unknown, ctx: WalkContext): void {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return;
   const type = (raw as Record<string, unknown>).type;
   const bucket = typeof type === "string" ? `entry[${type}]` : "entry[<no-type>]";
