@@ -204,6 +204,25 @@ function syncTypesMd(docPath: string, types: ExtractedType[], check: boolean): S
   return { changes, missingInDoc, missingInSource };
 }
 
+/**
+ * Parse src/index.ts and return the set of type names that form the public API.
+ * These are the names listed inside `export type { ... }` blocks.
+ */
+function getPublicTypeNames(indexPath: string): Set<string> {
+  const source = readFileSync(indexPath, "utf8");
+  const names = new Set<string>();
+  // Match all `export type { A, B, C }` and `export { A, B }` blocks (possibly multi-line)
+  const blockRe = /export(?:\s+type)?\s*\{([^}]+)\}/g;
+  let m: RegExpExecArray | null;
+  while ((m = blockRe.exec(source)) !== null) {
+    for (const entry of m[1].split(",")) {
+      const name = entry.trim().split(/\s+/)[0]; // handle `Foo as Bar` — take original name
+      if (name) names.add(name);
+    }
+  }
+  return names;
+}
+
 function main(): void {
   const args = process.argv.slice(2);
   const check = args.includes("--check");
@@ -221,7 +240,6 @@ function main(): void {
   if (check) {
     if (changes > 0) {
       console.error(`[sync-types-md] ${changes} section(s) out of sync with source. Run 'npm run types:sync' to update.`);
-      process.exit(1);
     } else {
       console.log("[sync-types-md] docs/types.md is in sync with source.");
     }
@@ -229,13 +247,27 @@ function main(): void {
     console.log(`[sync-types-md] ${changes} section(s) updated in docs/types.md`);
   }
 
-  if (missingInDoc.length > 0) {
-    console.warn(`[sync-types-md] WARNING: ${missingInDoc.length} exported type(s) have no section in docs/types.md:`);
-    for (const m of missingInDoc) console.warn(`  - ${m}`);
+  // Split missingInDoc into public API types (must document) vs internal (warn only).
+  const publicNames = getPublicTypeNames("src/index.ts");
+  const missingPublic = missingInDoc.filter((m) => publicNames.has(m.split(" ")[0]));
+  const missingInternal = missingInDoc.filter((m) => !publicNames.has(m.split(" ")[0]));
+
+  if (missingPublic.length > 0) {
+    console.error(`[sync-types-md] ${missingPublic.length} public type(s) exported from src/index.ts have no '### TypeName' section in docs/types.md:`);
+    for (const m of missingPublic) console.error(`  - ${m}`);
+    if (check) process.exitCode = 1;
+  }
+  if (missingInternal.length > 0) {
+    console.warn(`[sync-types-md] WARNING: ${missingInternal.length} internal exported type(s) have no section in docs/types.md (not required):`);
+    for (const m of missingInternal) console.warn(`  - ${m}`);
   }
   if (missingInSource.length > 0) {
     console.warn(`[sync-types-md] WARNING: ${missingInSource.length} '### ...' heading(s) in docs/types.md have no matching source type:`);
     for (const m of missingInSource) console.warn(`  - ${m}`);
+  }
+
+  if (check && (changes > 0 || missingPublic.length > 0)) {
+    process.exit(1);
   }
 }
 

@@ -52,17 +52,23 @@ The parser recognizes every entry type observed across hundreds of real session 
 
 Unknown future types are preserved as `UnknownEntry` with their raw fields intact.
 
-## Usage
+## Install
+
+```bash
+npm install cc-logs
+```
+
+## CLI
 
 ```bash
 # Output to stdout
-npx tsx src/index.ts <session.jsonl>
+cc-logs <session.jsonl>
 
 # Output to file
-npx tsx src/index.ts <session.jsonl> -o condensed.json
+cc-logs <session.jsonl> -o condensed.json
 
 # With custom thresholds
-npx tsx src/index.ts <session.jsonl> \
+cc-logs <session.jsonl> \
   --thinking-max 500 \
   --tool-input-max 500 \
   --result-max 1000
@@ -76,13 +82,6 @@ npx tsx src/index.ts <session.jsonl> \
 | `--thinking-max <n>` | 500 | Max chars for thinking block summaries |
 | `--tool-input-max <n>` | 500 | Max chars for large tool input fields (file content, commands, prompts) |
 | `--result-max <n>` | 1000 | Max chars for tool result content |
-
-### Built version
-
-```bash
-npm run build
-node dist/index.js <session.jsonl>
-```
 
 ## What gets preserved vs dropped
 
@@ -117,6 +116,7 @@ Claude Code stores session logs at:
 npm install
 npm test              # run tests
 npm run test:watch    # watch mode
+npm run coverage      # run tests with coverage report
 npm run build         # compile typescript
 ```
 
