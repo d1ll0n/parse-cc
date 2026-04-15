@@ -25,7 +25,6 @@ import { findAllSessions, defaultProjectsDir } from "../src/discover.ts";
 import { readJsonlFile } from "../src/parse/read.ts";
 import { Session } from "../src/session.ts";
 import {
-  buildInventory,
   createDefaultContext,
   recordEntry,
   sortInventory,
@@ -171,7 +170,7 @@ async function main(): Promise<void> {
       });
     }
   }
-  process.stdout.write("\r" + " ".repeat(80) + "\r");
+  process.stdout.write(`\r${" ".repeat(80)}\r`);
 
   const sortedInv = sortInventory(inv);
   console.log(`[audit] sessions:   ${stats.sessionsScanned}`);
@@ -182,7 +181,7 @@ async function main(): Promise<void> {
 
   if (opts.updateBaseline) {
     fs.mkdirSync(path.dirname(BASELINE_PATH), { recursive: true });
-    const json = JSON.stringify(sortedInv, null, 2) + "\n";
+    const json = `${JSON.stringify(sortedInv, null, 2)}\n`;
     fs.writeFileSync(BASELINE_PATH, json);
     console.log(
       `[audit] wrote baseline: ${BASELINE_PATH} (${formatBytes(json.length)})`

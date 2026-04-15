@@ -118,7 +118,7 @@ export async function listProjects(
 
   for (const name of entries) {
     const dirPath = path.join(projectsDir, name);
-    let statResult;
+    let statResult: Awaited<ReturnType<typeof stat>>;
     try {
       statResult = await stat(dirPath);
     } catch {
