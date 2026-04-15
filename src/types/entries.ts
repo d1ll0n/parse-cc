@@ -226,6 +226,67 @@ export interface LastPromptEntry {
   timestamp?: string;
 }
 
+/**
+ * Records the display name assigned to a sub-agent for the current session.
+ * Emitted when the harness labels an agent (e.g. the user-visible title shown
+ * in the TUI) so it can be surfaced in tooling without re-deriving it.
+ */
+export interface AgentNameEntry {
+  type: "agent-name";
+  sessionId: string;
+  agentName: string;
+}
+
+/**
+ * Records a user- or harness-assigned custom title for a session. Used by the
+ * Claude Code UI to display a human-readable session name in place of the
+ * default first-prompt preview.
+ */
+export interface CustomTitleEntry {
+  type: "custom-title";
+  sessionId: string;
+  customTitle: string;
+}
+
+/**
+ * Records that a session was associated with a GitHub pull request — typically
+ * written when the user creates or links a PR from within Claude Code.
+ */
+export interface PrLinkEntry {
+  type: "pr-link";
+  sessionId: string;
+  /** Owner/name slug of the repository the PR lives in (e.g. `"acme/app"`). */
+  prRepository: string;
+  prNumber: number;
+  prUrl: string;
+  timestamp: string;
+}
+
+/**
+ * Records the worktree context for a session that was launched inside a
+ * disposable git worktree, preserving enough information to map results back
+ * to the original branch/checkout after the worktree is removed.
+ */
+export interface WorktreeStateEntry {
+  type: "worktree-state";
+  sessionId: string;
+  worktreeSession: {
+    sessionId: string;
+    /** Short name of the worktree (typically matches the directory name). */
+    worktreeName: string;
+    /** Absolute path to the worktree checkout on disk. */
+    worktreePath: string;
+    /** Branch checked out inside the worktree. */
+    worktreeBranch: string;
+    /** Branch the parent repo had checked out when the worktree was created. */
+    originalBranch: string;
+    /** Absolute path the parent repo was in when the worktree was created. */
+    originalCwd: string;
+    /** Commit SHA of the parent repo's HEAD at worktree-creation time. */
+    originalHeadCommit: string;
+  };
+}
+
 /** Fallback for entry types we don't recognize yet — preserved verbatim. */
 export interface UnknownEntry {
   type: string;
@@ -253,6 +314,10 @@ export type LogEntry =
   | PermissionModeEntry
   | ProgressEntry
   | LastPromptEntry
+  | AgentNameEntry
+  | CustomTitleEntry
+  | PrLinkEntry
+  | WorktreeStateEntry
   | UnknownEntry;
 
 // Type guards
@@ -269,3 +334,9 @@ export const isPermissionModeEntry = (e: LogEntry): e is PermissionModeEntry =>
   e.type === "permission-mode";
 export const isProgressEntry = (e: LogEntry): e is ProgressEntry => e.type === "progress";
 export const isLastPromptEntry = (e: LogEntry): e is LastPromptEntry => e.type === "last-prompt";
+export const isAgentNameEntry = (e: LogEntry): e is AgentNameEntry => e.type === "agent-name";
+export const isCustomTitleEntry = (e: LogEntry): e is CustomTitleEntry =>
+  e.type === "custom-title";
+export const isPrLinkEntry = (e: LogEntry): e is PrLinkEntry => e.type === "pr-link";
+export const isWorktreeStateEntry = (e: LogEntry): e is WorktreeStateEntry =>
+  e.type === "worktree-state";

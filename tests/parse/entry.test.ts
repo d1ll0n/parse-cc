@@ -3,6 +3,10 @@ import { parseEntry } from "../../src/parse/entry.js";
 import {
   isQueueOperationEntry,
   isPermissionModeEntry,
+  isAgentNameEntry,
+  isCustomTitleEntry,
+  isPrLinkEntry,
+  isWorktreeStateEntry,
   type LogEntry,
 } from "../../src/types/entries.js";
 import { isImageBlock, type ContentBlock } from "../../src/types/content.js";
@@ -61,6 +65,53 @@ describe("entry type guards", () => {
     expect(isPermissionModeEntry(e)).toBe(true);
     const other: LogEntry = { ...base, type: "user", message: { role: "user", content: "x" } };
     expect(isPermissionModeEntry(other)).toBe(false);
+  });
+
+  it("isAgentNameEntry narrows agent-name entries", () => {
+    const e: LogEntry = { type: "agent-name", sessionId: "s1", agentName: "code-reviewer" };
+    expect(isAgentNameEntry(e)).toBe(true);
+    const other: LogEntry = { type: "last-prompt", lastPrompt: "hi" };
+    expect(isAgentNameEntry(other)).toBe(false);
+  });
+
+  it("isCustomTitleEntry narrows custom-title entries", () => {
+    const e: LogEntry = { type: "custom-title", sessionId: "s1", customTitle: "My session" };
+    expect(isCustomTitleEntry(e)).toBe(true);
+    const other: LogEntry = { type: "agent-name", sessionId: "s1", agentName: "x" };
+    expect(isCustomTitleEntry(other)).toBe(false);
+  });
+
+  it("isPrLinkEntry narrows pr-link entries", () => {
+    const e: LogEntry = {
+      type: "pr-link",
+      sessionId: "s1",
+      prRepository: "acme/app",
+      prNumber: 1,
+      prUrl: "https://github.com/acme/app/pull/1",
+      timestamp: "2026-04-10T00:00:00Z",
+    };
+    expect(isPrLinkEntry(e)).toBe(true);
+    const other: LogEntry = { type: "custom-title", sessionId: "s1", customTitle: "x" };
+    expect(isPrLinkEntry(other)).toBe(false);
+  });
+
+  it("isWorktreeStateEntry narrows worktree-state entries", () => {
+    const e: LogEntry = {
+      type: "worktree-state",
+      sessionId: "s1",
+      worktreeSession: {
+        sessionId: "s1",
+        worktreeName: "feat-x",
+        worktreePath: "/tmp/wt",
+        worktreeBranch: "feat/x",
+        originalBranch: "main",
+        originalCwd: "/home/u/repo",
+        originalHeadCommit: "abc",
+      },
+    };
+    expect(isWorktreeStateEntry(e)).toBe(true);
+    const other: LogEntry = { type: "pr-link", sessionId: "s1", prRepository: "a/b", prNumber: 1, prUrl: "", timestamp: "" };
+    expect(isWorktreeStateEntry(other)).toBe(false);
   });
 });
 

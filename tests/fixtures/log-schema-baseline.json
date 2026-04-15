@@ -1,0 +1,2112 @@
+{
+  "entry[agent-name]": [
+    "object"
+  ],
+  "entry[agent-name].agentName": [
+    "string"
+  ],
+  "entry[agent-name].sessionId": [
+    "string"
+  ],
+  "entry[agent-name].type": [
+    "string"
+  ],
+  "entry[assistant]": [
+    "object"
+  ],
+  "entry[assistant].agentId": [
+    "string"
+  ],
+  "entry[assistant].cwd": [
+    "string"
+  ],
+  "entry[assistant].entrypoint": [
+    "string"
+  ],
+  "entry[assistant].error": [
+    "string"
+  ],
+  "entry[assistant].forkedFrom": [
+    "object"
+  ],
+  "entry[assistant].forkedFrom.messageUuid": [
+    "string"
+  ],
+  "entry[assistant].forkedFrom.sessionId": [
+    "string"
+  ],
+  "entry[assistant].gitBranch": [
+    "string"
+  ],
+  "entry[assistant].isApiErrorMessage": [
+    "boolean"
+  ],
+  "entry[assistant].isSidechain": [
+    "boolean"
+  ],
+  "entry[assistant].message": [
+    "object"
+  ],
+  "entry[assistant].message.container": [
+    "null"
+  ],
+  "entry[assistant].message.content": [
+    "array"
+  ],
+  "entry[assistant].message.content[text]": [
+    "object"
+  ],
+  "entry[assistant].message.content[text].text": [
+    "string"
+  ],
+  "entry[assistant].message.content[text].type": [
+    "string"
+  ],
+  "entry[assistant].message.content[thinking]": [
+    "object"
+  ],
+  "entry[assistant].message.content[thinking].signature": [
+    "string"
+  ],
+  "entry[assistant].message.content[thinking].thinking": [
+    "string"
+  ],
+  "entry[assistant].message.content[thinking].type": [
+    "string"
+  ],
+  "entry[assistant].message.content[tool_use]": [
+    "object"
+  ],
+  "entry[assistant].message.content[tool_use].caller": [
+    "object"
+  ],
+  "entry[assistant].message.content[tool_use].caller.type": [
+    "string"
+  ],
+  "entry[assistant].message.content[tool_use].id": [
+    "string"
+  ],
+  "entry[assistant].message.content[tool_use].input": [
+    "object"
+  ],
+  "entry[assistant].message.content[tool_use].name": [
+    "string"
+  ],
+  "entry[assistant].message.content[tool_use].type": [
+    "string"
+  ],
+  "entry[assistant].message.context_management": [
+    "null",
+    "object"
+  ],
+  "entry[assistant].message.context_management.applied_edits": [
+    "array"
+  ],
+  "entry[assistant].message.id": [
+    "string"
+  ],
+  "entry[assistant].message.model": [
+    "string"
+  ],
+  "entry[assistant].message.role": [
+    "string"
+  ],
+  "entry[assistant].message.stop_details": [
+    "null"
+  ],
+  "entry[assistant].message.stop_reason": [
+    "null",
+    "string"
+  ],
+  "entry[assistant].message.stop_sequence": [
+    "null",
+    "string"
+  ],
+  "entry[assistant].message.type": [
+    "string"
+  ],
+  "entry[assistant].message.usage": [
+    "object"
+  ],
+  "entry[assistant].message.usage.cache_creation": [
+    "object"
+  ],
+  "entry[assistant].message.usage.cache_creation.ephemeral_1h_input_tokens": [
+    "number"
+  ],
+  "entry[assistant].message.usage.cache_creation.ephemeral_5m_input_tokens": [
+    "number"
+  ],
+  "entry[assistant].message.usage.cache_creation_input_tokens": [
+    "number"
+  ],
+  "entry[assistant].message.usage.cache_read_input_tokens": [
+    "number"
+  ],
+  "entry[assistant].message.usage.inference_geo": [
+    "null",
+    "string"
+  ],
+  "entry[assistant].message.usage.input_tokens": [
+    "number"
+  ],
+  "entry[assistant].message.usage.iterations": [
+    "array",
+    "null"
+  ],
+  "entry[assistant].message.usage.iterations[]": [
+    "object"
+  ],
+  "entry[assistant].message.usage.iterations[].cache_creation": [
+    "object"
+  ],
+  "entry[assistant].message.usage.iterations[].cache_creation.ephemeral_1h_input_tokens": [
+    "number"
+  ],
+  "entry[assistant].message.usage.iterations[].cache_creation.ephemeral_5m_input_tokens": [
+    "number"
+  ],
+  "entry[assistant].message.usage.iterations[].cache_creation_input_tokens": [
+    "number"
+  ],
+  "entry[assistant].message.usage.iterations[].cache_read_input_tokens": [
+    "number"
+  ],
+  "entry[assistant].message.usage.iterations[].input_tokens": [
+    "number"
+  ],
+  "entry[assistant].message.usage.iterations[].output_tokens": [
+    "number"
+  ],
+  "entry[assistant].message.usage.iterations[].type": [
+    "string"
+  ],
+  "entry[assistant].message.usage.output_tokens": [
+    "number"
+  ],
+  "entry[assistant].message.usage.server_tool_use": [
+    "object"
+  ],
+  "entry[assistant].message.usage.server_tool_use.web_fetch_requests": [
+    "number"
+  ],
+  "entry[assistant].message.usage.server_tool_use.web_search_requests": [
+    "number"
+  ],
+  "entry[assistant].message.usage.service_tier": [
+    "null",
+    "string"
+  ],
+  "entry[assistant].message.usage.speed": [
+    "null",
+    "string"
+  ],
+  "entry[assistant].parentUuid": [
+    "string"
+  ],
+  "entry[assistant].requestId": [
+    "string"
+  ],
+  "entry[assistant].sessionId": [
+    "string"
+  ],
+  "entry[assistant].slug": [
+    "string"
+  ],
+  "entry[assistant].timestamp": [
+    "string"
+  ],
+  "entry[assistant].type": [
+    "string"
+  ],
+  "entry[assistant].userType": [
+    "string"
+  ],
+  "entry[assistant].uuid": [
+    "string"
+  ],
+  "entry[assistant].version": [
+    "string"
+  ],
+  "entry[attachment]": [
+    "object"
+  ],
+  "entry[attachment].agentId": [
+    "string"
+  ],
+  "entry[attachment].attachment": [
+    "object"
+  ],
+  "entry[attachment].attachment.addedLines": [
+    "array"
+  ],
+  "entry[attachment].attachment.addedLines[]": [
+    "string"
+  ],
+  "entry[attachment].attachment.addedNames": [
+    "array"
+  ],
+  "entry[attachment].attachment.addedNames[]": [
+    "string"
+  ],
+  "entry[attachment].attachment.allowedTools": [
+    "array"
+  ],
+  "entry[attachment].attachment.allowedTools[]": [
+    "string"
+  ],
+  "entry[attachment].attachment.command": [
+    "string"
+  ],
+  "entry[attachment].attachment.commandMode": [
+    "string"
+  ],
+  "entry[attachment].attachment.content": [
+    "array",
+    "object",
+    "string"
+  ],
+  "entry[attachment].attachment.content.content": [
+    "string"
+  ],
+  "entry[attachment].attachment.content.contentDiffersFromDisk": [
+    "boolean"
+  ],
+  "entry[attachment].attachment.content.file": [
+    "object"
+  ],
+  "entry[attachment].attachment.content.file.content": [
+    "string"
+  ],
+  "entry[attachment].attachment.content.file.filePath": [
+    "string"
+  ],
+  "entry[attachment].attachment.content.file.numLines": [
+    "number"
+  ],
+  "entry[attachment].attachment.content.file.startLine": [
+    "number"
+  ],
+  "entry[attachment].attachment.content.file.totalLines": [
+    "number"
+  ],
+  "entry[attachment].attachment.content.path": [
+    "string"
+  ],
+  "entry[attachment].attachment.content.rawContent": [
+    "string"
+  ],
+  "entry[attachment].attachment.content.type": [
+    "string"
+  ],
+  "entry[attachment].attachment.content[]": [
+    "object",
+    "string"
+  ],
+  "entry[attachment].attachment.content[].activeForm": [
+    "string"
+  ],
+  "entry[attachment].attachment.content[].blockedBy": [
+    "array"
+  ],
+  "entry[attachment].attachment.content[].blocks": [
+    "array"
+  ],
+  "entry[attachment].attachment.content[].description": [
+    "string"
+  ],
+  "entry[attachment].attachment.content[].id": [
+    "string"
+  ],
+  "entry[attachment].attachment.content[].status": [
+    "string"
+  ],
+  "entry[attachment].attachment.content[].subject": [
+    "string"
+  ],
+  "entry[attachment].attachment.displayPath": [
+    "string"
+  ],
+  "entry[attachment].attachment.durationMs": [
+    "number"
+  ],
+  "entry[attachment].attachment.exitCode": [
+    "number"
+  ],
+  "entry[attachment].attachment.filename": [
+    "string"
+  ],
+  "entry[attachment].attachment.files": [
+    "array"
+  ],
+  "entry[attachment].attachment.files[]": [
+    "object"
+  ],
+  "entry[attachment].attachment.files[].diagnostics": [
+    "array"
+  ],
+  "entry[attachment].attachment.files[].diagnostics[]": [
+    "object"
+  ],
+  "entry[attachment].attachment.files[].diagnostics[].code": [
+    "string"
+  ],
+  "entry[attachment].attachment.files[].diagnostics[].message": [
+    "string"
+  ],
+  "entry[attachment].attachment.files[].diagnostics[].range": [
+    "object"
+  ],
+  "entry[attachment].attachment.files[].diagnostics[].range.end": [
+    "object"
+  ],
+  "entry[attachment].attachment.files[].diagnostics[].range.end.character": [
+    "number"
+  ],
+  "entry[attachment].attachment.files[].diagnostics[].range.end.line": [
+    "number"
+  ],
+  "entry[attachment].attachment.files[].diagnostics[].range.start": [
+    "object"
+  ],
+  "entry[attachment].attachment.files[].diagnostics[].range.start.character": [
+    "number"
+  ],
+  "entry[attachment].attachment.files[].diagnostics[].range.start.line": [
+    "number"
+  ],
+  "entry[attachment].attachment.files[].diagnostics[].severity": [
+    "string"
+  ],
+  "entry[attachment].attachment.files[].diagnostics[].source": [
+    "string"
+  ],
+  "entry[attachment].attachment.files[].uri": [
+    "string"
+  ],
+  "entry[attachment].attachment.hookEvent": [
+    "string"
+  ],
+  "entry[attachment].attachment.hookName": [
+    "string"
+  ],
+  "entry[attachment].attachment.ideName": [
+    "string"
+  ],
+  "entry[attachment].attachment.isInitial": [
+    "boolean"
+  ],
+  "entry[attachment].attachment.isNew": [
+    "boolean"
+  ],
+  "entry[attachment].attachment.isSubAgent": [
+    "boolean"
+  ],
+  "entry[attachment].attachment.itemCount": [
+    "number"
+  ],
+  "entry[attachment].attachment.lineEnd": [
+    "number"
+  ],
+  "entry[attachment].attachment.lineStart": [
+    "number"
+  ],
+  "entry[attachment].attachment.newDate": [
+    "string"
+  ],
+  "entry[attachment].attachment.path": [
+    "string"
+  ],
+  "entry[attachment].attachment.planContent": [
+    "string"
+  ],
+  "entry[attachment].attachment.planExists": [
+    "boolean"
+  ],
+  "entry[attachment].attachment.planFilePath": [
+    "string"
+  ],
+  "entry[attachment].attachment.prompt": [
+    "string"
+  ],
+  "entry[attachment].attachment.reminderType": [
+    "string"
+  ],
+  "entry[attachment].attachment.removedNames": [
+    "array"
+  ],
+  "entry[attachment].attachment.removedNames[]": [
+    "string"
+  ],
+  "entry[attachment].attachment.skillCount": [
+    "number"
+  ],
+  "entry[attachment].attachment.skills": [
+    "array"
+  ],
+  "entry[attachment].attachment.skills[]": [
+    "object"
+  ],
+  "entry[attachment].attachment.skills[].content": [
+    "string"
+  ],
+  "entry[attachment].attachment.skills[].name": [
+    "string"
+  ],
+  "entry[attachment].attachment.skills[].path": [
+    "string"
+  ],
+  "entry[attachment].attachment.snippet": [
+    "string"
+  ],
+  "entry[attachment].attachment.stderr": [
+    "string"
+  ],
+  "entry[attachment].attachment.stdout": [
+    "string"
+  ],
+  "entry[attachment].attachment.toolUseID": [
+    "string"
+  ],
+  "entry[attachment].attachment.type": [
+    "string"
+  ],
+  "entry[attachment].cwd": [
+    "string"
+  ],
+  "entry[attachment].entrypoint": [
+    "string"
+  ],
+  "entry[attachment].forkedFrom": [
+    "object"
+  ],
+  "entry[attachment].forkedFrom.messageUuid": [
+    "string"
+  ],
+  "entry[attachment].forkedFrom.sessionId": [
+    "string"
+  ],
+  "entry[attachment].gitBranch": [
+    "string"
+  ],
+  "entry[attachment].isSidechain": [
+    "boolean"
+  ],
+  "entry[attachment].parentUuid": [
+    "null",
+    "string"
+  ],
+  "entry[attachment].sessionId": [
+    "string"
+  ],
+  "entry[attachment].slug": [
+    "string"
+  ],
+  "entry[attachment].timestamp": [
+    "string"
+  ],
+  "entry[attachment].type": [
+    "string"
+  ],
+  "entry[attachment].userType": [
+    "string"
+  ],
+  "entry[attachment].uuid": [
+    "string"
+  ],
+  "entry[attachment].version": [
+    "string"
+  ],
+  "entry[custom-title]": [
+    "object"
+  ],
+  "entry[custom-title].customTitle": [
+    "string"
+  ],
+  "entry[custom-title].sessionId": [
+    "string"
+  ],
+  "entry[custom-title].type": [
+    "string"
+  ],
+  "entry[file-history-snapshot]": [
+    "object"
+  ],
+  "entry[file-history-snapshot].isSnapshotUpdate": [
+    "boolean"
+  ],
+  "entry[file-history-snapshot].messageId": [
+    "string"
+  ],
+  "entry[file-history-snapshot].snapshot": [
+    "object"
+  ],
+  "entry[file-history-snapshot].snapshot.messageId": [
+    "string"
+  ],
+  "entry[file-history-snapshot].snapshot.timestamp": [
+    "string"
+  ],
+  "entry[file-history-snapshot].snapshot.trackedFileBackups": [
+    "object"
+  ],
+  "entry[file-history-snapshot].snapshot.trackedFileBackups{*}": [
+    "object"
+  ],
+  "entry[file-history-snapshot].snapshot.trackedFileBackups{*}.backupFileName": [
+    "null",
+    "string"
+  ],
+  "entry[file-history-snapshot].snapshot.trackedFileBackups{*}.backupTime": [
+    "string"
+  ],
+  "entry[file-history-snapshot].snapshot.trackedFileBackups{*}.version": [
+    "number"
+  ],
+  "entry[file-history-snapshot].type": [
+    "string"
+  ],
+  "entry[last-prompt]": [
+    "object"
+  ],
+  "entry[last-prompt].lastPrompt": [
+    "string"
+  ],
+  "entry[last-prompt].sessionId": [
+    "string"
+  ],
+  "entry[last-prompt].type": [
+    "string"
+  ],
+  "entry[permission-mode]": [
+    "object"
+  ],
+  "entry[permission-mode].permissionMode": [
+    "string"
+  ],
+  "entry[permission-mode].sessionId": [
+    "string"
+  ],
+  "entry[permission-mode].type": [
+    "string"
+  ],
+  "entry[pr-link]": [
+    "object"
+  ],
+  "entry[pr-link].prNumber": [
+    "number"
+  ],
+  "entry[pr-link].prRepository": [
+    "string"
+  ],
+  "entry[pr-link].prUrl": [
+    "string"
+  ],
+  "entry[pr-link].sessionId": [
+    "string"
+  ],
+  "entry[pr-link].timestamp": [
+    "string"
+  ],
+  "entry[pr-link].type": [
+    "string"
+  ],
+  "entry[progress]": [
+    "object"
+  ],
+  "entry[progress].agentId": [
+    "string"
+  ],
+  "entry[progress].cwd": [
+    "string"
+  ],
+  "entry[progress].data": [
+    "object"
+  ],
+  "entry[progress].data.agentId": [
+    "string"
+  ],
+  "entry[progress].data.command": [
+    "string"
+  ],
+  "entry[progress].data.elapsedTimeMs": [
+    "number"
+  ],
+  "entry[progress].data.elapsedTimeSeconds": [
+    "number"
+  ],
+  "entry[progress].data.fullOutput": [
+    "string"
+  ],
+  "entry[progress].data.hookEvent": [
+    "string"
+  ],
+  "entry[progress].data.hookName": [
+    "string"
+  ],
+  "entry[progress].data.message": [
+    "object"
+  ],
+  "entry[progress].data.message.message": [
+    "object"
+  ],
+  "entry[progress].data.message.message.content": [
+    "array"
+  ],
+  "entry[progress].data.message.message.content[text]": [
+    "object"
+  ],
+  "entry[progress].data.message.message.content[text].text": [
+    "string"
+  ],
+  "entry[progress].data.message.message.content[text].type": [
+    "string"
+  ],
+  "entry[progress].data.message.message.content[tool_result]": [
+    "object"
+  ],
+  "entry[progress].data.message.message.content[tool_result].content": [
+    "array",
+    "string"
+  ],
+  "entry[progress].data.message.message.content[tool_result].content[]": [
+    "object"
+  ],
+  "entry[progress].data.message.message.content[tool_result].content[].text": [
+    "string"
+  ],
+  "entry[progress].data.message.message.content[tool_result].content[].tool_name": [
+    "string"
+  ],
+  "entry[progress].data.message.message.content[tool_result].content[].type": [
+    "string"
+  ],
+  "entry[progress].data.message.message.content[tool_result].is_error": [
+    "boolean"
+  ],
+  "entry[progress].data.message.message.content[tool_result].tool_use_id": [
+    "string"
+  ],
+  "entry[progress].data.message.message.content[tool_result].type": [
+    "string"
+  ],
+  "entry[progress].data.message.message.content[tool_use]": [
+    "object"
+  ],
+  "entry[progress].data.message.message.content[tool_use].caller": [
+    "object"
+  ],
+  "entry[progress].data.message.message.content[tool_use].caller.type": [
+    "string"
+  ],
+  "entry[progress].data.message.message.content[tool_use].id": [
+    "string"
+  ],
+  "entry[progress].data.message.message.content[tool_use].input": [
+    "object"
+  ],
+  "entry[progress].data.message.message.content[tool_use].name": [
+    "string"
+  ],
+  "entry[progress].data.message.message.content[tool_use].type": [
+    "string"
+  ],
+  "entry[progress].data.message.message.context_management": [
+    "null"
+  ],
+  "entry[progress].data.message.message.id": [
+    "string"
+  ],
+  "entry[progress].data.message.message.model": [
+    "string"
+  ],
+  "entry[progress].data.message.message.role": [
+    "string"
+  ],
+  "entry[progress].data.message.message.stop_reason": [
+    "null"
+  ],
+  "entry[progress].data.message.message.stop_sequence": [
+    "null"
+  ],
+  "entry[progress].data.message.message.type": [
+    "string"
+  ],
+  "entry[progress].data.message.message.usage": [
+    "object"
+  ],
+  "entry[progress].data.message.message.usage.cache_creation": [
+    "object"
+  ],
+  "entry[progress].data.message.message.usage.cache_creation.ephemeral_1h_input_tokens": [
+    "number"
+  ],
+  "entry[progress].data.message.message.usage.cache_creation.ephemeral_5m_input_tokens": [
+    "number"
+  ],
+  "entry[progress].data.message.message.usage.cache_creation_input_tokens": [
+    "number"
+  ],
+  "entry[progress].data.message.message.usage.cache_read_input_tokens": [
+    "number"
+  ],
+  "entry[progress].data.message.message.usage.inference_geo": [
+    "string"
+  ],
+  "entry[progress].data.message.message.usage.input_tokens": [
+    "number"
+  ],
+  "entry[progress].data.message.message.usage.output_tokens": [
+    "number"
+  ],
+  "entry[progress].data.message.message.usage.service_tier": [
+    "string"
+  ],
+  "entry[progress].data.message.requestId": [
+    "string"
+  ],
+  "entry[progress].data.message.timestamp": [
+    "string"
+  ],
+  "entry[progress].data.message.toolUseResult": [
+    "string"
+  ],
+  "entry[progress].data.message.type": [
+    "string"
+  ],
+  "entry[progress].data.message.uuid": [
+    "string"
+  ],
+  "entry[progress].data.normalizedMessages": [
+    "array"
+  ],
+  "entry[progress].data.output": [
+    "string"
+  ],
+  "entry[progress].data.prompt": [
+    "string"
+  ],
+  "entry[progress].data.query": [
+    "string"
+  ],
+  "entry[progress].data.resultCount": [
+    "number"
+  ],
+  "entry[progress].data.serverName": [
+    "string"
+  ],
+  "entry[progress].data.status": [
+    "string"
+  ],
+  "entry[progress].data.taskDescription": [
+    "string"
+  ],
+  "entry[progress].data.taskId": [
+    "string"
+  ],
+  "entry[progress].data.taskType": [
+    "string"
+  ],
+  "entry[progress].data.timeoutMs": [
+    "number"
+  ],
+  "entry[progress].data.toolName": [
+    "string"
+  ],
+  "entry[progress].data.totalBytes": [
+    "number"
+  ],
+  "entry[progress].data.totalLines": [
+    "number"
+  ],
+  "entry[progress].data.type": [
+    "string"
+  ],
+  "entry[progress].entrypoint": [
+    "string"
+  ],
+  "entry[progress].gitBranch": [
+    "string"
+  ],
+  "entry[progress].isSidechain": [
+    "boolean"
+  ],
+  "entry[progress].parentToolUseID": [
+    "string"
+  ],
+  "entry[progress].parentUuid": [
+    "string"
+  ],
+  "entry[progress].sessionId": [
+    "string"
+  ],
+  "entry[progress].slug": [
+    "string"
+  ],
+  "entry[progress].timestamp": [
+    "string"
+  ],
+  "entry[progress].toolUseID": [
+    "string"
+  ],
+  "entry[progress].type": [
+    "string"
+  ],
+  "entry[progress].userType": [
+    "string"
+  ],
+  "entry[progress].uuid": [
+    "string"
+  ],
+  "entry[progress].version": [
+    "string"
+  ],
+  "entry[queue-operation]": [
+    "object"
+  ],
+  "entry[queue-operation].content": [
+    "string"
+  ],
+  "entry[queue-operation].operation": [
+    "string"
+  ],
+  "entry[queue-operation].sessionId": [
+    "string"
+  ],
+  "entry[queue-operation].timestamp": [
+    "string"
+  ],
+  "entry[queue-operation].type": [
+    "string"
+  ],
+  "entry[system]": [
+    "object"
+  ],
+  "entry[system].agentId": [
+    "string"
+  ],
+  "entry[system].cause": [
+    "object"
+  ],
+  "entry[system].cause.code": [
+    "string"
+  ],
+  "entry[system].cause.errno": [
+    "number"
+  ],
+  "entry[system].cause.path": [
+    "string"
+  ],
+  "entry[system].compactMetadata": [
+    "object"
+  ],
+  "entry[system].compactMetadata.durationMs": [
+    "number"
+  ],
+  "entry[system].compactMetadata.postTokens": [
+    "number"
+  ],
+  "entry[system].compactMetadata.preCompactDiscoveredTools": [
+    "array"
+  ],
+  "entry[system].compactMetadata.preCompactDiscoveredTools[]": [
+    "string"
+  ],
+  "entry[system].compactMetadata.preTokens": [
+    "number"
+  ],
+  "entry[system].compactMetadata.trigger": [
+    "string"
+  ],
+  "entry[system].content": [
+    "string"
+  ],
+  "entry[system].cwd": [
+    "string"
+  ],
+  "entry[system].durationMs": [
+    "number"
+  ],
+  "entry[system].entrypoint": [
+    "string"
+  ],
+  "entry[system].error": [
+    "object"
+  ],
+  "entry[system].error.cause": [
+    "object"
+  ],
+  "entry[system].error.cause.code": [
+    "string"
+  ],
+  "entry[system].error.cause.errno": [
+    "number"
+  ],
+  "entry[system].error.cause.path": [
+    "string"
+  ],
+  "entry[system].error.error": [
+    "object"
+  ],
+  "entry[system].error.error.error": [
+    "object"
+  ],
+  "entry[system].error.error.error.message": [
+    "string"
+  ],
+  "entry[system].error.error.error.type": [
+    "string"
+  ],
+  "entry[system].error.error.request_id": [
+    "string"
+  ],
+  "entry[system].error.error.type": [
+    "string"
+  ],
+  "entry[system].error.headers": [
+    "object"
+  ],
+  "entry[system].error.headers.anthropic-organization-id": [
+    "string"
+  ],
+  "entry[system].error.headers.cf-cache-status": [
+    "string"
+  ],
+  "entry[system].error.headers.cf-ray": [
+    "string"
+  ],
+  "entry[system].error.headers.connection": [
+    "string"
+  ],
+  "entry[system].error.headers.content-encoding": [
+    "string"
+  ],
+  "entry[system].error.headers.content-security-policy": [
+    "string"
+  ],
+  "entry[system].error.headers.content-type": [
+    "string"
+  ],
+  "entry[system].error.headers.date": [
+    "string"
+  ],
+  "entry[system].error.headers.request-id": [
+    "string"
+  ],
+  "entry[system].error.headers.server": [
+    "string"
+  ],
+  "entry[system].error.headers.server-timing": [
+    "string"
+  ],
+  "entry[system].error.headers.strict-transport-security": [
+    "string"
+  ],
+  "entry[system].error.headers.transfer-encoding": [
+    "string"
+  ],
+  "entry[system].error.headers.vary": [
+    "string"
+  ],
+  "entry[system].error.headers.x-envoy-upstream-service-time": [
+    "string"
+  ],
+  "entry[system].error.headers.x-robots-tag": [
+    "string"
+  ],
+  "entry[system].error.headers.x-should-retry": [
+    "string"
+  ],
+  "entry[system].error.requestID": [
+    "string"
+  ],
+  "entry[system].error.status": [
+    "number"
+  ],
+  "entry[system].forkedFrom": [
+    "object"
+  ],
+  "entry[system].forkedFrom.messageUuid": [
+    "string"
+  ],
+  "entry[system].forkedFrom.sessionId": [
+    "string"
+  ],
+  "entry[system].gitBranch": [
+    "string"
+  ],
+  "entry[system].hasOutput": [
+    "boolean"
+  ],
+  "entry[system].hookCount": [
+    "number"
+  ],
+  "entry[system].hookErrors": [
+    "array"
+  ],
+  "entry[system].hookErrors[]": [
+    "string"
+  ],
+  "entry[system].hookInfos": [
+    "array"
+  ],
+  "entry[system].hookInfos[]": [
+    "object"
+  ],
+  "entry[system].hookInfos[].command": [
+    "string"
+  ],
+  "entry[system].hookInfos[].durationMs": [
+    "number"
+  ],
+  "entry[system].isMeta": [
+    "boolean"
+  ],
+  "entry[system].isSidechain": [
+    "boolean"
+  ],
+  "entry[system].level": [
+    "string"
+  ],
+  "entry[system].logicalParentUuid": [
+    "string"
+  ],
+  "entry[system].maxRetries": [
+    "number"
+  ],
+  "entry[system].messageCount": [
+    "number"
+  ],
+  "entry[system].parentUuid": [
+    "null",
+    "string"
+  ],
+  "entry[system].preventedContinuation": [
+    "boolean"
+  ],
+  "entry[system].retryAttempt": [
+    "number"
+  ],
+  "entry[system].retryInMs": [
+    "number"
+  ],
+  "entry[system].sessionId": [
+    "string"
+  ],
+  "entry[system].slug": [
+    "string"
+  ],
+  "entry[system].stopReason": [
+    "string"
+  ],
+  "entry[system].subtype": [
+    "string"
+  ],
+  "entry[system].timestamp": [
+    "string"
+  ],
+  "entry[system].toolUseID": [
+    "string"
+  ],
+  "entry[system].type": [
+    "string"
+  ],
+  "entry[system].userType": [
+    "string"
+  ],
+  "entry[system].uuid": [
+    "string"
+  ],
+  "entry[system].version": [
+    "string"
+  ],
+  "entry[user]": [
+    "object"
+  ],
+  "entry[user].agentId": [
+    "string"
+  ],
+  "entry[user].cwd": [
+    "string"
+  ],
+  "entry[user].entrypoint": [
+    "string"
+  ],
+  "entry[user].forkedFrom": [
+    "object"
+  ],
+  "entry[user].forkedFrom.messageUuid": [
+    "string"
+  ],
+  "entry[user].forkedFrom.sessionId": [
+    "string"
+  ],
+  "entry[user].gitBranch": [
+    "string"
+  ],
+  "entry[user].isCompactSummary": [
+    "boolean"
+  ],
+  "entry[user].isMeta": [
+    "boolean"
+  ],
+  "entry[user].isSidechain": [
+    "boolean"
+  ],
+  "entry[user].isVisibleInTranscriptOnly": [
+    "boolean"
+  ],
+  "entry[user].message": [
+    "object"
+  ],
+  "entry[user].message.content": [
+    "array",
+    "string"
+  ],
+  "entry[user].message.content[document]": [
+    "object"
+  ],
+  "entry[user].message.content[document].source": [
+    "object"
+  ],
+  "entry[user].message.content[document].source.data": [
+    "string"
+  ],
+  "entry[user].message.content[document].source.media_type": [
+    "string"
+  ],
+  "entry[user].message.content[document].source.type": [
+    "string"
+  ],
+  "entry[user].message.content[document].type": [
+    "string"
+  ],
+  "entry[user].message.content[image]": [
+    "object"
+  ],
+  "entry[user].message.content[image].source": [
+    "object"
+  ],
+  "entry[user].message.content[image].source.data": [
+    "string"
+  ],
+  "entry[user].message.content[image].source.media_type": [
+    "string"
+  ],
+  "entry[user].message.content[image].source.type": [
+    "string"
+  ],
+  "entry[user].message.content[image].type": [
+    "string"
+  ],
+  "entry[user].message.content[text]": [
+    "object"
+  ],
+  "entry[user].message.content[text].text": [
+    "string"
+  ],
+  "entry[user].message.content[text].type": [
+    "string"
+  ],
+  "entry[user].message.content[tool_result]": [
+    "object"
+  ],
+  "entry[user].message.content[tool_result].content": [
+    "array",
+    "string"
+  ],
+  "entry[user].message.content[tool_result].content[image]": [
+    "object"
+  ],
+  "entry[user].message.content[tool_result].content[image].source": [
+    "object"
+  ],
+  "entry[user].message.content[tool_result].content[image].source.data": [
+    "string"
+  ],
+  "entry[user].message.content[tool_result].content[image].source.media_type": [
+    "string"
+  ],
+  "entry[user].message.content[tool_result].content[image].source.type": [
+    "string"
+  ],
+  "entry[user].message.content[tool_result].content[image].type": [
+    "string"
+  ],
+  "entry[user].message.content[tool_result].content[text]": [
+    "object"
+  ],
+  "entry[user].message.content[tool_result].content[text].text": [
+    "string"
+  ],
+  "entry[user].message.content[tool_result].content[text].type": [
+    "string"
+  ],
+  "entry[user].message.content[tool_result].content[tool_reference]": [
+    "object"
+  ],
+  "entry[user].message.content[tool_result].content[tool_reference].tool_name": [
+    "string"
+  ],
+  "entry[user].message.content[tool_result].content[tool_reference].type": [
+    "string"
+  ],
+  "entry[user].message.content[tool_result].is_error": [
+    "boolean"
+  ],
+  "entry[user].message.content[tool_result].tool_use_id": [
+    "string"
+  ],
+  "entry[user].message.content[tool_result].type": [
+    "string"
+  ],
+  "entry[user].message.role": [
+    "string"
+  ],
+  "entry[user].origin": [
+    "object"
+  ],
+  "entry[user].origin.kind": [
+    "string"
+  ],
+  "entry[user].parentUuid": [
+    "null",
+    "string"
+  ],
+  "entry[user].permissionMode": [
+    "string"
+  ],
+  "entry[user].planContent": [
+    "string"
+  ],
+  "entry[user].promptId": [
+    "string"
+  ],
+  "entry[user].sessionId": [
+    "string"
+  ],
+  "entry[user].slug": [
+    "string"
+  ],
+  "entry[user].sourceToolAssistantUUID": [
+    "string"
+  ],
+  "entry[user].sourceToolUseID": [
+    "string"
+  ],
+  "entry[user].timestamp": [
+    "string"
+  ],
+  "entry[user].toolUseResult": [
+    "array",
+    "object",
+    "string"
+  ],
+  "entry[user].toolUseResult.agentId": [
+    "string"
+  ],
+  "entry[user].toolUseResult.agentType": [
+    "string"
+  ],
+  "entry[user].toolUseResult.allowedTools": [
+    "array"
+  ],
+  "entry[user].toolUseResult.allowedTools[]": [
+    "string"
+  ],
+  "entry[user].toolUseResult.annotations": [
+    "object"
+  ],
+  "entry[user].toolUseResult.annotations.Commit planning docs to git?": [
+    "object"
+  ],
+  "entry[user].toolUseResult.annotations.Commit planning docs to git?.notes": [
+    "string"
+  ],
+  "entry[user].toolUseResult.annotations.Do you want BorrowerDailyStats as part of this change, or just ProtocolDailyStats + MarketDailyStats improvements?": [
+    "object"
+  ],
+  "entry[user].toolUseResult.annotations.Do you want BorrowerDailyStats as part of this change, or just ProtocolDailyStats + MarketDailyStats improvements?.notes": [
+    "string"
+  ],
+  "entry[user].toolUseResult.annotations.For the 'actual docs', what format do you want?": [
+    "object"
+  ],
+  "entry[user].toolUseResult.annotations.For the 'actual docs', what format do you want?.notes": [
+    "string"
+  ],
+  "entry[user].toolUseResult.annotations.For the dev dependency cleanup — what's the desired end state for linting/formatting?": [
+    "object"
+  ],
+  "entry[user].toolUseResult.annotations.For the dev dependency cleanup — what's the desired end state for linting/formatting?.notes": [
+    "string"
+  ],
+  "entry[user].toolUseResult.annotations.How should images be stored? The app is fully client-side, and images are too large for localStorage.": [
+    "object"
+  ],
+  "entry[user].toolUseResult.annotations.How should images be stored? The app is fully client-side, and images are too large for localStorage..notes": [
+    "string"
+  ],
+  "entry[user].toolUseResult.annotations.No CONTEXT.md found for Phase 1. Plans will use research and requirements only — your design preferences won't be included. Continue or capture context first?": [
+    "object"
+  ],
+  "entry[user].toolUseResult.annotations.No CONTEXT.md found for Phase 1. Plans will use research and requirements only — your design preferences won't be included. Continue or capture context first?.notes": [
+    "string"
+  ],
+  "entry[user].toolUseResult.annotations.Research before planning Phase 1: Toolchain Migration?": [
+    "object"
+  ],
+  "entry[user].toolUseResult.annotations.Research before planning Phase 1: Toolchain Migration?.notes": [
+    "string"
+  ],
+  "entry[user].toolUseResult.annotations.Should I clean up dead code and empty files as I go (e.g., empty function_memory_analysis.ts, debug console.log in struct_type.ts, test code in readers/index.ts), or just document what exists?": [
+    "object"
+  ],
+  "entry[user].toolUseResult.annotations.Should I clean up dead code and empty files as I go (e.g., empty function_memory_analysis.ts, debug console.log in struct_type.ts, test code in readers/index.ts), or just document what exists?.notes": [
+    "string"
+  ],
+  "entry[user].toolUseResult.annotations.What key metrics should these snapshots track? Select all that apply.": [
+    "object"
+  ],
+  "entry[user].toolUseResult.annotations.What key metrics should these snapshots track? Select all that apply..notes": [
+    "string"
+  ],
+  "entry[user].toolUseResult.annotations.Which CI features for v1?": [
+    "object"
+  ],
+  "entry[user].toolUseResult.annotations.Which CI features for v1?.notes": [
+    "string"
+  ],
+  "entry[user].toolUseResult.annotations.Which documentation for v1?": [
+    "object"
+  ],
+  "entry[user].toolUseResult.annotations.Which documentation for v1?.notes": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers": [
+    "object"
+  ],
+  "entry[user].toolUseResult.answers.Commit planning docs to git?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Do these 22 requirements capture the scope correctly?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Do you want BorrowerDailyStats as part of this change, or just ProtocolDailyStats + MarketDailyStats improvements?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Does the heuristic resolution approach (same as all other languages in the project) work for you, or would you like to explore a more precise strategy for Solidity?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Does this roadmap structure work for you?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.During a game session, should the player see one image for the full duration, or cycle through multiple saved images?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.For ProtocolDailyStats, we need a way to identify the single protocol instance. Should I use a hardcoded singleton ID (e.g. \"protocol\") or derive it from the ArchController address?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.For lender daily stats, should we track per-lender interest earned that day?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.For protocol-level stats, should we track counts like number of active markets, number of delinquent markets, number of active lenders?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.For the 'actual docs', what format do you want?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.For the dev dependency cleanup — what's the desired end state for linting/formatting?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Given the size of the codebase (~100+ files), which area should we tackle first?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.How do you want to work?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.How finely should scope be sliced into phases?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.How many of the 5 domme moods should the MVP support?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.How should images be stored? The app is fully client-side, and images are too large for localStorage.": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.How should images/media work in the MVP? This is the content that gets censored/revealed during gameplay.": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.How should we handle the backend for MVP?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.I see the updated MarketDailyStats with daily deltas (raw), cumulative all-time (raw + USD), and state snapshots. For the new protocol/borrower/lender daily stats, which metric categories should we include?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.I think I have a clear picture. Here's what I'm seeing:\n\n**Repo cleanup:** Strip Hardhat/TypeChain/TS deps, simplify linting to minimal tooling that preserves your current style rules (printWidth 100, 2-space tabs, single quotes, etc.) while working in VS Code/Cursor.\n\n**CI:** GitHub Actions — run forge test, forge coverage report, lint check.\n\n**Docs & process:** CLAUDE.md, updated README, verify/update existing docs, add contributing guidelines or similar process docs to make the repo AI-agent friendly for reviews/tests/doc maintenance.\n\nReady to create PROJECT.md?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.More questions about formatting divergence, or move to next? (No other areas were selected — we can explore more gray areas or create the context now.)": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.No CONTEXT.md found for Phase 1. Plans will use research and requirements only — your design preferences won't be included. Continue or capture context first?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Ready to create CONTEXT.md with these decisions?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Research before planning Phase 1: Toolchain Migration?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Research before planning each phase? (adds tokens/time)": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Research the domain ecosystem before defining requirements? (CI best practices for Foundry, modern Solidity linting, AI-agent repo patterns)": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Run plans in parallel?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Should I clean up dead code and empty files as I go (e.g., empty function_memory_analysis.ts, debug console.log in struct_type.ts, test code in readers/index.ts), or just document what exists?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Should covered body parts (covered butt, covered breasts, covered belly) also count as forbidden/arousing zones, or only exposed variants?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Should the AI domme (LLM integration) be in the MVP, or should we use templated/scripted dialogue first?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Should the analytics app keep the /analytics URL prefix, or should the root / be the protocol overview directly (since it's now its own standalone app)?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Should the borrower and lender daily snapshots aggregate across all markets (one row per borrower/lender per day), or be per-market (one row per borrower-market / lender-market per day)?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Should the tables include client-side sorting (click column headers to sort)?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Should the tables include filters (e.g. by status, asset, market type)?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Should we initialize a git repo for the new analytics-app?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.The codegen module has ~59 TS files (~8,500 lines) — much larger than readers (~7 files, ~1,800 lines). How should we scope this?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.The existing MarketDailyStats entity is NOT in uncrashable-config.template.yaml — it uses a manual wrapper. Should the new entities (ProtocolDailyStats, BorrowerDailyStats) follow the same manual pattern, or should they be added to the uncrashable config?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Verify plans will achieve their goals? (adds tokens/time)": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Verify work satisfies requirements after each phase? (adds tokens/time)": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.What CI platform should the test pipeline run on?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.What does 'zero-diff' mean for this migration?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.What key metrics should these snapshots track? Select all that apply.": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.What level of test coverage tooling do you want?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.What server-side storage approach do you want for images?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.What session phases should the MVP include? The full spec has 7 phases.": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.What should these listing pages show? A full-featured table with all markets/borrowers and summary stats at the top, or something simpler?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.What tech stack do you want to build with?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.When forge fmt can't exactly match prettier in specific spots (assembly blocks, complex expressions), how should we handle it?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Where should the admin panel live in the app?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Which AI models for planning agents?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Which CI features for v1?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Which areas do you want to discuss for Toolchain Migration?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Which challenge mechanics should be in the first playable build? Pick 2-3 to start with.": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Which documentation for v1?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.answers.Which toolchain cleanup for v1?": [
+    "string"
+  ],
+  "entry[user].toolUseResult.appliedLimit": [
+    "number"
+  ],
+  "entry[user].toolUseResult.assistantAutoBackgrounded": [
+    "boolean"
+  ],
+  "entry[user].toolUseResult.backgroundTaskId": [
+    "string"
+  ],
+  "entry[user].toolUseResult.backgroundedByUser": [
+    "boolean"
+  ],
+  "entry[user].toolUseResult.bytes": [
+    "number"
+  ],
+  "entry[user].toolUseResult.canReadOutputFile": [
+    "boolean"
+  ],
+  "entry[user].toolUseResult.clampedDelaySeconds": [
+    "number"
+  ],
+  "entry[user].toolUseResult.code": [
+    "number"
+  ],
+  "entry[user].toolUseResult.codeText": [
+    "string"
+  ],
+  "entry[user].toolUseResult.command": [
+    "string"
+  ],
+  "entry[user].toolUseResult.commandName": [
+    "string"
+  ],
+  "entry[user].toolUseResult.content": [
+    "array",
+    "string"
+  ],
+  "entry[user].toolUseResult.content[]": [
+    "object"
+  ],
+  "entry[user].toolUseResult.content[].text": [
+    "string"
+  ],
+  "entry[user].toolUseResult.content[].type": [
+    "string"
+  ],
+  "entry[user].toolUseResult.dangerouslyDisableSandbox": [
+    "boolean"
+  ],
+  "entry[user].toolUseResult.description": [
+    "string"
+  ],
+  "entry[user].toolUseResult.durationMs": [
+    "number"
+  ],
+  "entry[user].toolUseResult.durationSeconds": [
+    "number"
+  ],
+  "entry[user].toolUseResult.error": [
+    "string"
+  ],
+  "entry[user].toolUseResult.file": [
+    "object"
+  ],
+  "entry[user].toolUseResult.file.base64": [
+    "string"
+  ],
+  "entry[user].toolUseResult.file.content": [
+    "string"
+  ],
+  "entry[user].toolUseResult.file.count": [
+    "number"
+  ],
+  "entry[user].toolUseResult.file.dimensions": [
+    "object"
+  ],
+  "entry[user].toolUseResult.file.dimensions.displayHeight": [
+    "number"
+  ],
+  "entry[user].toolUseResult.file.dimensions.displayWidth": [
+    "number"
+  ],
+  "entry[user].toolUseResult.file.dimensions.originalHeight": [
+    "number"
+  ],
+  "entry[user].toolUseResult.file.dimensions.originalWidth": [
+    "number"
+  ],
+  "entry[user].toolUseResult.file.filePath": [
+    "string"
+  ],
+  "entry[user].toolUseResult.file.numLines": [
+    "number"
+  ],
+  "entry[user].toolUseResult.file.originalSize": [
+    "number"
+  ],
+  "entry[user].toolUseResult.file.outputDir": [
+    "string"
+  ],
+  "entry[user].toolUseResult.file.startLine": [
+    "number"
+  ],
+  "entry[user].toolUseResult.file.totalLines": [
+    "number"
+  ],
+  "entry[user].toolUseResult.file.type": [
+    "string"
+  ],
+  "entry[user].toolUseResult.filePath": [
+    "string"
+  ],
+  "entry[user].toolUseResult.filenames": [
+    "array"
+  ],
+  "entry[user].toolUseResult.filenames[]": [
+    "string"
+  ],
+  "entry[user].toolUseResult.interrupted": [
+    "boolean"
+  ],
+  "entry[user].toolUseResult.isAgent": [
+    "boolean"
+  ],
+  "entry[user].toolUseResult.isAsync": [
+    "boolean"
+  ],
+  "entry[user].toolUseResult.isImage": [
+    "boolean"
+  ],
+  "entry[user].toolUseResult.matches": [
+    "array"
+  ],
+  "entry[user].toolUseResult.matches[]": [
+    "string"
+  ],
+  "entry[user].toolUseResult.message": [
+    "string"
+  ],
+  "entry[user].toolUseResult.mode": [
+    "string"
+  ],
+  "entry[user].toolUseResult.newString": [
+    "string"
+  ],
+  "entry[user].toolUseResult.noOutputExpected": [
+    "boolean"
+  ],
+  "entry[user].toolUseResult.numFiles": [
+    "number"
+  ],
+  "entry[user].toolUseResult.numLines": [
+    "number"
+  ],
+  "entry[user].toolUseResult.numMatches": [
+    "number"
+  ],
+  "entry[user].toolUseResult.oldString": [
+    "string"
+  ],
+  "entry[user].toolUseResult.originalFile": [
+    "null",
+    "string"
+  ],
+  "entry[user].toolUseResult.outputFile": [
+    "string"
+  ],
+  "entry[user].toolUseResult.persistedOutputPath": [
+    "string"
+  ],
+  "entry[user].toolUseResult.persistedOutputSize": [
+    "number"
+  ],
+  "entry[user].toolUseResult.plan": [
+    "null",
+    "string"
+  ],
+  "entry[user].toolUseResult.prompt": [
+    "string"
+  ],
+  "entry[user].toolUseResult.query": [
+    "string"
+  ],
+  "entry[user].toolUseResult.questions": [
+    "array"
+  ],
+  "entry[user].toolUseResult.questions[]": [
+    "object"
+  ],
+  "entry[user].toolUseResult.questions[].header": [
+    "string"
+  ],
+  "entry[user].toolUseResult.questions[].multiSelect": [
+    "boolean"
+  ],
+  "entry[user].toolUseResult.questions[].options": [
+    "array"
+  ],
+  "entry[user].toolUseResult.questions[].options[]": [
+    "object"
+  ],
+  "entry[user].toolUseResult.questions[].options[].description": [
+    "string"
+  ],
+  "entry[user].toolUseResult.questions[].options[].label": [
+    "string"
+  ],
+  "entry[user].toolUseResult.questions[].question": [
+    "string"
+  ],
+  "entry[user].toolUseResult.replaceAll": [
+    "boolean"
+  ],
+  "entry[user].toolUseResult.result": [
+    "string"
+  ],
+  "entry[user].toolUseResult.results": [
+    "array"
+  ],
+  "entry[user].toolUseResult.results[]": [
+    "object",
+    "string"
+  ],
+  "entry[user].toolUseResult.results[].content": [
+    "array"
+  ],
+  "entry[user].toolUseResult.results[].content[]": [
+    "object"
+  ],
+  "entry[user].toolUseResult.results[].content[].title": [
+    "string"
+  ],
+  "entry[user].toolUseResult.results[].content[].url": [
+    "string"
+  ],
+  "entry[user].toolUseResult.results[].tool_use_id": [
+    "string"
+  ],
+  "entry[user].toolUseResult.retrieval_status": [
+    "string"
+  ],
+  "entry[user].toolUseResult.returnCodeInterpretation": [
+    "string"
+  ],
+  "entry[user].toolUseResult.scheduledFor": [
+    "number"
+  ],
+  "entry[user].toolUseResult.status": [
+    "string"
+  ],
+  "entry[user].toolUseResult.statusChange": [
+    "object"
+  ],
+  "entry[user].toolUseResult.statusChange.from": [
+    "string"
+  ],
+  "entry[user].toolUseResult.statusChange.to": [
+    "string"
+  ],
+  "entry[user].toolUseResult.stderr": [
+    "string"
+  ],
+  "entry[user].toolUseResult.stdout": [
+    "string"
+  ],
+  "entry[user].toolUseResult.structuredPatch": [
+    "array"
+  ],
+  "entry[user].toolUseResult.structuredPatch[]": [
+    "object"
+  ],
+  "entry[user].toolUseResult.structuredPatch[].lines": [
+    "array"
+  ],
+  "entry[user].toolUseResult.structuredPatch[].lines[]": [
+    "string"
+  ],
+  "entry[user].toolUseResult.structuredPatch[].newLines": [
+    "number"
+  ],
+  "entry[user].toolUseResult.structuredPatch[].newStart": [
+    "number"
+  ],
+  "entry[user].toolUseResult.structuredPatch[].oldLines": [
+    "number"
+  ],
+  "entry[user].toolUseResult.structuredPatch[].oldStart": [
+    "number"
+  ],
+  "entry[user].toolUseResult.success": [
+    "boolean"
+  ],
+  "entry[user].toolUseResult.task": [
+    "null",
+    "object"
+  ],
+  "entry[user].toolUseResult.task.description": [
+    "string"
+  ],
+  "entry[user].toolUseResult.task.exitCode": [
+    "null"
+  ],
+  "entry[user].toolUseResult.task.id": [
+    "string"
+  ],
+  "entry[user].toolUseResult.task.output": [
+    "string"
+  ],
+  "entry[user].toolUseResult.task.status": [
+    "string"
+  ],
+  "entry[user].toolUseResult.task.subject": [
+    "string"
+  ],
+  "entry[user].toolUseResult.task.task_id": [
+    "string"
+  ],
+  "entry[user].toolUseResult.task.task_type": [
+    "string"
+  ],
+  "entry[user].toolUseResult.taskId": [
+    "string"
+  ],
+  "entry[user].toolUseResult.task_id": [
+    "string"
+  ],
+  "entry[user].toolUseResult.task_type": [
+    "string"
+  ],
+  "entry[user].toolUseResult.tasks": [
+    "array"
+  ],
+  "entry[user].toolUseResult.tasks[]": [
+    "object"
+  ],
+  "entry[user].toolUseResult.tasks[].blockedBy": [
+    "array"
+  ],
+  "entry[user].toolUseResult.tasks[].id": [
+    "string"
+  ],
+  "entry[user].toolUseResult.tasks[].status": [
+    "string"
+  ],
+  "entry[user].toolUseResult.tasks[].subject": [
+    "string"
+  ],
+  "entry[user].toolUseResult.tokenSaverOutput": [
+    "string"
+  ],
+  "entry[user].toolUseResult.toolStats": [
+    "object"
+  ],
+  "entry[user].toolUseResult.toolStats.bashCount": [
+    "number"
+  ],
+  "entry[user].toolUseResult.toolStats.editFileCount": [
+    "number"
+  ],
+  "entry[user].toolUseResult.toolStats.linesAdded": [
+    "number"
+  ],
+  "entry[user].toolUseResult.toolStats.linesRemoved": [
+    "number"
+  ],
+  "entry[user].toolUseResult.toolStats.otherToolCount": [
+    "number"
+  ],
+  "entry[user].toolUseResult.toolStats.readCount": [
+    "number"
+  ],
+  "entry[user].toolUseResult.toolStats.searchCount": [
+    "number"
+  ],
+  "entry[user].toolUseResult.totalDurationMs": [
+    "number"
+  ],
+  "entry[user].toolUseResult.totalTokens": [
+    "number"
+  ],
+  "entry[user].toolUseResult.totalToolUseCount": [
+    "number"
+  ],
+  "entry[user].toolUseResult.total_deferred_tools": [
+    "number"
+  ],
+  "entry[user].toolUseResult.truncated": [
+    "boolean"
+  ],
+  "entry[user].toolUseResult.type": [
+    "string"
+  ],
+  "entry[user].toolUseResult.updatedFields": [
+    "array"
+  ],
+  "entry[user].toolUseResult.updatedFields[]": [
+    "string"
+  ],
+  "entry[user].toolUseResult.url": [
+    "string"
+  ],
+  "entry[user].toolUseResult.usage": [
+    "object"
+  ],
+  "entry[user].toolUseResult.usage.cache_creation": [
+    "object"
+  ],
+  "entry[user].toolUseResult.usage.cache_creation.ephemeral_1h_input_tokens": [
+    "number"
+  ],
+  "entry[user].toolUseResult.usage.cache_creation.ephemeral_5m_input_tokens": [
+    "number"
+  ],
+  "entry[user].toolUseResult.usage.cache_creation_input_tokens": [
+    "number"
+  ],
+  "entry[user].toolUseResult.usage.cache_read_input_tokens": [
+    "number"
+  ],
+  "entry[user].toolUseResult.usage.inference_geo": [
+    "null",
+    "string"
+  ],
+  "entry[user].toolUseResult.usage.input_tokens": [
+    "number"
+  ],
+  "entry[user].toolUseResult.usage.iterations": [
+    "array",
+    "null"
+  ],
+  "entry[user].toolUseResult.usage.iterations[]": [
+    "object"
+  ],
+  "entry[user].toolUseResult.usage.iterations[].cache_creation": [
+    "object"
+  ],
+  "entry[user].toolUseResult.usage.iterations[].cache_creation.ephemeral_1h_input_tokens": [
+    "number"
+  ],
+  "entry[user].toolUseResult.usage.iterations[].cache_creation.ephemeral_5m_input_tokens": [
+    "number"
+  ],
+  "entry[user].toolUseResult.usage.iterations[].cache_creation_input_tokens": [
+    "number"
+  ],
+  "entry[user].toolUseResult.usage.iterations[].cache_read_input_tokens": [
+    "number"
+  ],
+  "entry[user].toolUseResult.usage.iterations[].input_tokens": [
+    "number"
+  ],
+  "entry[user].toolUseResult.usage.iterations[].output_tokens": [
+    "number"
+  ],
+  "entry[user].toolUseResult.usage.iterations[].type": [
+    "string"
+  ],
+  "entry[user].toolUseResult.usage.output_tokens": [
+    "number"
+  ],
+  "entry[user].toolUseResult.usage.server_tool_use": [
+    "object"
+  ],
+  "entry[user].toolUseResult.usage.server_tool_use.web_fetch_requests": [
+    "number"
+  ],
+  "entry[user].toolUseResult.usage.server_tool_use.web_search_requests": [
+    "number"
+  ],
+  "entry[user].toolUseResult.usage.service_tier": [
+    "null",
+    "string"
+  ],
+  "entry[user].toolUseResult.usage.speed": [
+    "null",
+    "string"
+  ],
+  "entry[user].toolUseResult.userModified": [
+    "boolean"
+  ],
+  "entry[user].toolUseResult.verificationNudgeNeeded": [
+    "boolean"
+  ],
+  "entry[user].toolUseResult.wasClamped": [
+    "boolean"
+  ],
+  "entry[user].toolUseResult.worktreeBranch": [
+    "string"
+  ],
+  "entry[user].toolUseResult.worktreePath": [
+    "string"
+  ],
+  "entry[user].toolUseResult[]": [
+    "object"
+  ],
+  "entry[user].toolUseResult[].source": [
+    "object"
+  ],
+  "entry[user].toolUseResult[].source.data": [
+    "string"
+  ],
+  "entry[user].toolUseResult[].source.media_type": [
+    "string"
+  ],
+  "entry[user].toolUseResult[].source.type": [
+    "string"
+  ],
+  "entry[user].toolUseResult[].text": [
+    "string"
+  ],
+  "entry[user].toolUseResult[].type": [
+    "string"
+  ],
+  "entry[user].type": [
+    "string"
+  ],
+  "entry[user].userType": [
+    "string"
+  ],
+  "entry[user].uuid": [
+    "string"
+  ],
+  "entry[user].version": [
+    "string"
+  ],
+  "entry[worktree-state]": [
+    "object"
+  ],
+  "entry[worktree-state].sessionId": [
+    "string"
+  ],
+  "entry[worktree-state].type": [
+    "string"
+  ],
+  "entry[worktree-state].worktreeSession": [
+    "object"
+  ],
+  "entry[worktree-state].worktreeSession.originalBranch": [
+    "string"
+  ],
+  "entry[worktree-state].worktreeSession.originalCwd": [
+    "string"
+  ],
+  "entry[worktree-state].worktreeSession.originalHeadCommit": [
+    "string"
+  ],
+  "entry[worktree-state].worktreeSession.sessionId": [
+    "string"
+  ],
+  "entry[worktree-state].worktreeSession.worktreeBranch": [
+    "string"
+  ],
+  "entry[worktree-state].worktreeSession.worktreeName": [
+    "string"
+  ],
+  "entry[worktree-state].worktreeSession.worktreePath": [
+    "string"
+  ]
+}

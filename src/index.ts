@@ -13,6 +13,10 @@ export type {
   PermissionModeEntry,
   ProgressEntry,
   LastPromptEntry,
+  AgentNameEntry,
+  CustomTitleEntry,
+  PrLinkEntry,
+  WorktreeStateEntry,
   UnknownEntry,
   UsageMetadata,
   StopReason,
@@ -28,6 +32,10 @@ export {
   isPermissionModeEntry,
   isProgressEntry,
   isLastPromptEntry,
+  isAgentNameEntry,
+  isCustomTitleEntry,
+  isPrLinkEntry,
+  isWorktreeStateEntry,
 } from "./types/entries.js";
 export type {
   ContentBlock,
