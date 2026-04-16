@@ -1,5 +1,5 @@
 {
-  "name": "cc-logs",
+  "name": "parse-cc",
   "version": "0.1.0",
   "description": "Parse Claude Code session .jsonl logs into typed entries, metrics, tool calls, subagents, and more.",
   "keywords": [
@@ -15,12 +15,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/d1ll0n/cc-logs.git"
+    "url": "git+https://github.com/d1ll0n/parse-cc.git"
   },
   "bugs": {
-    "url": "https://github.com/d1ll0n/cc-logs/issues"
+    "url": "https://github.com/d1ll0n/parse-cc/issues"
   },
-  "homepage": "https://github.com/d1ll0n/cc-logs#readme",
+  "homepage": "https://github.com/d1ll0n/parse-cc#readme",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

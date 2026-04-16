@@ -30,7 +30,7 @@ Use the session log directly (via [querying.md](querying.md)) when:
 ## sess.fileHistory()
 
 ```ts
-import { Session } from "cc-logs";
+import { Session } from "parse-cc";
 
 const sess = new Session("/path/to/session.jsonl");
 await sess.messages(); // prime sessionId
@@ -103,7 +103,7 @@ When you don't have a `Session` instance, these are exported at the top level.
 Resolve the file-history directory for a given session ID. Returns the absolute path if it exists, `null` otherwise.
 
 ```ts
-import { findFileHistoryDir } from "cc-logs";
+import { findFileHistoryDir } from "parse-cc";
 
 const dir = await findFileHistoryDir("sess-abc123");
 // "/root/.claude/file-history/sess-abc123" or null
@@ -116,7 +116,7 @@ Pass a custom `baseDir` as the second argument to point at a non-default locatio
 Walk the file-history directory directly — does NOT consult any session log. Useful for detecting orphan blobs whose session file is gone, or for cross-referencing against what a session's snapshot entries actually recorded.
 
 ```ts
-import { listFileHistoryBlobs } from "cc-logs";
+import { listFileHistoryBlobs } from "parse-cc";
 
 const blobs = await listFileHistoryBlobs("sess-abc123");
 // [{ backupFileName, blobPath, size }, ...]
@@ -129,7 +129,7 @@ Returns an empty array if the session's file-history directory doesn't exist.
 Low-level blob reader that takes a [`FileHistoryVersion`](types.md#filehistoryversion):
 
 ```ts
-import { readFileHistoryBlob } from "cc-logs";
+import { readFileHistoryBlob } from "parse-cc";
 
 const content = await readFileHistoryBlob(version);
 // string or null
@@ -140,7 +140,7 @@ const content = await readFileHistoryBlob(version);
 ### defaultFileHistoryDir()
 
 ```ts
-import { defaultFileHistoryDir } from "cc-logs";
+import { defaultFileHistoryDir } from "parse-cc";
 
 console.log(defaultFileHistoryDir()); // "/root/.claude/file-history"
 ```

@@ -25,7 +25,7 @@ export function defaultProjectsDir(): string {
  * `.jsonl` files and does not include subagent files nested in subdirectories.
  */
 export interface ProjectInfo {
-  /** Slugified directory name (e.g. "-root-d1ll0n-cc-logs") */
+  /** Slugified directory name (e.g. "-root-d1ll0n-parse-cc") */
   name: string;
   /** Absolute path to the project directory */
   path: string;

@@ -15,7 +15,7 @@ When a parent session dispatches work via the `Agent` or `Task` tool, the subage
 ## sess.subagents()
 
 ```ts
-import { Session } from "cc-logs";
+import { Session } from "parse-cc";
 
 const parent = new Session("/path/to/parent.jsonl");
 const subs = await parent.subagents();
@@ -36,7 +36,7 @@ The result is cached on the parent session, so repeated calls to `sess.subagents
 When you only want file paths (no `Session` construction):
 
 ```ts
-import { findSubagentFiles } from "cc-logs";
+import { findSubagentFiles } from "parse-cc";
 
 const paths = await findSubagentFiles("/path/to/parent.jsonl");
 // string[] — absolute paths to every subagent .jsonl for this parent

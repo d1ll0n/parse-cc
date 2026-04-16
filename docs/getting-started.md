@@ -5,7 +5,7 @@ Parse and explore a Claude Code session log in under 5 minutes.
 ## Install
 
 ```bash
-npm install cc-logs
+npm install parse-cc
 ```
 
 ### Building from source
@@ -13,8 +13,8 @@ npm install cc-logs
 For contributors working on the library itself:
 
 ```bash
-git clone https://github.com/d1ll0n/cc-logs.git
-cd cc-logs
+git clone https://github.com/d1ll0n/parse-cc.git
+cd parse-cc
 npm install
 npm run build
 ```
@@ -24,7 +24,7 @@ npm run build
 Pick any `.jsonl` file from `~/.claude/projects/<project>/` and load it:
 
 ```ts
-import { Session } from "cc-logs";
+import { Session } from "parse-cc";
 
 const sess = new Session("/root/.claude/projects/-home-username-myproject/abc123.jsonl");
 

@@ -1,4 +1,4 @@
-# Contributing to cc-logs
+# Contributing to parse-cc
 
 This file documents the non-obvious invariants you need to know before touching this codebase. It covers architecture patterns, parsing edge cases, and tooling quirks that have real consequences if ignored. Read it before opening a PR.
 

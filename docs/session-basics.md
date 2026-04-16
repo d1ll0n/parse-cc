@@ -15,7 +15,7 @@ The `Session` class is the entry point for everything in this library. Construct
 ## Construction
 
 ```ts
-import { Session } from "cc-logs";
+import { Session } from "parse-cc";
 
 const sess = new Session("/path/to/session.jsonl");
 ```
@@ -34,7 +34,7 @@ Returns the full typed array. See [`LogEntry`](types.md#logentry) for the discri
 The library does **not** filter, classify, or drop any entry types. Assistant messages, user messages, system entries, attachments, permission-mode markers, file-history snapshots, queue operations — they're all returned. If you only want one kind, filter with the exported type guards:
 
 ```ts
-import { isAssistantEntry, isUserEntry, isAttachmentEntry } from "cc-logs";
+import { isAssistantEntry, isUserEntry, isAttachmentEntry } from "parse-cc";
 
 const assistants = msgs.filter(isAssistantEntry);
 const userTurns = msgs.filter(isUserEntry);

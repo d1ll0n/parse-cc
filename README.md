@@ -1,7 +1,7 @@
-# cc-logs
+# parse-cc
 
-[![CI](https://github.com/d1ll0n/cc-logs/actions/workflows/ci.yml/badge.svg)](https://github.com/d1ll0n/cc-logs/actions/workflows/ci.yml)
-[![coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/d1ll0n/cc-logs/badges/coverage-badge.json)](https://github.com/d1ll0n/cc-logs/actions/workflows/ci.yml)
+[![CI](https://github.com/d1ll0n/parse-cc/actions/workflows/ci.yml/badge.svg)](https://github.com/d1ll0n/parse-cc/actions/workflows/ci.yml)
+[![coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/d1ll0n/parse-cc/badges/coverage-badge.json)](https://github.com/d1ll0n/parse-cc/actions/workflows/ci.yml)
 
 TypeScript library for parsing Claude Code session log files (`.jsonl`). Exposes a `Session` class with lazy-cached getters for metrics, tool calls, skill listings, subagents, persisted-output references, file history, and more.
 
@@ -10,7 +10,7 @@ TypeScript library for parsing Claude Code session log files (`.jsonl`). Exposes
 Use the `Session` class to parse, query, and navigate session logs. Use the module-level helpers (`listProjects`, `findAllSessions`, etc.) to discover sessions without opening them.
 
 ```ts
-import { Session, findAllSessions } from "cc-logs";
+import { Session, findAllSessions } from "parse-cc";
 
 const sess = new Session("/path/to/session.jsonl");
 await sess.messages();
@@ -48,7 +48,7 @@ Unknown future types are preserved as `UnknownEntry` with their raw fields intac
 ## Install
 
 ```bash
-npm install cc-logs
+npm install parse-cc
 ```
 
 ## Log file locations

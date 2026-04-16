@@ -16,7 +16,7 @@ Find Claude Code projects and their session files on disk. All functions are exp
 Returns `~/.claude/projects`.
 
 ```ts
-import { defaultProjectsDir } from "cc-logs";
+import { defaultProjectsDir } from "parse-cc";
 
 console.log(defaultProjectsDir()); // "/root/.claude/projects"
 ```
@@ -28,7 +28,7 @@ All other discovery functions use this as their default `projectsDir` argument. 
 Lists every project directory under a projects root. Only reads directory entries — does **not** open any session files.
 
 ```ts
-import { listProjects } from "cc-logs";
+import { listProjects } from "parse-cc";
 
 const projects = await listProjects();
 for (const p of projects) {
@@ -40,7 +40,7 @@ Returns [`ProjectInfo[]`](types.md#projectinfo), sorted alphabetically by `name`
 
 ```ts
 interface ProjectInfo {
-  name: string;         // slugified dir name, e.g. "-root-d1ll0n-cc-logs"
+  name: string;         // slugified dir name, e.g. "-root-d1ll0n-parse-cc"
   path: string;         // absolute path to the project directory
   sessionCount: number; // count of top-level .jsonl files
 }
@@ -59,7 +59,7 @@ If the directory doesn't exist, the function returns an empty array rather than 
 Given a project directory, returns a summary for each session file inside it. Only reads the head of each file (default 200 lines) to extract cheap metadata.
 
 ```ts
-import { listProjects, listSessions } from "cc-logs";
+import { listProjects, listSessions } from "parse-cc";
 
 const projects = await listProjects();
 const sessions = await listSessions(projects[0].path);
@@ -96,7 +96,7 @@ See [`ListSessionsOptions`](types.md#listsessionsoptions).
 Walks every project under the projects root and returns a flat summary list across all of them.
 
 ```ts
-import { findAllSessions } from "cc-logs";
+import { findAllSessions } from "parse-cc";
 
 const all = await findAllSessions();
 console.log(`found ${all.length} sessions total`);
@@ -116,7 +116,7 @@ const quick = await findAllSessions(undefined, { headLines: 30 });
 A `SessionSummary` contains a `path` field. Hand it to `new Session(path)` to load the full thing:
 
 ```ts
-import { Session, findAllSessions } from "cc-logs";
+import { Session, findAllSessions } from "parse-cc";
 
 const summaries = await findAllSessions();
 const target = summaries.find((s) => s.firstUserMessage?.text.includes("database migration"));

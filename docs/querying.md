@@ -17,7 +17,7 @@ Pull derived values — metrics, tool calls, results, compaction info — from a
 All examples assume you already have a loaded session:
 
 ```ts
-import { Session } from "cc-logs";
+import { Session } from "parse-cc";
 
 const sess = new Session("/path/to/session.jsonl");
 await sess.messages();

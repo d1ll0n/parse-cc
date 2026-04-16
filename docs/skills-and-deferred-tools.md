@@ -18,7 +18,7 @@ This library aggregates both across a session's entries so you can see what the 
 ## sess.skills()
 
 ```ts
-import { Session } from "cc-logs";
+import { Session } from "parse-cc";
 
 const sess = new Session("/path/to/session.jsonl");
 await sess.messages();

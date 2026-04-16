@@ -1,6 +1,6 @@
 # Data types
 
-Every type the `cc-logs` library exports, organized by category. Use Ctrl-F with the type name to jump directly; all `#anchor` links from other docs point here.
+Every type the `parse-cc` library exports, organized by category. Use Ctrl-F with the type name to jump directly; all `#anchor` links from other docs point here.
 
 This doc is a reference — if you want examples of how to USE these types, see [getting-started.md](getting-started.md), [querying.md](querying.md), and other topic guides.
 
@@ -1536,7 +1536,7 @@ Metadata for a single Claude Code project directory, returned by `listProjects()
 
 ```ts
 export interface ProjectInfo {
-  /** Slugified directory name (e.g. "-root-d1ll0n-cc-logs") */
+  /** Slugified directory name (e.g. "-root-d1ll0n-parse-cc") */
   name: string;
   /** Absolute path to the project directory */
   path: string;
@@ -1551,8 +1551,8 @@ export interface ProjectInfo {
 
 ```json
 {
-  "name": "-root-d1ll0n-cc-logs",
-  "path": "/root/.claude/projects/-root-d1ll0n-cc-logs",
+  "name": "-root-d1ll0n-parse-cc",
+  "path": "/root/.claude/projects/-root-d1ll0n-parse-cc",
   "sessionCount": 14
 }
 ```

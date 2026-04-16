@@ -43,7 +43,7 @@ The referenced file lives in the session's sibling `tool-results/` directory:
 ## parsePersistedOutput()
 
 ```ts
-import { Session } from "cc-logs";
+import { Session } from "parse-cc";
 
 const sess = new Session("/path/to/session.jsonl");
 const results = await sess.toolResults();
@@ -90,7 +90,7 @@ If the file is missing or unreadable, the underlying `readFile` throws — wrap 
 Iterate every tool result and fully resolve any spilled ones:
 
 ```ts
-import { Session } from "cc-logs";
+import { Session } from "parse-cc";
 
 const sess = new Session(path);
 const results = await sess.toolResults();
@@ -122,7 +122,7 @@ for (const r of results) {
 If you don't have a `Session` instance (e.g., you only parsed a tool_result string from somewhere else), the same functions are exported at the top level:
 
 ```ts
-import { parsePersistedOutput, loadPersistedOutput } from "cc-logs";
+import { parsePersistedOutput, loadPersistedOutput } from "parse-cc";
 
 const ref = parsePersistedOutput(someString);
 if (ref) {
