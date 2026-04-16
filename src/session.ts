@@ -111,31 +111,31 @@ export class Session {
     }
   }
 
-  /** First-observed session UUID across the parsed entries. Returns `""` when absent. */
+  /** First-observed session UUID across the parsed entries. Returns `""` when absent. Throws until at least one async method (e.g. `messages()`) has been awaited. */
   get sessionId(): string {
     this.ensureMetaLoaded("sessionId");
     return this._meta.sessionId ?? "";
   }
 
-  /** Claude Code version string from the first entry that carries it, or `null`. */
+  /** Claude Code version string from the first entry that carries it, or `null`. Throws until at least one async method (e.g. `messages()`) has been awaited. */
   get version(): string | null {
     this.ensureMetaLoaded("version");
     return this._meta.version;
   }
 
-  /** Git branch recorded in the session metadata, or `null` if not present. */
+  /** Git branch recorded in the session metadata, or `null` if not present. Throws until at least one async method (e.g. `messages()`) has been awaited. */
   get gitBranch(): string | null {
     this.ensureMetaLoaded("gitBranch");
     return this._meta.gitBranch;
   }
 
-  /** Working directory recorded in the session metadata, or `null` if not present. */
+  /** Working directory recorded in the session metadata, or `null` if not present. Throws until at least one async method (e.g. `messages()`) has been awaited. */
   get cwd(): string | null {
     this.ensureMetaLoaded("cwd");
     return this._meta.cwd;
   }
 
-  /** Permission mode (e.g. `"default"`, `"bypassPermissions"`) or `null` if not recorded. */
+  /** Permission mode (e.g. `"default"`, `"bypassPermissions"`) or `null` if not recorded. Throws until at least one async method (e.g. `messages()`) has been awaited. */
   get permissionMode(): string | null {
     this.ensureMetaLoaded("permissionMode");
     return this._meta.permissionMode;

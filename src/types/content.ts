@@ -66,23 +66,23 @@ export interface ImageBlock {
  */
 export type ContentBlock = TextBlock | ThinkingBlock | ToolUseBlock | ToolResultBlock | ImageBlock;
 
-/** Type guard for `TextBlock`. */
+/** Type guard: returns true if the content block's `type` is `"text"`. */
 export function isTextBlock(b: ContentBlock): b is TextBlock {
   return b.type === "text";
 }
-/** Type guard for `ThinkingBlock`. */
+/** Type guard: returns true if the content block's `type` is `"thinking"`. */
 export function isThinkingBlock(b: ContentBlock): b is ThinkingBlock {
   return b.type === "thinking";
 }
-/** Type guard for `ToolUseBlock`. */
+/** Type guard: returns true if the content block's `type` is `"tool_use"`. */
 export function isToolUseBlock(b: ContentBlock): b is ToolUseBlock {
   return b.type === "tool_use";
 }
-/** Type guard for `ToolResultBlock`. */
+/** Type guard: returns true if the content block's `type` is `"tool_result"`. */
 export function isToolResultBlock(b: ContentBlock): b is ToolResultBlock {
   return b.type === "tool_result";
 }
-/** Type guard for `ImageBlock`. */
+/** Type guard: returns true if the content block's `type` is `"image"`. */
 export function isImageBlock(b: ContentBlock): b is ImageBlock {
   return b.type === "image";
 }

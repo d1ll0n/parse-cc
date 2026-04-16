@@ -316,21 +316,35 @@ export type LogEntry =
   | UnknownEntry;
 
 // Type guards
+/** Type guard: returns true if the entry's discriminator is `"user"`. */
 export const isUserEntry = (e: LogEntry): e is UserEntry => e.type === "user";
+/** Type guard: returns true if the entry's discriminator is `"assistant"`. */
 export const isAssistantEntry = (e: LogEntry): e is AssistantEntry => e.type === "assistant";
+/** Type guard: returns true if the entry's discriminator is `"system"`. */
 export const isSystemEntry = (e: LogEntry): e is SystemEntry => e.type === "system";
+/** Type guard: returns true if the entry's discriminator is `"summary"`. */
 export const isSummaryEntry = (e: LogEntry): e is SummaryEntry => e.type === "summary";
+/** Type guard: returns true if the entry's discriminator is `"file-history-snapshot"`. */
 export const isFileHistorySnapshotEntry = (e: LogEntry): e is FileHistorySnapshotEntry =>
   e.type === "file-history-snapshot";
+/** Type guard: returns true if the entry's discriminator is `"queue-operation"`. */
 export const isQueueOperationEntry = (e: LogEntry): e is QueueOperationEntry =>
   e.type === "queue-operation";
+/** Type guard: returns true if the entry's discriminator is `"attachment"`. */
 export const isAttachmentEntry = (e: LogEntry): e is AttachmentEntry => e.type === "attachment";
+/** Type guard: returns true if the entry's discriminator is `"permission-mode"`. */
 export const isPermissionModeEntry = (e: LogEntry): e is PermissionModeEntry =>
   e.type === "permission-mode";
+/** Type guard: returns true if the entry's discriminator is `"progress"`. */
 export const isProgressEntry = (e: LogEntry): e is ProgressEntry => e.type === "progress";
+/** Type guard: returns true if the entry's discriminator is `"last-prompt"`. */
 export const isLastPromptEntry = (e: LogEntry): e is LastPromptEntry => e.type === "last-prompt";
+/** Type guard: returns true if the entry's discriminator is `"agent-name"`. */
 export const isAgentNameEntry = (e: LogEntry): e is AgentNameEntry => e.type === "agent-name";
+/** Type guard: returns true if the entry's discriminator is `"custom-title"`. */
 export const isCustomTitleEntry = (e: LogEntry): e is CustomTitleEntry => e.type === "custom-title";
+/** Type guard: returns true if the entry's discriminator is `"pr-link"`. */
 export const isPrLinkEntry = (e: LogEntry): e is PrLinkEntry => e.type === "pr-link";
+/** Type guard: returns true if the entry's discriminator is `"worktree-state"`. */
 export const isWorktreeStateEntry = (e: LogEntry): e is WorktreeStateEntry =>
   e.type === "worktree-state";

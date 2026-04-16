@@ -1,3 +1,7 @@
+// Intentionally runs via tsx (not `node --experimental-strip-types`). This script does not
+// spawn child processes, so the tsx IPC-pipe issue doesn't apply. See CONTRIBUTING.md §
+// "Script runtime" for why the sibling sync-types-md.ts uses the opposite choice.
+
 /**
  * Walk every Claude Code session under ~/.claude/projects, build a schema
  * inventory, exercise every Session introspection method, and compare the

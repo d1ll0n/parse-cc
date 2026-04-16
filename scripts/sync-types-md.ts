@@ -1,3 +1,7 @@
+// Intentionally runs via `node --experimental-strip-types` (not tsx). This script
+// spawns child processes; tsx can fail with EPERM when creating its IPC pipe in
+// restricted-tmp environments. See CONTRIBUTING.md § "Script runtime" for the full rationale.
+
 /**
  * scripts/sync-types-md.ts
  *

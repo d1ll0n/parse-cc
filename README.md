@@ -31,6 +31,8 @@ Full docs live under [`docs/`](docs/). Pick a topic by what you want to do:
 | List skills and deferred tools available to a session | [docs/skills-and-deferred-tools.md](docs/skills-and-deferred-tools.md) |
 | Look up the exact shape of any exported type | [docs/types.md](docs/types.md) |
 
+`docs/types.md` is generated from JSDoc via `npm run types:sync` — do not hand-edit the TypeScript fences inside it.
+
 ### Supported message types
 
 The parser recognizes every entry type observed across hundreds of real session logs:
@@ -83,6 +85,10 @@ npm run audit:logs -- -v      # verbose: per-error details + removed paths
 - A user reports a session this library fails on — the audit pinpoints which shape drifted.
 
 The script reads only from your local `~/.claude`, so it's not wired into CI — run it manually. New findings should either be typed properly in [`src/types/entries.ts`](src/types/entries.ts) or accepted into the baseline via `audit:logs:update`.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for architecture notes, invariants, and the non-obvious patterns every contributor needs to know before touching this codebase.
 
 ## Project structure
 

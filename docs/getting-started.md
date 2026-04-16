@@ -4,16 +4,20 @@ Parse and explore a Claude Code session log in under 5 minutes.
 
 ## Install
 
-This library is not yet published to npm. For now, clone the repo and build it:
+```bash
+npm install cc-logs
+```
+
+### Building from source
+
+For contributors working on the library itself:
 
 ```bash
-git clone <repo-url> cc-logs
+git clone https://github.com/d1ll0n/cc-logs.git
 cd cc-logs
 npm install
 npm run build
 ```
-
-Then reference the built output from another project (via a workspace link, path alias, or local `npm link`). Or run examples directly in this repo with `npx tsx <script.ts>`.
 
 ## Hello world
 
