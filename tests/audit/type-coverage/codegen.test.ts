@@ -347,15 +347,87 @@ describe("synthesizePatches — unknown-variant (Case A)", () => {
   });
 });
 
-describe("synthesizePatches — unsupported gap kinds", () => {
-  it("reports ambiguous-fit as requiring manual review (no auto-fix by design)", () => {
+describe("synthesizePatches — ambiguous-fit (Case D, review-required)", () => {
+  it("emits a proposed-variant-needs-review patch with a placeholder discriminator", () => {
+    const project = createProject();
+    const walked = walkLogEntry(project);
+
+    // Synthetic: a discriminator-less attachment that doesn't fit any
+    // existing AttachmentPayload variant. Capture buckets it under
+    // <no-discriminator> at the union position.
+    const corpus = captureCorpus(
+      [
+        {
+          type: "attachment",
+          uuid: "att-1",
+          parentUuid: null,
+          timestamp: "2026-04-17T00:00:00Z",
+          sessionId: "s1",
+          attachment: {
+            // NOTE: no `type` field — this is the discriminator-less case
+            content: [{ id: "1", subject: "Task" }],
+            customField: "value",
+          },
+        },
+      ],
+      walked.schema,
+      EMPTY_AL
+    );
+
+    const gap: Gap = {
+      path: "$[attachment].attachment",
+      kind: "ambiguous-fit",
+      detail:
+        "best-fit variant=skill_listing (score 1/2); structural mismatches: ...; observed properties: content, customField",
+    };
+
+    const result = synthesizePatches([gap], corpus, project);
+    expect(result.unsupported).toEqual([]);
+    expect(result.patches).toHaveLength(1);
+
+    const patch = result.patches[0];
+    expect(patch.kind).toBe("proposed-variant-needs-review");
+    if (patch.kind !== "proposed-variant-needs-review") return;
+    expect(patch.unionAliasName).toBe("AttachmentPayload");
+    expect(patch.bestFitVariantName).toBe("skill_listing");
+    const memberNames = patch.members.map((m) => m.name).sort();
+    expect(memberNames).toEqual(["content", "customField"]);
+  });
+
+  it("rejects ambiguous-fit when no corpus is available", () => {
     const project = createProject();
     const result = synthesizePatches(
-      [{ path: "$[attachment]", kind: "ambiguous-fit", detail: "..." }],
+      [{ path: "$[attachment].attachment", kind: "ambiguous-fit", detail: "" }],
       null,
       project
     );
-    expect(result.unsupported[0].reason).toMatch(/manual review/);
+    expect(result.unsupported).toHaveLength(1);
+    expect(result.unsupported[0].reason).toMatch(/no corpus/);
+  });
+});
+
+describe("applyPatches — proposed-variant-needs-review", () => {
+  it("does NOT apply review-required patches under --write (silent skip)", () => {
+    const proj = new Project({ useInMemoryFileSystem: true });
+    proj.createSourceFile(
+      "/payload.ts",
+      `export interface Existing { type: "x"; }\n` +
+        `export type AttachmentPayload = Existing;\n`
+    );
+    const patch: import("../../../scripts/audit/type-coverage/codegen.ts").Patch = {
+      kind: "proposed-variant-needs-review",
+      targetFile: "/payload.ts",
+      newInterfaceName: "ProposedPayload",
+      unionAliasName: "AttachmentPayload",
+      bestFitVariantName: "x",
+      members: [{ name: "content", typeText: "string", required: true }],
+      sourceGap: { path: "$[a].x", kind: "ambiguous-fit", detail: "" },
+    };
+    applyPatches([patch], proj);
+    const updated = proj.getSourceFileOrThrow("/payload.ts").getFullText();
+    // Source unchanged — review-required patches are never applied
+    expect(updated).not.toContain("ProposedPayload");
+    expect(updated).toContain("AttachmentPayload = Existing");
   });
 });
 

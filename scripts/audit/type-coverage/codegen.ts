@@ -72,6 +72,26 @@ export type Patch =
        *  discriminator field (which is emitted as a literal). */
       members: Array<{ name: string; typeText: string; required: boolean }>;
       sourceGap: Gap;
+    }
+  | {
+      /**
+       * Discriminator-less observed object structurally distinct from any
+       * existing variant. Codegen proposes a new variant but uses a
+       * placeholder discriminator value ("…") because the observed shape
+       * has no `type` field — the maintainer must inspect a real entry to
+       * pick the right discriminator (or, if there genuinely isn't one,
+       * restructure the union as untagged).
+       *
+       * Always REVIEW-REQUIRED — never applied under --write.
+       */
+      kind: "proposed-variant-needs-review";
+      targetFile: string;
+      newInterfaceName: string;
+      unionAliasName: string;
+      /** Hint from the comparator: which existing variant looked closest. */
+      bestFitVariantName: string | null;
+      members: Array<{ name: string; typeText: string; required: boolean }>;
+      sourceGap: Gap;
     };
 
 /** A gap that codegen can't yet auto-fix (other Cases land in later commits). */
@@ -143,6 +163,9 @@ export function applyPatches(patches: Patch[], project: Project): void {
   for (const v of newVariants) {
     applyAddVariantToUnion(v, project);
   }
+  // proposed-variant-needs-review: never applied. CLI prints them in --suggest;
+  // applyPatches deliberately skips them so --write doesn't introduce
+  // half-baked variants with placeholder discriminators.
 
   project.saveSync();
 }
@@ -169,6 +192,15 @@ export function describePatch(patch: Patch): string {
       .map((m) => `                ${m.name}${m.required ? "" : "?"}: ${m.typeText};`)
       .join("\n");
     return `NEW-VARIANT   ${patch.newInterfaceName} (${patch.discriminatorField}: "${patch.discriminatorValue}") → ${patch.unionAliasName}\n              ${shortPath(patch.targetFile)}  (gap: ${patch.sourceGap.path})\n              interface body:\n${memberLines}`;
+  }
+  if (patch.kind === "proposed-variant-needs-review") {
+    const memberLines = patch.members
+      .map((m) => `                ${m.name}${m.required ? "" : "?"}: ${m.typeText};`)
+      .join("\n");
+    const bestFit = patch.bestFitVariantName
+      ? `closest existing variant: ${patch.bestFitVariantName}`
+      : "no close structural match";
+    return `REVIEW-REQ    ${patch.newInterfaceName} → ${patch.unionAliasName}  [discriminator-less]\n              ${shortPath(patch.targetFile)}  (gap: ${patch.sourceGap.path})\n              ${bestFit}\n              proposed body (with placeholder discriminator):\n                type: "...";  // TODO: inspect a real entry to choose, or restructure as untagged union\n${memberLines}\n              --write WILL NOT apply this patch; manual review required.`;
   }
   return `UNKNOWN-PATCH ${JSON.stringify(patch)}`;
 }
@@ -198,7 +230,7 @@ function synthesizeOne(
     case "unknown-variant":
       return synthesizeUnknownVariant(gap, corpus, project);
     case "ambiguous-fit":
-      return { reason: "ambiguous-fit requires manual review (no auto-fix by design)" };
+      return synthesizeAmbiguousFit(gap, corpus, project);
     case "no-variant-match":
       return { reason: "no-variant-match requires manual review (no auto-fix by design)" };
     case "literal-mismatch":
@@ -397,6 +429,134 @@ function synthesizeUnknownVariant(
       members,
       sourceGap: gap,
     },
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Case D: ambiguous-fit → propose new variant (review-required, never written)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Parse "best-fit variant=skill_listing (score N/M)" out of gap.detail. */
+function parseAmbiguousBestFit(detail: string): string | null {
+  const m = detail.match(/best-fit variant=([\w-]+)/);
+  return m?.[1] ?? null;
+}
+
+function synthesizeAmbiguousFit(
+  gap: Gap,
+  corpus: Schema | null,
+  project: Project
+): SynthesisOutput {
+  // Path looks like `$[attachment].attachment` — points at the union's
+  // POSITION (not at a discriminator value). resolveTarget would walk into
+  // the union and try to discriminate, which fails on discriminator-less
+  // observed objects. We need a different strategy: walk syntactically to
+  // find the union alias at the gap path, then propose a new variant.
+  //
+  // The gap's `bestFitVariantName` (parsed from detail) tells us the union;
+  // the corpus at this path holds the merged observed shape that didn't fit.
+
+  const bestFit = parseAmbiguousBestFit(gap.detail);
+  if (!corpus) {
+    return { reason: "no corpus available — cannot synthesize ambiguous-fit body without observed shape" };
+  }
+  const observedShape = lookupCorpusAtPath(corpus, gap.path);
+  if (!observedShape) {
+    return { reason: "no observed shape in corpus at gap path" };
+  }
+
+  // The corpus position is typically a discUnion (because capture routed by
+  // discriminator). The "ambiguous" sample lands under the special
+  // <no-discriminator> bucket if capture saw it.
+  let candidateShape: Schema | null = observedShape;
+  if (observedShape.kind === "discUnion") {
+    candidateShape = observedShape.variants["<no-discriminator>"] ?? null;
+    if (!candidateShape) {
+      return {
+        reason: "observed corpus has no <no-discriminator> bucket at this path; expected discriminator-less ambiguous-fit",
+      };
+    }
+  }
+  if (candidateShape.kind !== "object") {
+    return { reason: `observed shape is ${candidateShape.kind}, expected object` };
+  }
+
+  // Find the union via ts-morph syntactically. Strategy: walk gap.path via
+  // resolveTarget; if it reaches a position where the typed schema is a
+  // union, we use that. (resolveTarget for ambiguous-fit paths typically
+  // returns "fail" because it can't route — we recover by syntactic walk.)
+  const unionInfo = findUnionAtPath(gap.path, project);
+  if (!unionInfo) {
+    return { reason: `could not locate union alias at gap path ${gap.path}` };
+  }
+
+  const newInterfaceName = synthesizeVariantName(unionInfo.unionAliasName, "new_variant");
+  const members: Array<{ name: string; typeText: string; required: boolean }> = [];
+  for (const [name, { schema, required }] of Object.entries(candidateShape.props)) {
+    members.push({ name, typeText: schemaToTsType(schema), required });
+  }
+
+  return {
+    patch: {
+      kind: "proposed-variant-needs-review",
+      targetFile: unionInfo.unionDeclFile,
+      newInterfaceName,
+      unionAliasName: unionInfo.unionAliasName,
+      bestFitVariantName: bestFit,
+      members,
+      sourceGap: gap,
+    },
+  };
+}
+
+function findUnionAtPath(
+  gapPath: string,
+  project: Project
+): { unionAliasName: string; unionDeclFile: string } | null {
+  // Walk via the same resolver — at the position where the type is a union,
+  // capture its alias info. Since resolveTarget returns terminal modes,
+  // we re-walk here without taking the terminal action.
+  const sourceFile = project.getSourceFileOrThrow("src/types/entries.ts");
+  const logEntryAlias = sourceFile.getTypeAliasOrThrow("LogEntry");
+  const segs = parsePath(gapPath);
+  let currentType = logEntryAlias.getType();
+  for (let i = 0; i < segs.length; i++) {
+    const seg = segs[i];
+    if (seg.kind === "discBucket") {
+      if (!currentType.isUnion()) return null;
+      const variants = currentType.getUnionTypes();
+      const matched = variants.find((v) => {
+        const prop = v.getProperty("type");
+        const decl = prop?.getValueDeclaration();
+        if (!decl) return false;
+        const t = prop.getTypeAtLocation(decl);
+        return t.isStringLiteral() && t.getLiteralValueOrThrow() === seg.value;
+      });
+      if (!matched) return null;
+      currentType = matched;
+    } else if (seg.kind === "prop") {
+      const prop = currentType.getProperty(seg.name);
+      const decl = prop?.getValueDeclaration();
+      if (!decl) return null;
+      currentType = prop.getTypeAtLocation(decl);
+    } else if (seg.kind === "arrayElem") {
+      const elem = currentType.getArrayElementType();
+      if (!elem) return null;
+      currentType = elem;
+    } else if (seg.kind === "recordKey") {
+      const idx = currentType.getStringIndexType();
+      if (!idx) return null;
+      currentType = idx;
+    }
+  }
+  // After full walk, currentType should be a union — its alias is the target.
+  if (!currentType.isUnion()) return null;
+  const aliasSym = currentType.getAliasSymbol();
+  const aliasDecl = aliasSym?.getDeclarations()[0];
+  if (!aliasSym || !aliasDecl) return null;
+  return {
+    unionAliasName: aliasSym.getName(),
+    unionDeclFile: aliasDecl.getSourceFile().getFilePath(),
   };
 }
 
