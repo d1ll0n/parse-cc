@@ -17,4 +17,15 @@
 # To verify after editing: `npm run audit:logs -- -v` reports stale entries
 # (those that match zero observed paths in the current scan).
 
-entries: []
+entries:
+  # Task `metadata` is a free-form bag the harness preserves verbatim from
+  # whatever the caller passed to TaskCreate/TaskUpdate. Capturing per-key
+  # would leak arbitrary user-supplied property names into the corpus
+  # (caller-controlled, potentially sensitive). Treat as opaque.
+  - path: $[attachment].attachment[task_reminder].content[].metadata.*
+    reason: >
+      Task.metadata is Record<string, unknown> — caller-supplied keys, not part
+      of the harness contract.
+  - path: $[attachment].attachment[todo_reminder].content[].metadata.*
+    reason: >
+      Same as task_reminder: arbitrary caller-supplied metadata keys.

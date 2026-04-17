@@ -20,6 +20,8 @@
  * return null — codegen reports them as "not auto-fixable yet" and the
  * maintainer handles by hand. Subsequent commits add each.
  */
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import path from "node:path";
 import { Node, SyntaxKind } from "ts-morph";
 import type { InterfaceDeclaration, Project, TypeLiteralNode } from "ts-morph";
 import type { Schema } from "./schema.ts";
@@ -191,7 +193,13 @@ export function describePatch(patch: Patch): string {
     const memberLines = patch.members
       .map((m) => `                ${m.name}${m.required ? "" : "?"}: ${m.typeText};`)
       .join("\n");
-    return `NEW-VARIANT   ${patch.newInterfaceName} (${patch.discriminatorField}: "${patch.discriminatorValue}") → ${patch.unionAliasName}\n              ${shortPath(patch.targetFile)}  (gap: ${patch.sourceGap.path})\n              interface body:\n${memberLines}`;
+    const isLogEntryVariant = patch.unionAliasName === "LogEntry";
+    const guardLine = isLogEntryVariant
+      ? `\n              + type guard: is${patch.newInterfaceName}(e: LogEntry): e is ${patch.newInterfaceName}`
+      : "";
+    const exportLine = `\n              + src/index.ts re-export${isLogEntryVariant ? " (type + guard)" : " (type)"}`;
+    const docLine = `\n              + docs/types.md heading stub`;
+    return `NEW-VARIANT   ${patch.newInterfaceName} (${patch.discriminatorField}: "${patch.discriminatorValue}") → ${patch.unionAliasName}\n              ${shortPath(patch.targetFile)}  (gap: ${patch.sourceGap.path})\n              interface body:\n${memberLines}${guardLine}${exportLine}${docLine}`;
   }
   if (patch.kind === "proposed-variant-needs-review") {
     const memberLines = patch.members
@@ -596,6 +604,112 @@ function applyAddVariantToUnion(patch: Patch, project: Project): void {
   if (!new RegExp(`\\b${patch.newInterfaceName}\\b`).test(existing)) {
     aliasDecl.setType(`${existing} | ${patch.newInterfaceName}`);
   }
+
+  // Scaffolding: type guard, src/index.ts re-exports, docs/types.md heading.
+  // Convention: only LogEntry's direct variants get type guards in this
+  // codebase (AttachmentPayload / ContentBlock variants don't). Detect by
+  // checking the union alias name.
+  const isLogEntryVariant = patch.unionAliasName === "LogEntry";
+  const guardName = isLogEntryVariant
+    ? `is${patch.newInterfaceName}`
+    : null;
+
+  if (guardName && !sourceFile.getFunction(guardName)) {
+    sourceFile.addFunction({
+      name: guardName,
+      isExported: true,
+      docs: [`Type guard: returns true if the entry's discriminator is ${JSON.stringify(patch.discriminatorValue)}.`],
+      parameters: [{ name: "e", type: patch.unionAliasName }],
+      returnType: `e is ${patch.newInterfaceName}`,
+      statements: [
+        `return e.${patch.discriminatorField} === ${JSON.stringify(patch.discriminatorValue)};`,
+      ],
+    });
+  }
+
+  updateIndexExports(project, patch.targetFile, patch.newInterfaceName, guardName);
+  stubDocsTypesHeading(project, patch.newInterfaceName);
+}
+
+/**
+ * Add the new interface (and optional guard) to `src/index.ts`'s named
+ * re-exports. Looks up the export blocks by module specifier and inserts
+ * into the right one. Idempotent.
+ */
+function updateIndexExports(
+  project: Project,
+  variantFile: string,
+  interfaceName: string,
+  guardName: string | null
+): void {
+  const indexFile = project.getSourceFile("src/index.ts");
+  if (!indexFile) return; // not a real repo run (e.g. in-memory test) — skip
+
+  // Compute the module specifier index.ts uses for the variant's file.
+  // index.ts lives at src/index.ts; variantFile is an abs path under src/.
+  // The convention is `./types/foo.js` (Node16 ESM resolution).
+  const indexDir = path.dirname(indexFile.getFilePath());
+  let rel = path.relative(indexDir, variantFile);
+  if (!rel.startsWith(".")) rel = `./${rel}`;
+  // .ts → .js for Node16 module resolution
+  rel = rel.replace(/\.ts$/, ".js");
+
+  const decls = indexFile.getExportDeclarations();
+  const typeBlock = decls.find(
+    (d) => d.getModuleSpecifierValue() === rel && d.isTypeOnly()
+  );
+  const valueBlock = decls.find(
+    (d) => d.getModuleSpecifierValue() === rel && !d.isTypeOnly()
+  );
+
+  if (typeBlock) {
+    const existing = typeBlock.getNamedExports().map((e) => e.getName());
+    if (!existing.includes(interfaceName)) {
+      typeBlock.addNamedExport(interfaceName);
+    }
+  } else {
+    // No type-only export block for this file yet — add one.
+    indexFile.addExportDeclaration({
+      moduleSpecifier: rel,
+      isTypeOnly: true,
+      namedExports: [interfaceName],
+    });
+  }
+
+  if (guardName) {
+    if (valueBlock) {
+      const existing = valueBlock.getNamedExports().map((e) => e.getName());
+      if (!existing.includes(guardName)) {
+        valueBlock.addNamedExport(guardName);
+      }
+    } else {
+      indexFile.addExportDeclaration({
+        moduleSpecifier: rel,
+        namedExports: [guardName],
+      });
+    }
+  }
+}
+
+/**
+ * Append a `### TypeName` heading + empty ts fence to `docs/types.md` so
+ * `npm run types:sync` will populate the fence on next run from the
+ * source's JSDoc. No-op when the heading already exists.
+ */
+function stubDocsTypesHeading(project: Project, typeName: string): void {
+  // Find docs/types.md relative to the project root.
+  const compiler = project.getCompilerOptions();
+  const tsConfigPath = compiler.configFilePath;
+  if (typeof tsConfigPath !== "string") return;
+  const docPath = path.join(path.dirname(tsConfigPath), "docs", "types.md");
+  if (!existsSync(docPath)) return; // not a real repo run
+
+  const current = readFileSync(docPath, "utf8");
+  const headingPattern = new RegExp(`^### ${typeName}\\b`, "m");
+  if (headingPattern.test(current)) return; // already present
+
+  const stub = `\n---\n\n### ${typeName}\n\nSynthesized by codegen — see source JSDoc.\n\n\`\`\`ts\n\`\`\`\n`;
+  writeFileSync(docPath, current.trimEnd() + stub);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

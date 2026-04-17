@@ -1880,78 +1880,8 @@
                               },
                               "metadata": {
                                 "schema": {
-                                  "kind": "object",
-                                  "props": {
-                                    "category": {
-                                      "schema": {
-                                        "kind": "prim",
-                                        "types": [
-                                          "string"
-                                        ]
-                                      },
-                                      "required": false
-                                    },
-                                    "nested": {
-                                      "schema": {
-                                        "kind": "object",
-                                        "props": {
-                                          "a": {
-                                            "schema": {
-                                              "kind": "prim",
-                                              "types": [
-                                                "number"
-                                              ]
-                                            },
-                                            "required": true
-                                          },
-                                          "b": {
-                                            "schema": {
-                                              "kind": "array",
-                                              "element": {
-                                                "kind": "prim",
-                                                "types": [
-                                                  "boolean",
-                                                  "null",
-                                                  "string"
-                                                ]
-                                              }
-                                            },
-                                            "required": true
-                                          }
-                                        },
-                                        "openExtras": false
-                                      },
-                                      "required": false
-                                    },
-                                    "phase": {
-                                      "schema": {
-                                        "kind": "prim",
-                                        "types": [
-                                          "string"
-                                        ]
-                                      },
-                                      "required": false
-                                    },
-                                    "REDACTED": {
-                                      "schema": {
-                                        "kind": "prim",
-                                        "types": [
-                                          "string"
-                                        ]
-                                      },
-                                      "required": false
-                                    },
-                                    "tag": {
-                                      "schema": {
-                                        "kind": "prim",
-                                        "types": [
-                                          "string"
-                                        ]
-                                      },
-                                      "required": false
-                                    }
-                                  },
-                                  "openExtras": false
+                                  "kind": "opaque",
+                                  "reason": "Task.metadata is Record<string, unknown> — caller-supplied keys, not part of the harness contract.\n"
                                 },
                                 "required": false
                               },

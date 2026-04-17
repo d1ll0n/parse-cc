@@ -358,13 +358,19 @@ function runCodegen(
   if (result.unsupported.length > 0) {
     console.log("");
     console.log("[codegen] not auto-fixable (need manual handling):");
-    // Bucket by reason so review-required types group together.
-    const byReason = new Map<string, number>();
+    // Bucket by reason so similar issues group together; list the gap paths
+    // under each so the maintainer knows exactly what to look at.
+    const byReason = new Map<string, string[]>();
     for (const u of result.unsupported) {
-      byReason.set(u.reason, (byReason.get(u.reason) ?? 0) + 1);
+      const list = byReason.get(u.reason) ?? [];
+      list.push(u.gap.path);
+      byReason.set(u.reason, list);
     }
-    for (const [reason, n] of [...byReason.entries()].sort((a, b) => b[1] - a[1])) {
-      console.log(`    ${n.toString().padStart(4)}  ${reason}`);
+    for (const [reason, paths] of [...byReason.entries()].sort((a, b) => b[1].length - a[1].length)) {
+      console.log(`    ${paths.length.toString().padStart(4)}  ${reason}`);
+      for (const p of paths) {
+        console.log(`          ${p}`);
+      }
     }
   }
 
