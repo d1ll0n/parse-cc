@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   audit,
+  auditMerged,
   type Gap,
 } from "../../../scripts/audit/type-coverage/comparator.ts";
 import {
@@ -334,5 +335,105 @@ describe("audit — edge cases", () => {
       { type: "system", data: 42 },
     ];
     expect(audit(typed, samples)).toEqual([]);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// auditMerged — structural compare (corpus path).
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("auditMerged — structural comparison", () => {
+  it("returns empty when corpus is a structural subset of typed", () => {
+    const typed = discUnion("type", {
+      user: object({ type: literal("user"), message: prim("string") }),
+      assistant: object({ type: literal("assistant"), message: prim("string") }),
+    });
+    const corpus = discUnion("type", {
+      user: object({ type: literal("user"), message: prim("string") }),
+    });
+    expect(auditMerged(typed, corpus)).toEqual([]);
+  });
+
+  it("emits unknown-variant when corpus has a discriminator typed doesn't", () => {
+    const typed = discUnion("type", {
+      user: object({ type: literal("user") }),
+    });
+    const corpus = discUnion("type", {
+      user: object({ type: literal("user") }),
+      "task-reminder": object({ type: literal("task-reminder"), taskId: prim("string") }),
+    });
+    const gaps = auditMerged(typed, corpus);
+    expect(gaps).toHaveLength(1);
+    expect(gaps[0].kind).toBe("unknown-variant");
+    expect(gaps[0].path).toBe("$[task-reminder]");
+    expect(gaps[0].detail).toContain("taskId");
+  });
+
+  it("emits missing-field when corpus has a property typed doesn't model", () => {
+    const typed = discUnion("type", {
+      assistant: object({
+        type: literal("assistant"),
+        usage: object({ input_tokens: prim("number") }),
+      }),
+    });
+    const corpus = discUnion("type", {
+      assistant: object({
+        type: literal("assistant"),
+        usage: object({
+          input_tokens: prim("number"),
+          cache_creation_input_tokens: prim("number"),
+        }),
+      }),
+    });
+    const gaps = auditMerged(typed, corpus);
+    expect(gaps).toHaveLength(1);
+    expect(gaps[0].kind).toBe("missing-field");
+    expect(gaps[0].path).toBe("$[assistant].usage.cache_creation_input_tokens");
+  });
+
+  it("emits widen-prim when corpus has primitive types not in typed", () => {
+    const typed = object({
+      stop_reason: prim("string"),
+    });
+    const corpus = object({
+      stop_reason: prim("string", "null"),
+    });
+    const gaps = auditMerged(typed, corpus);
+    expect(gaps).toHaveLength(1);
+    expect(gaps[0].kind).toBe("widen-prim");
+    expect(gaps[0].detail).toContain("null");
+  });
+
+  it("opaque on either side short-circuits descent", () => {
+    const typed = object({ data: opaque("typed-opaque") });
+    const corpus = object({
+      data: object({ deeply: object({ nested: prim("string") }) }),
+    });
+    expect(auditMerged(typed, corpus)).toEqual([]);
+
+    const typed2 = object({ data: object({ x: prim("string") }) });
+    const corpus2 = object({ data: opaque("corpus-opaque") });
+    expect(auditMerged(typed2, corpus2)).toEqual([]);
+  });
+
+  it("openExtras absorbs corpus properties that typed doesn't model", () => {
+    const typed = object({ x: prim("string") }, /* openExtras */ true);
+    const corpus = object({
+      x: prim("string"),
+      surprise: prim("number"),
+      another: prim("boolean"),
+    });
+    expect(auditMerged(typed, corpus)).toEqual([]);
+  });
+
+  it("recurses into arrays", () => {
+    const typed = object({ items: { kind: "array" as const, element: prim("string") } });
+    const corpus = object({
+      items: { kind: "array" as const, element: prim("string", "number") },
+    });
+    const gaps = auditMerged(typed, corpus);
+    expect(gaps).toHaveLength(1);
+    expect(gaps[0].path).toBe("$.items[]");
+    expect(gaps[0].kind).toBe("widen-prim");
   });
 });

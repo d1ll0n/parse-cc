@@ -49,8 +49,8 @@
     "lint:ci": "biome lint --error-on-warnings --reporter=github",
     "types:sync": "node --experimental-strip-types scripts/sync-types-md.ts --verbose",
     "types:check": "node --experimental-strip-types scripts/sync-types-md.ts --verbose --check",
-    "audit:logs": "tsx scripts/audit-log-schema.ts",
-    "audit:logs:update": "tsx scripts/audit-log-schema.ts --update-baseline",
+    "audit:logs": "tsx scripts/audit/type-coverage/cli.ts",
+    "audit:logs:capture": "tsx scripts/audit/type-coverage/capture.ts",
     "prepare": "husky",
     "prepublishOnly": "npm run lint && npm run types:check && npm test && npm run build"
   },

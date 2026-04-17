@@ -275,3 +275,161 @@ function dedupGaps(gaps: Gap[]): Gap[] {
   }
   return out;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// auditMerged: compare a typed Schema against an already-merged observed
+// Schema (e.g. the committed corpus). Per-sample routing is unnecessary here
+// — the corpus's discUnion structure is the routing result baked in.
+// Walks both trees in parallel.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Compare a typed schema against an observed schema (already merged).
+ * Used for the committed corpus path; live samples should still go through
+ * `audit()` to preserve per-sample routing semantics.
+ *
+ * Walks both trees in parallel. Gaps are emitted with the same `Gap` shape
+ * the per-sample comparator uses, so callers can dedupe across both paths.
+ */
+export function auditMerged(typed: Schema, observed: Schema, path = "$"): Gap[] {
+  if (!typed) return [{ path, kind: "missing-typed", detail: "no typed schema at this position" }];
+  if (typed.kind === "opaque") return [];
+  if (observed.kind === "opaque") return [];
+
+  // Discriminated union on the typed side: walk corpus' discUnion variants
+  // against the matching typed variants.
+  if (typed.kind === "discUnion") {
+    if (observed.kind !== "discUnion") {
+      // Corpus didn't bucket — could be a top-level shape mismatch.
+      return [{ path, kind: "kind-mismatch", detail: `typed=discUnion observed=${observed.kind}` }];
+    }
+    const gaps: Gap[] = [];
+    for (const [discValue, observedVariant] of Object.entries(observed.variants)) {
+      const typedVariant = typed.variants[discValue];
+      if (!typedVariant) {
+        gaps.push({
+          path: `${path}[${discValue}]`,
+          kind: "unknown-variant",
+          detail: `discriminator ${typed.discriminator}=${JSON.stringify(discValue)} has no typed variant. observed shape: ${observedSummary(observedVariant)}`,
+        });
+        continue;
+      }
+      gaps.push(...auditMerged(typedVariant, observedVariant, `${path}[${discValue}]`));
+    }
+    return dedupGaps(gaps);
+  }
+
+  if (typed.kind === "object") {
+    if (observed.kind !== "object") {
+      return [{ path, kind: "kind-mismatch", detail: `typed=object observed=${observed.kind}` }];
+    }
+    const gaps: Gap[] = [];
+    for (const [k, observedProp] of Object.entries(observed.props)) {
+      const typedProp = typed.props[k];
+      if (!typedProp) {
+        if (!typed.openExtras) {
+          gaps.push({
+            path: `${path}.${k}`,
+            kind: "missing-field",
+            detail: `observed type: ${observedSummary(observedProp.schema)}`,
+          });
+        }
+        continue;
+      }
+      gaps.push(...auditMerged(typedProp.schema, observedProp.schema, `${path}.${k}`));
+    }
+    return gaps;
+  }
+
+  if (typed.kind === "array") {
+    if (observed.kind !== "array") {
+      return [{ path, kind: "kind-mismatch", detail: `typed=array observed=${observed.kind}` }];
+    }
+    return auditMerged(typed.element, observed.element, `${path}[]`);
+  }
+
+  if (typed.kind === "record") {
+    if (observed.kind === "record") {
+      return auditMerged(typed.value, observed.value, `${path}{*}`);
+    }
+    if (observed.kind === "object") {
+      // Corpus captured per-key (no record collapse) but typed expects a
+      // record. Recurse into each observed property's value against
+      // typed.value.
+      const gaps: Gap[] = [];
+      for (const [k, observedProp] of Object.entries(observed.props)) {
+        gaps.push(...auditMerged(typed.value, observedProp.schema, `${path}{${k}}`));
+      }
+      return dedupGaps(gaps);
+    }
+    return [{ path, kind: "kind-mismatch", detail: `typed=record observed=${observed.kind}` }];
+  }
+
+  if (typed.kind === "prim") {
+    if (observed.kind === "prim") {
+      const extras = observed.types.filter((t) => !typed.types.includes(t));
+      return extras.length
+        ? [{ path, kind: "widen-prim", detail: `observed +${extras.join(",")}` }]
+        : [];
+    }
+    if (observed.kind === "literal") {
+      const observedKind: string = observed.value === null ? "null" : typeof observed.value;
+      const extras = !typed.types.includes(observedKind as never) ? [observedKind] : [];
+      return extras.length
+        ? [{ path, kind: "widen-prim", detail: `observed +${extras.join(",")}` }]
+        : [];
+    }
+    return [{ path, kind: "kind-mismatch", detail: `typed=prim observed=${observed.kind}` }];
+  }
+
+  if (typed.kind === "literal") {
+    if (observed.kind === "literal" && observed.value === typed.value) return [];
+    return [{
+      path,
+      kind: "literal-mismatch",
+      detail: `expected ${JSON.stringify(typed.value)}, observed ${observedSummary(observed)}`,
+    }];
+  }
+
+  if (typed.kind === "union") {
+    // Best-fit-per-observed-shape: try each typed variant, pick lowest-gap.
+    if (observed.kind === "union") {
+      const gaps: Gap[] = [];
+      for (const obsVariant of observed.variants) {
+        let bestGaps: Gap[] | null = null;
+        for (const typedVariant of typed.variants) {
+          const g = auditMerged(typedVariant, obsVariant, path);
+          if (bestGaps === null || g.length < bestGaps.length) bestGaps = g;
+        }
+        gaps.push(...(bestGaps ?? []));
+      }
+      return dedupGaps(gaps);
+    }
+    let bestGaps: Gap[] | null = null;
+    for (const v of typed.variants) {
+      const g = auditMerged(v, observed, path);
+      if (bestGaps === null || g.length < bestGaps.length) bestGaps = g;
+    }
+    return bestGaps ?? [];
+  }
+
+  return [{ path, kind: "unhandled-typed-kind", detail: typed.kind }];
+}
+
+/** Short summary of an observed schema for inclusion in gap detail strings. */
+function observedSummary(s: Schema): string {
+  if (s.kind === "prim") return s.types.join("|");
+  if (s.kind === "literal") return JSON.stringify(s.value);
+  if (s.kind === "array") return `array<${observedSummary(s.element)}>`;
+  if (s.kind === "object") {
+    const keys = Object.keys(s.props).slice(0, 6).join(", ");
+    return `object{${keys}${Object.keys(s.props).length > 6 ? ", ..." : ""}${s.openExtras ? ", openExtras" : ""}}`;
+  }
+  if (s.kind === "discUnion") {
+    return `discUnion[${s.discriminator}]{${Object.keys(s.variants).join("|")}}`;
+  }
+  if (s.kind === "record") return `record<${observedSummary(s.value)}>`;
+  if (s.kind === "union") return `union<${s.variants.map(observedSummary).join("|")}>`;
+  if (s.kind === "opaque") return `opaque(${s.reason})`;
+  return "?";
+}
