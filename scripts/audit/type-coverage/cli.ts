@@ -23,6 +23,9 @@ import { createInterface } from "node:readline";
 import { homedir } from "node:os";
 import { readdir, stat } from "node:fs/promises";
 
+import { spawnSync } from "node:child_process";
+import type { Project } from "ts-morph";
+
 import { createProject, walkLogEntry } from "./walker.ts";
 import {
   parseAllowlist,
@@ -33,6 +36,7 @@ import {
 } from "./allowlist.ts";
 import { readCorpusFile, deriveSkipPatternsFromTypedSchema } from "./corpus.ts";
 import { audit, auditMerged, type Gap } from "./comparator.ts";
+import { synthesizePatches, applyPatches, describePatch } from "./codegen.ts";
 import type { Schema } from "./schema.ts";
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
@@ -43,21 +47,37 @@ const CORPUS_PATH = path.join(REPO_ROOT, "tests/fixtures/observed-corpus.json");
 interface CliOptions {
   verbose: boolean;
   projectsDir: string;
+  /** Print proposed codegen patches without applying. */
+  suggest: boolean;
+  /** Apply codegen patches to source files (implies --suggest output too). */
+  write: boolean;
 }
 
 function parseArgs(argv: string[]): CliOptions {
   const opts: CliOptions = {
     verbose: false,
     projectsDir: path.join(homedir(), ".claude", "projects"),
+    suggest: false,
+    write: false,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--verbose" || a === "-v") opts.verbose = true;
     else if (a === "--projects-dir") opts.projectsDir = argv[++i];
+    else if (a === "--suggest") opts.suggest = true;
+    else if (a === "--write") {
+      opts.write = true;
+      opts.suggest = true;
+    }
     else if (a === "--help" || a === "-h") {
       console.log(
-        "usage: audit-type-coverage [--verbose] [--projects-dir <path>]"
+        "usage: audit-type-coverage [--verbose] [--suggest | --write] [--projects-dir <path>]"
       );
+      console.log("");
+      console.log("  --suggest       Print codegen patches that would close gaps (dry-run)");
+      console.log("  --write         Apply patches to source files; runs `npm run lint` after");
+      console.log("                  to normalize formatting. Leaves the working tree dirty");
+      console.log("                  for human review.");
       process.exit(0);
     }
   }
@@ -65,6 +85,7 @@ function parseArgs(argv: string[]): CliOptions {
 }
 
 interface LoadedInputs {
+  project: Project;
   typed: Schema;
   walkerExclusions: ReturnType<typeof walkLogEntry>["exclusions"];
   derivedSkipPatterns: Array<{ path: string; reason: string }>;
@@ -102,6 +123,7 @@ function loadAll(): LoadedInputs {
   const corpus = readCorpusFile(CORPUS_PATH);
 
   return {
+    project,
     typed: walkResult.schema,
     walkerExclusions: walkResult.exclusions,
     derivedSkipPatterns,
@@ -209,7 +231,7 @@ async function main(): Promise<void> {
   console.log(`[audit] type-coverage audit`);
   console.log(`[audit] projects dir: ${opts.projectsDir}`);
 
-  const { typed, walkerExclusions, derivedSkipPatterns, allowlist, corpus } = loadAll();
+  const { project, typed, walkerExclusions, derivedSkipPatterns, allowlist, corpus } = loadAll();
   console.log(`[audit] typed walker: ${countDiscUnionVariants(typed)} variants, ${derivedSkipPatterns.length} auto-derived skip patterns`);
   console.log(`[audit] allowlist:    ${allowlist.entries.length} entries (${allowlist.entries.length - derivedSkipPatterns.length} user-supplied)`);
   console.log(`[audit] corpus:       ${corpus ? `${countDiscUnionVariants(corpus)} variants from ${CORPUS_PATH}` : "<not present, run audit:logs:capture --bootstrap>"}`);
@@ -285,11 +307,87 @@ async function main(): Promise<void> {
     }
   }
 
-  if (tagged.length > 0) {
+  // Codegen path: --suggest prints proposed patches; --write applies them.
+  if ((opts.suggest || opts.write) && tagged.length > 0) {
+    runCodegen(opts, tagged, corpus, project);
+  } else if (tagged.length > 0) {
     console.log(`[audit] rerun with --verbose for full gap detail and excluded-variant listing`);
+    console.log(`[audit] rerun with --suggest to see codegen patches that would close these gaps`);
   }
 
   process.exit(tagged.length > 0 ? 1 : 0);
+}
+
+function runCodegen(
+  opts: CliOptions,
+  gaps: SourceTaggedGap[],
+  corpus: Schema | null,
+  project: Project
+): void {
+  const result = synthesizePatches(gaps, corpus, project);
+
+  console.log("");
+  console.log(
+    `[codegen] ${result.patches.length} auto-fixable, ${result.unsupported.length} need manual review`
+  );
+
+  if (result.patches.length > 0) {
+    console.log("");
+    console.log("[codegen] proposed patches:");
+    // Group by target file for diff readability.
+    const byFile = new Map<string, typeof result.patches>();
+    for (const p of result.patches) {
+      const k = p.targetFile;
+      let bucket = byFile.get(k);
+      if (!bucket) {
+        bucket = [];
+        byFile.set(k, bucket);
+      }
+      bucket.push(p);
+    }
+    for (const [file, patches] of [...byFile.entries()].sort()) {
+      const rel = file.startsWith(REPO_ROOT) ? file.slice(REPO_ROOT.length + 1) : file;
+      console.log("");
+      console.log(`  ${rel}:`);
+      for (const p of patches) {
+        console.log(`    ${describePatch(p)}`);
+      }
+    }
+  }
+
+  if (result.unsupported.length > 0) {
+    console.log("");
+    console.log("[codegen] not auto-fixable (need manual handling):");
+    // Bucket by reason so review-required types group together.
+    const byReason = new Map<string, number>();
+    for (const u of result.unsupported) {
+      byReason.set(u.reason, (byReason.get(u.reason) ?? 0) + 1);
+    }
+    for (const [reason, n] of [...byReason.entries()].sort((a, b) => b[1] - a[1])) {
+      console.log(`    ${n.toString().padStart(4)}  ${reason}`);
+    }
+  }
+
+  if (opts.write && result.patches.length > 0) {
+    console.log("");
+    console.log(`[codegen] --write: applying ${result.patches.length} patch(es)...`);
+    applyPatches(result.patches, project);
+    const touched = new Set(result.patches.map((p) => p.targetFile));
+    console.log(`[codegen] modified ${touched.size} file(s).`);
+    console.log(`[codegen] running 'npm run lint' to normalize formatting...`);
+    const lintResult = spawnSync("npm", ["run", "lint:fix"], {
+      cwd: REPO_ROOT,
+      stdio: "inherit",
+    });
+    if (lintResult.status !== 0) {
+      console.log(`[codegen] lint:fix exited ${lintResult.status} (warnings remain — see above)`);
+    }
+    console.log("");
+    console.log(`[codegen] done. review the diff before committing.`);
+  } else if (opts.suggest) {
+    console.log("");
+    console.log(`[codegen] dry-run only. rerun with --write to apply.`);
+  }
 }
 
 function countDiscUnionVariants(s: Schema): number {
