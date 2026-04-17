@@ -112,6 +112,7 @@ async function auditSession(
     ["firstUserMessage", () => sess.firstUserMessage()],
     ["isOngoing", () => sess.isOngoing()],
     ["fileHistory", () => sess.fileHistory()],
+    ["tasks", () => sess.tasks()],
   ];
   for (const [name, call] of methods) {
     try {
