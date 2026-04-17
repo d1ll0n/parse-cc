@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
   captureCorpus,
-  captureOne,
   mergeIntoCorpus,
   serializeCorpus,
   deserializeCorpus,
@@ -22,18 +21,28 @@ import type { Schema } from "../../../scripts/audit/type-coverage/schema.ts";
 
 const EMPTY_ALLOWLIST = parseAllowlist(`entries: []`);
 
+// Convenience: a typed schema with a top-level discUnion for entry types.
+function makeTypedTopLevel(variants: Record<string, Schema>): Schema {
+  return discUnion("type", variants);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
-// captureCorpus — bucketing by entry type.
+// captureCorpus — type-guided routing at top-level discUnion.
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("captureCorpus — top-level bucketing", () => {
-  it("buckets entries by their `type` field into a discUnion", () => {
+describe("captureCorpus — top-level routing", () => {
+  it("routes samples by type into a discUnion mirroring the typed schema", () => {
+    const typed = makeTypedTopLevel({
+      user: object({ type: literal("user"), message: prim("string") }),
+      assistant: object({ type: literal("assistant"), message: prim("string") }),
+    });
     const corpus = captureCorpus(
       [
         { type: "user", message: "hi" },
         { type: "assistant", message: "ok" },
         { type: "user", message: "yo" },
       ],
+      typed,
       EMPTY_ALLOWLIST
     );
     expect(corpus.kind).toBe("discUnion");
@@ -42,133 +51,164 @@ describe("captureCorpus — top-level bucketing", () => {
     expect(Object.keys(corpus.variants).sort()).toEqual(["assistant", "user"]);
   });
 
-  it("places typeless entries under `<no-type>`", () => {
+  it("preserves discriminator literals at routed positions (no literal-mismatch noise)", () => {
+    const typed = makeTypedTopLevel({
+      user: object({ type: literal("user") }),
+    });
+    const corpus = captureCorpus([{ type: "user" }], typed, EMPTY_ALLOWLIST);
+    if (corpus.kind !== "discUnion") return;
+    const userVariant = corpus.variants.user;
+    if (userVariant.kind !== "object") return;
+    expect(userVariant.props.type?.schema).toEqual({ kind: "literal", value: "user" });
+  });
+
+  it("buckets unknown discriminator values separately for the audit to flag", () => {
+    const typed = makeTypedTopLevel({
+      user: object({ type: literal("user") }),
+    });
     const corpus = captureCorpus(
-      [{ uuid: "x", message: "hi" }],
+      [
+        { type: "user" },
+        { type: "task-reminder", taskId: "t1" }, // unknown variant
+      ],
+      typed,
       EMPTY_ALLOWLIST
     );
     if (corpus.kind !== "discUnion") return;
-    expect(corpus.variants["<no-type>"]).toBeDefined();
+    expect(Object.keys(corpus.variants).sort()).toEqual(["task-reminder", "user"]);
+    const tr = corpus.variants["task-reminder"];
+    if (tr.kind !== "object") return;
+    expect(Object.keys(tr.props)).toContain("taskId");
   });
 
-  it("merges multiple samples of the same type into one schema with optional widening", () => {
+  it("buckets discriminator-less samples under <no-discriminator>", () => {
+    const typed = makeTypedTopLevel({
+      user: object({ type: literal("user") }),
+    });
+    const corpus = captureCorpus(
+      [{ message: "hi" }],
+      typed,
+      EMPTY_ALLOWLIST
+    );
+    if (corpus.kind !== "discUnion") return;
+    expect(corpus.variants["<no-discriminator>"]).toBeDefined();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// captureCorpus — nested discUnions and per-property routing.
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("captureCorpus — nested routing", () => {
+  it("routes nested discUnions (e.g. AttachmentPayload)", () => {
+    const typed = makeTypedTopLevel({
+      attachment: object({
+        type: literal("attachment"),
+        attachment: discUnion("type", {
+          skill_listing: object({ type: literal("skill_listing"), content: prim("string") }),
+          hook_success: object({ type: literal("hook_success"), hookName: prim("string") }),
+        }),
+      }),
+    });
     const corpus = captureCorpus(
       [
-        { type: "user", message: "hi" },
-        { type: "user", message: "yo", isMeta: true },
+        { type: "attachment", attachment: { type: "skill_listing", content: "..." } },
+        { type: "attachment", attachment: { type: "hook_success", hookName: "PreToolUse" } },
       ],
+      typed,
+      EMPTY_ALLOWLIST
+    );
+    if (corpus.kind !== "discUnion") return;
+    const att = corpus.variants.attachment;
+    if (att.kind !== "object") return;
+    const innerPayload = att.props.attachment.schema;
+    expect(innerPayload.kind).toBe("discUnion");
+    if (innerPayload.kind !== "discUnion") return;
+    expect(Object.keys(innerPayload.variants).sort()).toEqual(["hook_success", "skill_listing"]);
+  });
+
+  it("captures observed properties typed doesn't model (for missing-field gaps)", () => {
+    const typed = makeTypedTopLevel({
+      user: object({ type: literal("user"), message: prim("string") }),
+    });
+    const corpus = captureCorpus(
+      [{ type: "user", message: "hi", surpriseField: 42 }],
+      typed,
       EMPTY_ALLOWLIST
     );
     if (corpus.kind !== "discUnion") return;
     const user = corpus.variants.user;
-    expect(user.kind).toBe("object");
     if (user.kind !== "object") return;
-    expect(user.props.message?.required).toBe(true);
-    expect(user.props.isMeta?.required).toBe(false);
+    expect(user.props.surpriseField?.schema).toEqual({ kind: "prim", types: ["number"] });
   });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// captureOne — allowlist short-circuit.
+// captureCorpus — allowlist short-circuit + skip-set behavior.
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("captureOne — allowlist short-circuit", () => {
-  it("returns opaque(reason) when the path matches an allowlist entry", () => {
-    const al = parseAllowlist(`
-entries:
-  - path: $[user].toolUseResult.*
-    reason: opaque-by-allowlist
-`);
-    const result = captureOne(
-      { stdout: "...", stderr: "..." },
-      "$[user].toolUseResult",
-      al,
-      0
-    );
-    expect(result).toEqual({ kind: "opaque", reason: "opaque-by-allowlist" });
-  });
-
-  it("recurses into objects when no path matches", () => {
-    const result = captureOne({ a: 1, b: "x" }, "$.foo", EMPTY_ALLOWLIST, 0);
-    expect(result.kind).toBe("object");
-    if (result.kind !== "object") return;
-    expect(result.props.a?.schema).toEqual({ kind: "prim", types: ["number"] });
-    expect(result.props.b?.schema).toEqual({ kind: "prim", types: ["string"] });
-  });
-
-  it("inlines literal opaque markers in arrays when allowlist matches the element path", () => {
-    const al = parseAllowlist(`
-entries:
-  - path: $.items[]
-    reason: per-item opaque
-`);
-    const result = captureOne([{ a: 1 }, { b: 2 }], "$.items", al, 0);
-    expect(result.kind).toBe("array");
-    if (result.kind !== "array") return;
-    expect(result.element).toEqual({ kind: "opaque", reason: "per-item opaque" });
-  });
-});
-
-// ─────────────────────────────────────────────────────────────────────────────
-// captureCorpus — measured against the file-history-snapshot bloat case.
-// ─────────────────────────────────────────────────────────────────────────────
-
-describe("captureCorpus — allowlist-driven shape collapse (file-history case)", () => {
-  it("collapses Record-keyed positions when allowlisted", () => {
+describe("captureCorpus — allowlist short-circuit", () => {
+  it("collapses Record-keyed positions when allowlist matches via .*", () => {
     const al = parseAllowlist(`
 entries:
   - path: $[file-history-snapshot].snapshot.trackedFileBackups.*
     reason: Record<string, TrackedFileBackup> — keys are file paths
 `);
-    const samples = [
-      {
-        type: "file-history-snapshot",
-        snapshot: {
-          trackedFileBackups: {
-            "/repo/src/a.ts": { backupFileName: "a@v1", version: 1 },
-            "/repo/src/b.ts": { backupFileName: "b@v1", version: 1 },
-            "/repo/src/c.ts": { backupFileName: "c@v1", version: 1 },
-          },
-        },
-      },
-    ];
-    const corpus = captureCorpus(samples, al);
-    if (corpus.kind !== "discUnion") return;
-    const fhs = corpus.variants["file-history-snapshot"];
-    if (fhs.kind !== "object") return;
-    const tracked = fhs.props.snapshot.schema;
-    if (tracked.kind !== "object") return;
-    expect(tracked.props.trackedFileBackups.schema).toEqual({
-      kind: "opaque",
-      reason: "Record<string, TrackedFileBackup> — keys are file paths",
+    const typed = makeTypedTopLevel({
+      "file-history-snapshot": object({
+        type: literal("file-history-snapshot"),
+        snapshot: object({
+          trackedFileBackups: record(
+            object({ backupFileName: prim("string"), version: prim("number") })
+          ),
+        }),
+      }),
     });
-  });
-
-  it("WITHOUT the allowlist, file paths fan out as keys (the bug we're avoiding)", () => {
-    const samples = [
-      {
-        type: "file-history-snapshot",
-        snapshot: {
-          trackedFileBackups: {
-            "/repo/src/a.ts": { backupFileName: "a@v1", version: 1 },
-            "/repo/src/b.ts": { backupFileName: "b@v1", version: 1 },
+    const corpus = captureCorpus(
+      [
+        {
+          type: "file-history-snapshot",
+          snapshot: {
+            trackedFileBackups: {
+              "/repo/src/a.ts": { backupFileName: "a@v1", version: 1 },
+              "/repo/src/b.ts": { backupFileName: "b@v1", version: 1 },
+              "/repo/src/c.ts": { backupFileName: "c@v1", version: 1 },
+            },
           },
         },
-      },
-    ];
-    const corpus = captureCorpus(samples, EMPTY_ALLOWLIST);
+      ],
+      typed,
+      al
+    );
     if (corpus.kind !== "discUnion") return;
     const fhs = corpus.variants["file-history-snapshot"];
     if (fhs.kind !== "object") return;
     const snap = fhs.props.snapshot.schema;
     if (snap.kind !== "object") return;
-    const tracked = snap.props.trackedFileBackups.schema;
-    if (tracked.kind !== "object") return;
-    // Without allowlist, file paths show up as property names (the bloat).
-    expect(Object.keys(tracked.props).sort()).toEqual([
-      "/repo/src/a.ts",
-      "/repo/src/b.ts",
-    ]);
+    expect(snap.props.trackedFileBackups.schema).toEqual({
+      kind: "opaque",
+      reason: "Record<string, TrackedFileBackup> — keys are file paths",
+    });
+  });
+
+  it("openExtras=true on typed object absorbs unknown observed keys", () => {
+    const typed = makeTypedTopLevel({
+      attachment: object(
+        { type: literal("attachment") },
+        /* openExtras */ true
+      ),
+    });
+    const corpus = captureCorpus(
+      [{ type: "attachment", randomKey: "x", another: 42 }],
+      typed,
+      EMPTY_ALLOWLIST
+    );
+    if (corpus.kind !== "discUnion") return;
+    const a = corpus.variants.attachment;
+    if (a.kind !== "object") return;
+    // Extras captured as opaque (openExtras parent reason)
+    expect(a.props.randomKey?.schema.kind).toBe("opaque");
+    expect(a.props.another?.schema.kind).toBe("opaque");
   });
 });
 
@@ -196,8 +236,6 @@ describe("serializeCorpus / deserializeCorpus — round-trip + determinism", () 
       apple: prim("number"),
       mango: prim("boolean"),
     });
-    // V8 preserves insertion order on JSON.parse, so Object.keys gives the
-    // serialized order back.
     const reparsed = JSON.parse(serializeCorpus(original)) as { props: Record<string, unknown> };
     expect(Object.keys(reparsed.props)).toEqual(["apple", "mango", "zebra"]);
   });
@@ -214,7 +252,6 @@ describe("serializeCorpus / deserializeCorpus — round-trip + determinism", () 
 });
 
 function sortShallow(s: Schema): Schema {
-  // Sort object/discUnion keys for equality comparison after a serialize round-trip.
   if (s.kind === "object") {
     const sorted: Record<string, { schema: Schema; required: boolean }> = {};
     for (const k of Object.keys(s.props).sort()) {
@@ -238,24 +275,54 @@ function sortShallow(s: Schema): Schema {
 
 describe("mergeIntoCorpus", () => {
   it("preserves shapes from the existing corpus when local doesn't see them", () => {
-    const existing = captureCorpus([{ type: "user", message: "hi" }], EMPTY_ALLOWLIST);
-    const local = captureCorpus([{ type: "assistant", message: "ok" }], EMPTY_ALLOWLIST);
+    const typed = makeTypedTopLevel({
+      user: object({ type: literal("user"), message: prim("string") }),
+      assistant: object({ type: literal("assistant"), message: prim("string") }),
+    });
+    const existing = captureCorpus([{ type: "user", message: "hi" }], typed, EMPTY_ALLOWLIST);
+    const local = captureCorpus([{ type: "assistant", message: "ok" }], typed, EMPTY_ALLOWLIST);
     const merged = mergeIntoCorpus(existing, local);
-    if (merged.kind !== "discUnion") return;
+    // Assert kind hard rather than `if (...) return;` — skip-on-narrowing
+    // hid a real merger bug (discUnion+discUnion went through flattenUnion
+    // and recursed into max-depth opaque) until a real-data run caught it.
+    expect(merged.kind).toBe("discUnion");
+    if (merged.kind !== "discUnion") throw new Error("unreachable");
     expect(Object.keys(merged.variants).sort()).toEqual(["assistant", "user"]);
   });
 
   it("widens optional/required when local sees additional optional properties", () => {
-    const existing = captureCorpus([{ type: "user", message: "hi" }], EMPTY_ALLOWLIST);
+    const typed = makeTypedTopLevel({
+      user: object({
+        type: literal("user"),
+        message: prim("string"),
+        isMeta: optional(prim("boolean")),
+      }),
+    });
+    const existing = captureCorpus([{ type: "user", message: "hi" }], typed, EMPTY_ALLOWLIST);
     const local = captureCorpus(
       [{ type: "user", message: "hi", isMeta: true }],
+      typed,
       EMPTY_ALLOWLIST
     );
     const merged = mergeIntoCorpus(existing, local);
-    if (merged.kind !== "discUnion") return;
+    expect(merged.kind).toBe("discUnion");
+    if (merged.kind !== "discUnion") throw new Error("unreachable");
     const user = merged.variants.user;
-    if (user.kind !== "object") return;
+    expect(user.kind).toBe("object");
+    if (user.kind !== "object") throw new Error("unreachable");
     expect(user.props.isMeta?.required).toBe(false);
+  });
+
+  it("handles multiple round-trip merges without collapsing to opaque", () => {
+    // Regression for the discUnion+discUnion → flattenUnion → max-depth bug.
+    const typed = makeTypedTopLevel({
+      user: object({ type: literal("user"), message: prim("string") }),
+    });
+    const a = captureCorpus([{ type: "user", message: "a" }], typed, EMPTY_ALLOWLIST);
+    const b = captureCorpus([{ type: "user", message: "b" }], typed, EMPTY_ALLOWLIST);
+    const c = captureCorpus([{ type: "user", message: "c" }], typed, EMPTY_ALLOWLIST);
+    const merged = mergeIntoCorpus(mergeIntoCorpus(a, b), c);
+    expect(merged.kind).toBe("discUnion");
   });
 });
 
@@ -280,7 +347,7 @@ describe("deriveSkipPatternsFromTypedSchema", () => {
     expect(inputPattern!.reason).toBe("per-tool");
   });
 
-  it("emits {*} patterns for record positions", () => {
+  it("emits trailing-`.*` patterns for record positions (matches capture's `.key` syntax)", () => {
     const typed = object({
       snapshot: object({
         trackedFileBackups: record(prim("string")),
@@ -289,6 +356,6 @@ describe("deriveSkipPatternsFromTypedSchema", () => {
     const patterns = deriveSkipPatternsFromTypedSchema(typed);
     const recordPattern = patterns.find((p) => p.path.includes("trackedFileBackups"));
     expect(recordPattern).toBeDefined();
-    expect(recordPattern!.path).toBe("$.snapshot.trackedFileBackups{*}");
+    expect(recordPattern!.path).toBe("$.snapshot.trackedFileBackups.*");
   });
 });

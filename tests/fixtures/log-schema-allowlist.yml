@@ -1,0 +1,20 @@
+# Type-coverage audit allowlist.
+#
+# Each entry declares a runtime path that is intentionally untyped — capture
+# stops there (records `opaque(reason)`) and the audit's gap filter accepts it
+# without producing a finding. Every entry MUST include a non-empty `reason`.
+#
+# The walker auto-derives skip patterns for typed-`unknown` and typed-`Record`
+# positions in src/types/, so this file only needs entries for things the
+# type system can't express (e.g., per-key globs at runtime positions, or
+# subtrees the maintainer has explicitly chosen to leave untyped).
+#
+# Path-pattern syntax (see scripts/audit/type-coverage/allowlist.ts):
+#   $[user].message.content[].input        exact path
+#   $[user].toolUseResult{mcp__*}          glob in record-key bucket
+#   $[attachment].attachment[queued_command].*    transitive descendants
+#
+# To verify after editing: `npm run audit:logs -- -v` reports stale entries
+# (those that match zero observed paths in the current scan).
+
+entries: []

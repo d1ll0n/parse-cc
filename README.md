@@ -69,22 +69,27 @@ npm run coverage      # run tests with coverage report
 npm run build         # compile typescript
 ```
 
-### Schema drift detection
+### Type-coverage audit
 
-Claude Code occasionally adds new entry types or fields to its session log format. The `audit:logs` script walks every session under `~/.claude/projects` (including subagents), builds a structural inventory (path → primitive type union, discriminated by `entry.type` and content block `type`), and compares it against a committed baseline at [`tests/fixtures/log-schema-baseline.json`](tests/fixtures/log-schema-baseline.json). It also exercises every `Session` introspection method to surface any that throw on real data.
+`parseEntry` is a passthrough cast — the TypeScript types in [`src/types/`](src/types/) are the only contract with consumers. The `audit:logs` script verifies that every field observed in real Claude Code session logs is either modelled by the types or explicitly declared intentionally untyped in the allowlist.
 
 ```bash
-npm run audit:logs            # compare current logs to baseline (exits 1 on drift)
-npm run audit:logs:update     # regenerate the baseline after accepting drift
-npm run audit:logs -- -v      # verbose: per-error details + removed paths
+npm run audit:logs              # check observed shapes against typed + allowlist
+npm run audit:logs -- -v        # verbose: full gap detail, walker exclusions, stale allowlist entries
+npm run audit:logs:capture      # merge current local scan into the committed corpus
+npm run audit:logs:capture -- --bootstrap   # create the corpus from scratch (one-time)
 ```
 
-**Run it when:**
-- You upgrade Claude Code to a new version — catches newly-emitted fields before they become silent `UnknownEntry` entries.
-- Before cutting a release — confirms the parser still resolves every session shape seen locally.
-- A user reports a session this library fails on — the audit pinpoints which shape drifted.
+The audit holds the invariant `observed ⊆ typed ∪ allowlist`. When a new entry type, field, or enum value lands in the harness, it surfaces as a coverage gap that must be either typed in `src/types/` or explicitly allowlisted in [`tests/fixtures/log-schema-allowlist.yml`](tests/fixtures/log-schema-allowlist.yml) with a written justification. A committed corpus at [`tests/fixtures/observed-corpus.json`](tests/fixtures/observed-corpus.json) preserves shape memory across machines and across time.
 
-The script reads only from your local `~/.claude`, so it's not wired into CI — run it manually. New findings should either be typed properly in [`src/types/entries.ts`](src/types/entries.ts) or accepted into the baseline via `audit:logs:update`.
+The corpus stores log **shape**, not log **content** — no file paths, project names, message text, tool inputs/outputs, IDs, timestamps, or header values. Only harness-controlled type/field names and primitive type unions land in it. The capture script prints a privacy reminder at the bottom of its output covering one edge case worth a glance (HTTP response header names from API errors) before committing.
+
+**Run it when:**
+- You upgrade Claude Code to a new version — surfaces newly-emitted fields immediately.
+- Before cutting a release — confirms the type system covers every shape the library has seen.
+- A user reports a session this library fails on — the audit pinpoints which shape isn't modelled.
+
+The script reads only from your local `~/.claude`, so it's not wired into CI — run it manually. Coverage gaps should be either typed properly in [`src/types/entries.ts`](src/types/entries.ts) (Phase 2 codegen will automate most of this) or accepted into the allowlist with a `reason` that's understandable six months later.
 
 ## Acknowledgements
 
@@ -123,13 +128,12 @@ src/
     skills.ts           Skill listing aggregation
     deferred-tools.ts   Deferred tools aggregation
 tests/
-  fixtures/             JSONL fixtures and persisted-output samples
-                        (includes log-schema-baseline.json for drift detection)
+  fixtures/             JSONL fixtures, log-schema-allowlist.yml, observed-corpus.json
   parse/, derive/       Unit tests per module
-  audit/                Schema inventory walker + diff tests
+  audit/type-coverage/  Walker / comparator / observed / corpus / allowlist tests
   integration/          Real-session E2E
 scripts/
   sync-types-md.ts      Regenerates docs/types.md ts fences from JSDoc
-  audit-log-schema.ts   Walks ~/.claude, diffs schema against baseline
-  audit/                Inventory walker + comparator used by the script
+  audit/type-coverage/  Type-coverage audit pipeline (cli.ts + capture.ts +
+                        walker / comparator / corpus / allowlist / observed)
 ```

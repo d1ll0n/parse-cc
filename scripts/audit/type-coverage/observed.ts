@@ -142,10 +142,28 @@ export function mergeSchemas(a: Schema, b: Schema, depth = 0): Schema {
           ? a
           : { kind: "union", variants: [a, otherOpaque] };
       }
-      case "discUnion":
+      case "discUnion": {
+        // Two discUnions on the same discriminator merge variant-by-variant.
+        // Used by mergeIntoCorpus to combine the existing corpus with a
+        // freshly captured local corpus.
+        const otherDisc = b as typeof a;
+        if (a.discriminator !== otherDisc.discriminator) {
+          return flattenUnion([a, otherDisc], depth);
+        }
+        const merged: Record<string, Schema> = {};
+        const allKeys = new Set([
+          ...Object.keys(a.variants),
+          ...Object.keys(otherDisc.variants),
+        ]);
+        for (const k of allKeys) {
+          const va = a.variants[k];
+          const vb = otherDisc.variants[k];
+          if (va && vb) merged[k] = mergeSchemas(va, vb, depth + 1);
+          else merged[k] = (va ?? vb) as Schema;
+        }
+        return { kind: "discUnion", discriminator: a.discriminator, variants: merged };
+      }
       case "union":
-        // These don't naturally appear in inferLeaf output; flatten if they
-        // ever show up via direct corpus merge.
         return flattenUnion([a, b], depth);
     }
   }

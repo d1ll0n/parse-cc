@@ -166,7 +166,15 @@ function walkObject(type: Type, next: (sub: Type) => Schema): Schema {
   let recordValue: Schema | null = null;
   const stringIdx = type.getStringIndexType();
   if (stringIdx) {
-    if (stringIdx.isUnknown() || stringIdx.isAny()) {
+    const idxIsUnknownish = stringIdx.isUnknown() || stringIdx.isAny();
+    if (idxIsUnknownish && Object.keys(props).length === 0) {
+      // Bare `Record<string, unknown>` / `[key: string]: unknown` with no
+      // named properties is semantically opaque — the whole subtree is
+      // user-defined. Emitting opaque here (rather than openExtras object)
+      // keeps the corpus from accumulating one entry per observed key.
+      return { kind: "opaque", reason: "Record<string, unknown> — opaque" };
+    }
+    if (idxIsUnknownish) {
       openExtras = true;
     } else if (Object.keys(props).length === 0) {
       recordValue = next(stringIdx);

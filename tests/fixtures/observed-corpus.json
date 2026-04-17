@@ -1,0 +1,4153 @@
+{
+  "kind": "discUnion",
+  "discriminator": "type",
+  "variants": {
+    "agent-name": {
+      "kind": "object",
+      "props": {
+        "agentName": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "sessionId": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "type": {
+          "schema": {
+            "kind": "literal",
+            "value": "agent-name"
+          },
+          "required": true
+        }
+      },
+      "openExtras": false
+    },
+    "assistant": {
+      "kind": "object",
+      "props": {
+        "cwd": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "entrypoint": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "error": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "forkedFrom": {
+          "schema": {
+            "kind": "object",
+            "props": {
+              "messageUuid": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              },
+              "sessionId": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              }
+            },
+            "openExtras": false
+          },
+          "required": false
+        },
+        "gitBranch": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "isApiErrorMessage": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "boolean"
+            ]
+          },
+          "required": false
+        },
+        "isSidechain": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "boolean"
+            ]
+          },
+          "required": true
+        },
+        "message": {
+          "schema": {
+            "kind": "object",
+            "props": {
+              "container": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "null"
+                  ]
+                },
+                "required": false
+              },
+              "content": {
+                "schema": {
+                  "kind": "array",
+                  "element": {
+                    "kind": "discUnion",
+                    "discriminator": "type",
+                    "variants": {
+                      "text": {
+                        "kind": "object",
+                        "props": {
+                          "text": {
+                            "schema": {
+                              "kind": "prim",
+                              "types": [
+                                "string"
+                              ]
+                            },
+                            "required": true
+                          },
+                          "type": {
+                            "schema": {
+                              "kind": "literal",
+                              "value": "text"
+                            },
+                            "required": true
+                          }
+                        },
+                        "openExtras": false
+                      },
+                      "thinking": {
+                        "kind": "object",
+                        "props": {
+                          "signature": {
+                            "schema": {
+                              "kind": "prim",
+                              "types": [
+                                "string"
+                              ]
+                            },
+                            "required": true
+                          },
+                          "thinking": {
+                            "schema": {
+                              "kind": "prim",
+                              "types": [
+                                "string"
+                              ]
+                            },
+                            "required": true
+                          },
+                          "type": {
+                            "schema": {
+                              "kind": "literal",
+                              "value": "thinking"
+                            },
+                            "required": true
+                          }
+                        },
+                        "openExtras": false
+                      },
+                      "tool_use": {
+                        "kind": "object",
+                        "props": {
+                          "caller": {
+                            "schema": {
+                              "kind": "object",
+                              "props": {
+                                "type": {
+                                  "schema": {
+                                    "kind": "prim",
+                                    "types": [
+                                      "string"
+                                    ]
+                                  },
+                                  "required": true
+                                }
+                              },
+                              "openExtras": false
+                            },
+                            "required": false
+                          },
+                          "id": {
+                            "schema": {
+                              "kind": "prim",
+                              "types": [
+                                "string"
+                              ]
+                            },
+                            "required": true
+                          },
+                          "input": {
+                            "schema": {
+                              "kind": "opaque",
+                              "reason": "(typed) Record<string, unknown> — opaque"
+                            },
+                            "required": true
+                          },
+                          "name": {
+                            "schema": {
+                              "kind": "prim",
+                              "types": [
+                                "string"
+                              ]
+                            },
+                            "required": true
+                          },
+                          "type": {
+                            "schema": {
+                              "kind": "literal",
+                              "value": "tool_use"
+                            },
+                            "required": true
+                          }
+                        },
+                        "openExtras": false
+                      }
+                    }
+                  }
+                },
+                "required": true
+              },
+              "context_management": {
+                "schema": {
+                  "kind": "union",
+                  "variants": [
+                    {
+                      "kind": "prim",
+                      "types": [
+                        "null"
+                      ]
+                    },
+                    {
+                      "kind": "object",
+                      "props": {
+                        "applied_edits": {
+                          "schema": {
+                            "kind": "array",
+                            "element": {
+                              "kind": "opaque",
+                              "reason": "empty"
+                            }
+                          },
+                          "required": true
+                        }
+                      },
+                      "openExtras": false
+                    }
+                  ]
+                },
+                "required": false
+              },
+              "id": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              },
+              "model": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              },
+              "role": {
+                "schema": {
+                  "kind": "literal",
+                  "value": "assistant"
+                },
+                "required": true
+              },
+              "stop_details": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "null"
+                  ]
+                },
+                "required": false
+              },
+              "stop_reason": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "required": true
+              },
+              "stop_sequence": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "required": true
+              },
+              "type": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              },
+              "usage": {
+                "schema": {
+                  "kind": "object",
+                  "props": {
+                    "cache_creation": {
+                      "schema": {
+                        "kind": "object",
+                        "props": {
+                          "ephemeral_1h_input_tokens": {
+                            "schema": {
+                              "kind": "prim",
+                              "types": [
+                                "number"
+                              ]
+                            },
+                            "required": true
+                          },
+                          "ephemeral_5m_input_tokens": {
+                            "schema": {
+                              "kind": "prim",
+                              "types": [
+                                "number"
+                              ]
+                            },
+                            "required": true
+                          }
+                        },
+                        "openExtras": false
+                      },
+                      "required": false
+                    },
+                    "cache_creation_input_tokens": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "number"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "cache_read_input_tokens": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "number"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "inference_geo": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "null",
+                          "string"
+                        ]
+                      },
+                      "required": false
+                    },
+                    "input_tokens": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "number"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "iterations": {
+                      "schema": {
+                        "kind": "union",
+                        "variants": [
+                          {
+                            "kind": "array",
+                            "element": {
+                              "kind": "union",
+                              "variants": [
+                                {
+                                  "kind": "opaque",
+                                  "reason": "empty"
+                                },
+                                {
+                                  "kind": "object",
+                                  "props": {
+                                    "cache_creation": {
+                                      "schema": {
+                                        "kind": "object",
+                                        "props": {
+                                          "ephemeral_1h_input_tokens": {
+                                            "schema": {
+                                              "kind": "prim",
+                                              "types": [
+                                                "number"
+                                              ]
+                                            },
+                                            "required": true
+                                          },
+                                          "ephemeral_5m_input_tokens": {
+                                            "schema": {
+                                              "kind": "prim",
+                                              "types": [
+                                                "number"
+                                              ]
+                                            },
+                                            "required": true
+                                          }
+                                        },
+                                        "openExtras": false
+                                      },
+                                      "required": true
+                                    },
+                                    "cache_creation_input_tokens": {
+                                      "schema": {
+                                        "kind": "prim",
+                                        "types": [
+                                          "number"
+                                        ]
+                                      },
+                                      "required": true
+                                    },
+                                    "cache_read_input_tokens": {
+                                      "schema": {
+                                        "kind": "prim",
+                                        "types": [
+                                          "number"
+                                        ]
+                                      },
+                                      "required": true
+                                    },
+                                    "input_tokens": {
+                                      "schema": {
+                                        "kind": "prim",
+                                        "types": [
+                                          "number"
+                                        ]
+                                      },
+                                      "required": true
+                                    },
+                                    "output_tokens": {
+                                      "schema": {
+                                        "kind": "prim",
+                                        "types": [
+                                          "number"
+                                        ]
+                                      },
+                                      "required": true
+                                    },
+                                    "type": {
+                                      "schema": {
+                                        "kind": "prim",
+                                        "types": [
+                                          "string"
+                                        ]
+                                      },
+                                      "required": true
+                                    }
+                                  },
+                                  "openExtras": false
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "kind": "prim",
+                            "types": [
+                              "null"
+                            ]
+                          }
+                        ]
+                      },
+                      "required": false
+                    },
+                    "output_tokens": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "number"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "server_tool_use": {
+                      "schema": {
+                        "kind": "object",
+                        "props": {
+                          "web_fetch_requests": {
+                            "schema": {
+                              "kind": "prim",
+                              "types": [
+                                "number"
+                              ]
+                            },
+                            "required": true
+                          },
+                          "web_search_requests": {
+                            "schema": {
+                              "kind": "prim",
+                              "types": [
+                                "number"
+                              ]
+                            },
+                            "required": true
+                          }
+                        },
+                        "openExtras": false
+                      },
+                      "required": false
+                    },
+                    "service_tier": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "null",
+                          "string"
+                        ]
+                      },
+                      "required": false
+                    },
+                    "speed": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "null",
+                          "string"
+                        ]
+                      },
+                      "required": false
+                    }
+                  },
+                  "openExtras": false
+                },
+                "required": true
+              }
+            },
+            "openExtras": false
+          },
+          "required": true
+        },
+        "parentUuid": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "requestId": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "sessionId": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "slug": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "timestamp": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "type": {
+          "schema": {
+            "kind": "literal",
+            "value": "assistant"
+          },
+          "required": true
+        },
+        "userType": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "uuid": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "version": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        }
+      },
+      "openExtras": false
+    },
+    "attachment": {
+      "kind": "object",
+      "props": {
+        "attachment": {
+          "schema": {
+            "kind": "discUnion",
+            "discriminator": "type",
+            "variants": {
+              "command_permissions": {
+                "kind": "object",
+                "props": {
+                  "allowedTools": {
+                    "schema": {
+                      "kind": "array",
+                      "element": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      }
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "literal",
+                      "value": "command_permissions"
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "compact_file_reference": {
+                "kind": "object",
+                "props": {
+                  "displayPath": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "filename": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "date_change": {
+                "kind": "object",
+                "props": {
+                  "newDate": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "deferred_tools_delta": {
+                "kind": "object",
+                "props": {
+                  "addedLines": {
+                    "schema": {
+                      "kind": "array",
+                      "element": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      }
+                    },
+                    "required": true
+                  },
+                  "addedNames": {
+                    "schema": {
+                      "kind": "array",
+                      "element": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      }
+                    },
+                    "required": true
+                  },
+                  "removedNames": {
+                    "schema": {
+                      "kind": "array",
+                      "element": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      }
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "literal",
+                      "value": "deferred_tools_delta"
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "diagnostics": {
+                "kind": "object",
+                "props": {
+                  "files": {
+                    "schema": {
+                      "kind": "array",
+                      "element": {
+                        "kind": "object",
+                        "props": {
+                          "diagnostics": {
+                            "schema": {
+                              "kind": "array",
+                              "element": {
+                                "kind": "object",
+                                "props": {
+                                  "code": {
+                                    "schema": {
+                                      "kind": "prim",
+                                      "types": [
+                                        "string"
+                                      ]
+                                    },
+                                    "required": true
+                                  },
+                                  "message": {
+                                    "schema": {
+                                      "kind": "prim",
+                                      "types": [
+                                        "string"
+                                      ]
+                                    },
+                                    "required": true
+                                  },
+                                  "range": {
+                                    "schema": {
+                                      "kind": "object",
+                                      "props": {
+                                        "end": {
+                                          "schema": {
+                                            "kind": "object",
+                                            "props": {
+                                              "character": {
+                                                "schema": {
+                                                  "kind": "prim",
+                                                  "types": [
+                                                    "number"
+                                                  ]
+                                                },
+                                                "required": true
+                                              },
+                                              "line": {
+                                                "schema": {
+                                                  "kind": "prim",
+                                                  "types": [
+                                                    "number"
+                                                  ]
+                                                },
+                                                "required": true
+                                              }
+                                            },
+                                            "openExtras": false
+                                          },
+                                          "required": true
+                                        },
+                                        "start": {
+                                          "schema": {
+                                            "kind": "object",
+                                            "props": {
+                                              "character": {
+                                                "schema": {
+                                                  "kind": "prim",
+                                                  "types": [
+                                                    "number"
+                                                  ]
+                                                },
+                                                "required": true
+                                              },
+                                              "line": {
+                                                "schema": {
+                                                  "kind": "prim",
+                                                  "types": [
+                                                    "number"
+                                                  ]
+                                                },
+                                                "required": true
+                                              }
+                                            },
+                                            "openExtras": false
+                                          },
+                                          "required": true
+                                        }
+                                      },
+                                      "openExtras": false
+                                    },
+                                    "required": true
+                                  },
+                                  "severity": {
+                                    "schema": {
+                                      "kind": "prim",
+                                      "types": [
+                                        "string"
+                                      ]
+                                    },
+                                    "required": true
+                                  },
+                                  "source": {
+                                    "schema": {
+                                      "kind": "prim",
+                                      "types": [
+                                        "string"
+                                      ]
+                                    },
+                                    "required": true
+                                  }
+                                },
+                                "openExtras": false
+                              }
+                            },
+                            "required": true
+                          },
+                          "uri": {
+                            "schema": {
+                              "kind": "prim",
+                              "types": [
+                                "string"
+                              ]
+                            },
+                            "required": true
+                          }
+                        },
+                        "openExtras": false
+                      }
+                    },
+                    "required": true
+                  },
+                  "isNew": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "boolean"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "edited_text_file": {
+                "kind": "object",
+                "props": {
+                  "filename": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "snippet": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "file": {
+                "kind": "object",
+                "props": {
+                  "content": {
+                    "schema": {
+                      "kind": "object",
+                      "props": {
+                        "file": {
+                          "schema": {
+                            "kind": "object",
+                            "props": {
+                              "content": {
+                                "schema": {
+                                  "kind": "prim",
+                                  "types": [
+                                    "string"
+                                  ]
+                                },
+                                "required": true
+                              },
+                              "filePath": {
+                                "schema": {
+                                  "kind": "prim",
+                                  "types": [
+                                    "string"
+                                  ]
+                                },
+                                "required": true
+                              },
+                              "numLines": {
+                                "schema": {
+                                  "kind": "prim",
+                                  "types": [
+                                    "number"
+                                  ]
+                                },
+                                "required": true
+                              },
+                              "startLine": {
+                                "schema": {
+                                  "kind": "prim",
+                                  "types": [
+                                    "number"
+                                  ]
+                                },
+                                "required": true
+                              },
+                              "totalLines": {
+                                "schema": {
+                                  "kind": "prim",
+                                  "types": [
+                                    "number"
+                                  ]
+                                },
+                                "required": true
+                              }
+                            },
+                            "openExtras": false
+                          },
+                          "required": true
+                        },
+                        "type": {
+                          "schema": {
+                            "kind": "prim",
+                            "types": [
+                              "string"
+                            ]
+                          },
+                          "required": true
+                        }
+                      },
+                      "openExtras": false
+                    },
+                    "required": true
+                  },
+                  "displayPath": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "filename": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "hook_additional_context": {
+                "kind": "object",
+                "props": {
+                  "content": {
+                    "schema": {
+                      "kind": "array",
+                      "element": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      }
+                    },
+                    "required": true
+                  },
+                  "hookEvent": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "hookName": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "toolUseID": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "literal",
+                      "value": "hook_additional_context"
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "hook_non_blocking_error": {
+                "kind": "object",
+                "props": {
+                  "command": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "durationMs": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "number"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "exitCode": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "number"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "hookEvent": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "hookName": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "stderr": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "stdout": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "toolUseID": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "hook_success": {
+                "kind": "object",
+                "props": {
+                  "command": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "content": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "durationMs": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "number"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "exitCode": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "number"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "hookEvent": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "hookName": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "stderr": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "stdout": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "toolUseID": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "literal",
+                      "value": "hook_success"
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "hook_system_message": {
+                "kind": "object",
+                "props": {
+                  "content": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "hookEvent": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "hookName": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "toolUseID": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "literal",
+                      "value": "hook_system_message"
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "invoked_skills": {
+                "kind": "object",
+                "props": {
+                  "skills": {
+                    "schema": {
+                      "kind": "array",
+                      "element": {
+                        "kind": "object",
+                        "props": {
+                          "content": {
+                            "schema": {
+                              "kind": "prim",
+                              "types": [
+                                "string"
+                              ]
+                            },
+                            "required": true
+                          },
+                          "name": {
+                            "schema": {
+                              "kind": "prim",
+                              "types": [
+                                "string"
+                              ]
+                            },
+                            "required": true
+                          },
+                          "path": {
+                            "schema": {
+                              "kind": "prim",
+                              "types": [
+                                "string"
+                              ]
+                            },
+                            "required": true
+                          }
+                        },
+                        "openExtras": false
+                      }
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "nested_memory": {
+                "kind": "object",
+                "props": {
+                  "content": {
+                    "schema": {
+                      "kind": "object",
+                      "props": {
+                        "content": {
+                          "schema": {
+                            "kind": "prim",
+                            "types": [
+                              "string"
+                            ]
+                          },
+                          "required": true
+                        },
+                        "contentDiffersFromDisk": {
+                          "schema": {
+                            "kind": "prim",
+                            "types": [
+                              "boolean"
+                            ]
+                          },
+                          "required": true
+                        },
+                        "path": {
+                          "schema": {
+                            "kind": "prim",
+                            "types": [
+                              "string"
+                            ]
+                          },
+                          "required": true
+                        },
+                        "rawContent": {
+                          "schema": {
+                            "kind": "prim",
+                            "types": [
+                              "string"
+                            ]
+                          },
+                          "required": false
+                        },
+                        "type": {
+                          "schema": {
+                            "kind": "prim",
+                            "types": [
+                              "string"
+                            ]
+                          },
+                          "required": true
+                        }
+                      },
+                      "openExtras": false
+                    },
+                    "required": true
+                  },
+                  "displayPath": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "path": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "opened_file_in_ide": {
+                "kind": "object",
+                "props": {
+                  "filename": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "literal",
+                      "value": "opened_file_in_ide"
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "plan_file_reference": {
+                "kind": "object",
+                "props": {
+                  "planContent": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "planFilePath": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "plan_mode": {
+                "kind": "object",
+                "props": {
+                  "isSubAgent": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "boolean"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "planExists": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "boolean"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "planFilePath": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "reminderType": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "plan_mode_exit": {
+                "kind": "object",
+                "props": {
+                  "planExists": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "boolean"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "planFilePath": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "queued_command": {
+                "kind": "object",
+                "props": {
+                  "commandMode": {
+                    "schema": {
+                      "kind": "opaque",
+                      "reason": "openExtras (parent)"
+                    },
+                    "required": true
+                  },
+                  "prompt": {
+                    "schema": {
+                      "kind": "opaque",
+                      "reason": "openExtras (parent)"
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "literal",
+                      "value": "queued_command"
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": true
+              },
+              "selected_lines_in_ide": {
+                "kind": "object",
+                "props": {
+                  "content": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "displayPath": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "filename": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "ideName": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "lineEnd": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "number"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "lineStart": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "number"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "literal",
+                      "value": "selected_lines_in_ide"
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "skill_listing": {
+                "kind": "object",
+                "props": {
+                  "content": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "isInitial": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "boolean"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "skillCount": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "number"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "literal",
+                      "value": "skill_listing"
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "task_reminder": {
+                "kind": "object",
+                "props": {
+                  "content": {
+                    "schema": {
+                      "kind": "array",
+                      "element": {
+                        "kind": "union",
+                        "variants": [
+                          {
+                            "kind": "opaque",
+                            "reason": "empty"
+                          },
+                          {
+                            "kind": "object",
+                            "props": {
+                              "activeForm": {
+                                "schema": {
+                                  "kind": "prim",
+                                  "types": [
+                                    "string"
+                                  ]
+                                },
+                                "required": false
+                              },
+                              "blockedBy": {
+                                "schema": {
+                                  "kind": "array",
+                                  "element": {
+                                    "kind": "union",
+                                    "variants": [
+                                      {
+                                        "kind": "opaque",
+                                        "reason": "empty"
+                                      },
+                                      {
+                                        "kind": "prim",
+                                        "types": [
+                                          "string"
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                },
+                                "required": true
+                              },
+                              "blocks": {
+                                "schema": {
+                                  "kind": "array",
+                                  "element": {
+                                    "kind": "union",
+                                    "variants": [
+                                      {
+                                        "kind": "opaque",
+                                        "reason": "empty"
+                                      },
+                                      {
+                                        "kind": "prim",
+                                        "types": [
+                                          "string"
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                },
+                                "required": true
+                              },
+                              "description": {
+                                "schema": {
+                                  "kind": "prim",
+                                  "types": [
+                                    "string"
+                                  ]
+                                },
+                                "required": true
+                              },
+                              "id": {
+                                "schema": {
+                                  "kind": "prim",
+                                  "types": [
+                                    "string"
+                                  ]
+                                },
+                                "required": true
+                              },
+                              "metadata": {
+                                "schema": {
+                                  "kind": "object",
+                                  "props": {
+                                    "category": {
+                                      "schema": {
+                                        "kind": "prim",
+                                        "types": [
+                                          "string"
+                                        ]
+                                      },
+                                      "required": false
+                                    },
+                                    "nested": {
+                                      "schema": {
+                                        "kind": "object",
+                                        "props": {
+                                          "a": {
+                                            "schema": {
+                                              "kind": "prim",
+                                              "types": [
+                                                "number"
+                                              ]
+                                            },
+                                            "required": true
+                                          },
+                                          "b": {
+                                            "schema": {
+                                              "kind": "array",
+                                              "element": {
+                                                "kind": "prim",
+                                                "types": [
+                                                  "boolean",
+                                                  "null",
+                                                  "string"
+                                                ]
+                                              }
+                                            },
+                                            "required": true
+                                          }
+                                        },
+                                        "openExtras": false
+                                      },
+                                      "required": false
+                                    },
+                                    "phase": {
+                                      "schema": {
+                                        "kind": "prim",
+                                        "types": [
+                                          "string"
+                                        ]
+                                      },
+                                      "required": false
+                                    },
+                                    "REDACTED": {
+                                      "schema": {
+                                        "kind": "prim",
+                                        "types": [
+                                          "string"
+                                        ]
+                                      },
+                                      "required": false
+                                    },
+                                    "tag": {
+                                      "schema": {
+                                        "kind": "prim",
+                                        "types": [
+                                          "string"
+                                        ]
+                                      },
+                                      "required": false
+                                    }
+                                  },
+                                  "openExtras": false
+                                },
+                                "required": false
+                              },
+                              "owner": {
+                                "schema": {
+                                  "kind": "prim",
+                                  "types": [
+                                    "string"
+                                  ]
+                                },
+                                "required": false
+                              },
+                              "status": {
+                                "schema": {
+                                  "kind": "prim",
+                                  "types": [
+                                    "string"
+                                  ]
+                                },
+                                "required": true
+                              },
+                              "subject": {
+                                "schema": {
+                                  "kind": "prim",
+                                  "types": [
+                                    "string"
+                                  ]
+                                },
+                                "required": true
+                              }
+                            },
+                            "openExtras": false
+                          }
+                        ]
+                      }
+                    },
+                    "required": true
+                  },
+                  "itemCount": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "number"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              },
+              "todo_reminder": {
+                "kind": "object",
+                "props": {
+                  "content": {
+                    "schema": {
+                      "kind": "array",
+                      "element": {
+                        "kind": "opaque",
+                        "reason": "empty"
+                      }
+                    },
+                    "required": true
+                  },
+                  "itemCount": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "number"
+                      ]
+                    },
+                    "required": true
+                  },
+                  "type": {
+                    "schema": {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    "required": true
+                  }
+                },
+                "openExtras": false
+              }
+            }
+          },
+          "required": true
+        },
+        "cwd": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "entrypoint": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "forkedFrom": {
+          "schema": {
+            "kind": "object",
+            "props": {
+              "messageUuid": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              },
+              "sessionId": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              }
+            },
+            "openExtras": false
+          },
+          "required": false
+        },
+        "gitBranch": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "isSidechain": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "boolean"
+            ]
+          },
+          "required": true
+        },
+        "parentUuid": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "null",
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "sessionId": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "slug": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "timestamp": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "type": {
+          "schema": {
+            "kind": "literal",
+            "value": "attachment"
+          },
+          "required": true
+        },
+        "userType": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "uuid": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "version": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        }
+      },
+      "openExtras": false
+    },
+    "custom-title": {
+      "kind": "object",
+      "props": {
+        "customTitle": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "sessionId": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "type": {
+          "schema": {
+            "kind": "literal",
+            "value": "custom-title"
+          },
+          "required": true
+        }
+      },
+      "openExtras": false
+    },
+    "file-history-snapshot": {
+      "kind": "object",
+      "props": {
+        "isSnapshotUpdate": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "boolean"
+            ]
+          },
+          "required": true
+        },
+        "messageId": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "snapshot": {
+          "schema": {
+            "kind": "object",
+            "props": {
+              "messageId": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              },
+              "timestamp": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              },
+              "trackedFileBackups": {
+                "schema": {
+                  "kind": "opaque",
+                  "reason": "(typed) Record<string, T>; per-key fan-out collapsed"
+                },
+                "required": true
+              }
+            },
+            "openExtras": false
+          },
+          "required": true
+        },
+        "type": {
+          "schema": {
+            "kind": "literal",
+            "value": "file-history-snapshot"
+          },
+          "required": true
+        }
+      },
+      "openExtras": false
+    },
+    "last-prompt": {
+      "kind": "object",
+      "props": {
+        "lastPrompt": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "sessionId": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "type": {
+          "schema": {
+            "kind": "literal",
+            "value": "last-prompt"
+          },
+          "required": true
+        }
+      },
+      "openExtras": false
+    },
+    "permission-mode": {
+      "kind": "object",
+      "props": {
+        "permissionMode": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "sessionId": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "type": {
+          "schema": {
+            "kind": "literal",
+            "value": "permission-mode"
+          },
+          "required": true
+        }
+      },
+      "openExtras": false
+    },
+    "pr-link": {
+      "kind": "object",
+      "props": {
+        "prNumber": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "number"
+            ]
+          },
+          "required": true
+        },
+        "prRepository": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "prUrl": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "sessionId": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "timestamp": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "type": {
+          "schema": {
+            "kind": "literal",
+            "value": "pr-link"
+          },
+          "required": true
+        }
+      },
+      "openExtras": false
+    },
+    "progress": {
+      "kind": "object",
+      "props": {
+        "cwd": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "data": {
+          "schema": {
+            "kind": "object",
+            "props": {
+              "agentId": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": false
+              },
+              "command": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": false
+              },
+              "elapsedTimeMs": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "number"
+                  ]
+                },
+                "required": false
+              },
+              "elapsedTimeSeconds": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "number"
+                  ]
+                },
+                "required": false
+              },
+              "fullOutput": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": false
+              },
+              "hookEvent": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": false
+              },
+              "hookName": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": false
+              },
+              "message": {
+                "schema": {
+                  "kind": "opaque",
+                  "reason": "(typed) declared as unknown"
+                },
+                "required": false
+              },
+              "normalizedMessages": {
+                "schema": {
+                  "kind": "array",
+                  "element": {
+                    "kind": "opaque",
+                    "reason": "empty"
+                  }
+                },
+                "required": false
+              },
+              "output": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": false
+              },
+              "prompt": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": false
+              },
+              "query": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": false
+              },
+              "resultCount": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "number"
+                  ]
+                },
+                "required": false
+              },
+              "serverName": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": false
+              },
+              "status": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": false
+              },
+              "taskDescription": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": false
+              },
+              "taskId": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": false
+              },
+              "taskType": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": false
+              },
+              "timeoutMs": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "number"
+                  ]
+                },
+                "required": false
+              },
+              "toolName": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": false
+              },
+              "totalBytes": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "number"
+                  ]
+                },
+                "required": false
+              },
+              "totalLines": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "number"
+                  ]
+                },
+                "required": false
+              },
+              "type": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              }
+            },
+            "openExtras": false
+          },
+          "required": true
+        },
+        "entrypoint": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "gitBranch": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "isSidechain": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "boolean"
+            ]
+          },
+          "required": true
+        },
+        "parentToolUseID": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "parentUuid": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "sessionId": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "slug": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "timestamp": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "toolUseID": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "type": {
+          "schema": {
+            "kind": "literal",
+            "value": "progress"
+          },
+          "required": true
+        },
+        "userType": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "uuid": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "version": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        }
+      },
+      "openExtras": false
+    },
+    "queue-operation": {
+      "kind": "object",
+      "props": {
+        "content": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "operation": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "sessionId": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "timestamp": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "type": {
+          "schema": {
+            "kind": "literal",
+            "value": "queue-operation"
+          },
+          "required": true
+        }
+      },
+      "openExtras": false
+    },
+    "system": {
+      "kind": "object",
+      "props": {
+        "cause": {
+          "schema": {
+            "kind": "object",
+            "props": {
+              "code": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              },
+              "errno": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "number"
+                  ]
+                },
+                "required": true
+              },
+              "path": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              }
+            },
+            "openExtras": false
+          },
+          "required": false
+        },
+        "compactMetadata": {
+          "schema": {
+            "kind": "object",
+            "props": {
+              "durationMs": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "number"
+                  ]
+                },
+                "required": false
+              },
+              "postTokens": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "number"
+                  ]
+                },
+                "required": false
+              },
+              "preCompactDiscoveredTools": {
+                "schema": {
+                  "kind": "array",
+                  "element": {
+                    "kind": "prim",
+                    "types": [
+                      "string"
+                    ]
+                  }
+                },
+                "required": false
+              },
+              "preTokens": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "number"
+                  ]
+                },
+                "required": true
+              },
+              "trigger": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              }
+            },
+            "openExtras": false
+          },
+          "required": false
+        },
+        "content": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "cwd": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "durationMs": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "number"
+            ]
+          },
+          "required": false
+        },
+        "entrypoint": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "error": {
+          "schema": {
+            "kind": "object",
+            "props": {
+              "cause": {
+                "schema": {
+                  "kind": "object",
+                  "props": {
+                    "code": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "errno": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "number"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "path": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    }
+                  },
+                  "openExtras": false
+                },
+                "required": false
+              },
+              "error": {
+                "schema": {
+                  "kind": "object",
+                  "props": {
+                    "error": {
+                      "schema": {
+                        "kind": "object",
+                        "props": {
+                          "message": {
+                            "schema": {
+                              "kind": "prim",
+                              "types": [
+                                "string"
+                              ]
+                            },
+                            "required": true
+                          },
+                          "type": {
+                            "schema": {
+                              "kind": "prim",
+                              "types": [
+                                "string"
+                              ]
+                            },
+                            "required": true
+                          }
+                        },
+                        "openExtras": false
+                      },
+                      "required": true
+                    },
+                    "request_id": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "type": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    }
+                  },
+                  "openExtras": false
+                },
+                "required": false
+              },
+              "headers": {
+                "schema": {
+                  "kind": "object",
+                  "props": {
+                    "anthropic-organization-id": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "cf-cache-status": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "cf-ray": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "connection": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "content-encoding": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "content-security-policy": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "content-type": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "date": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "request-id": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "server": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "server-timing": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "strict-transport-security": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "transfer-encoding": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "vary": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "x-envoy-upstream-service-time": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "x-robots-tag": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    },
+                    "x-should-retry": {
+                      "schema": {
+                        "kind": "prim",
+                        "types": [
+                          "string"
+                        ]
+                      },
+                      "required": true
+                    }
+                  },
+                  "openExtras": false
+                },
+                "required": false
+              },
+              "requestID": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": false
+              },
+              "status": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "number"
+                  ]
+                },
+                "required": false
+              },
+              "type": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "null"
+                  ]
+                },
+                "required": false
+              }
+            },
+            "openExtras": false
+          },
+          "required": false
+        },
+        "forkedFrom": {
+          "schema": {
+            "kind": "object",
+            "props": {
+              "messageUuid": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              },
+              "sessionId": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              }
+            },
+            "openExtras": false
+          },
+          "required": false
+        },
+        "gitBranch": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "hasOutput": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "boolean"
+            ]
+          },
+          "required": false
+        },
+        "hookCount": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "number"
+            ]
+          },
+          "required": false
+        },
+        "hookErrors": {
+          "schema": {
+            "kind": "array",
+            "element": {
+              "kind": "union",
+              "variants": [
+                {
+                  "kind": "opaque",
+                  "reason": "empty"
+                },
+                {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                }
+              ]
+            }
+          },
+          "required": false
+        },
+        "hookInfos": {
+          "schema": {
+            "kind": "array",
+            "element": {
+              "kind": "object",
+              "props": {
+                "command": {
+                  "schema": {
+                    "kind": "prim",
+                    "types": [
+                      "string"
+                    ]
+                  },
+                  "required": true
+                },
+                "durationMs": {
+                  "schema": {
+                    "kind": "prim",
+                    "types": [
+                      "number"
+                    ]
+                  },
+                  "required": true
+                }
+              },
+              "openExtras": false
+            }
+          },
+          "required": false
+        },
+        "isMeta": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "boolean"
+            ]
+          },
+          "required": false
+        },
+        "isSidechain": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "boolean"
+            ]
+          },
+          "required": true
+        },
+        "level": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "logicalParentUuid": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "maxRetries": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "number"
+            ]
+          },
+          "required": false
+        },
+        "messageCount": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "number"
+            ]
+          },
+          "required": false
+        },
+        "parentUuid": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "null",
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "preventedContinuation": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "boolean"
+            ]
+          },
+          "required": false
+        },
+        "retryAttempt": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "number"
+            ]
+          },
+          "required": false
+        },
+        "retryInMs": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "number"
+            ]
+          },
+          "required": false
+        },
+        "sessionId": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "slug": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "stopReason": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "subtype": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "timestamp": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "toolUseID": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "type": {
+          "schema": {
+            "kind": "literal",
+            "value": "system"
+          },
+          "required": true
+        },
+        "url": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "userType": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "uuid": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "version": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        }
+      },
+      "openExtras": false
+    },
+    "user": {
+      "kind": "object",
+      "props": {
+        "cwd": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "entrypoint": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "forkedFrom": {
+          "schema": {
+            "kind": "object",
+            "props": {
+              "messageUuid": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              },
+              "sessionId": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              }
+            },
+            "openExtras": false
+          },
+          "required": false
+        },
+        "gitBranch": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "isCompactSummary": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "boolean"
+            ]
+          },
+          "required": false
+        },
+        "isMeta": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "boolean"
+            ]
+          },
+          "required": false
+        },
+        "isSidechain": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "boolean"
+            ]
+          },
+          "required": true
+        },
+        "isVisibleInTranscriptOnly": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "boolean"
+            ]
+          },
+          "required": false
+        },
+        "message": {
+          "schema": {
+            "kind": "object",
+            "props": {
+              "content": {
+                "schema": {
+                  "kind": "union",
+                  "variants": [
+                    {
+                      "kind": "prim",
+                      "types": [
+                        "string"
+                      ]
+                    },
+                    {
+                      "kind": "array",
+                      "element": {
+                        "kind": "discUnion",
+                        "discriminator": "type",
+                        "variants": {
+                          "document": {
+                            "kind": "object",
+                            "props": {
+                              "source": {
+                                "schema": {
+                                  "kind": "object",
+                                  "props": {
+                                    "data": {
+                                      "schema": {
+                                        "kind": "prim",
+                                        "types": [
+                                          "string"
+                                        ]
+                                      },
+                                      "required": true
+                                    },
+                                    "media_type": {
+                                      "schema": {
+                                        "kind": "prim",
+                                        "types": [
+                                          "string"
+                                        ]
+                                      },
+                                      "required": true
+                                    },
+                                    "type": {
+                                      "schema": {
+                                        "kind": "prim",
+                                        "types": [
+                                          "string"
+                                        ]
+                                      },
+                                      "required": true
+                                    }
+                                  },
+                                  "openExtras": false
+                                },
+                                "required": true
+                              },
+                              "type": {
+                                "schema": {
+                                  "kind": "prim",
+                                  "types": [
+                                    "string"
+                                  ]
+                                },
+                                "required": true
+                              }
+                            },
+                            "openExtras": false
+                          },
+                          "image": {
+                            "kind": "object",
+                            "props": {
+                              "source": {
+                                "schema": {
+                                  "kind": "object",
+                                  "props": {
+                                    "data": {
+                                      "schema": {
+                                        "kind": "prim",
+                                        "types": [
+                                          "string"
+                                        ]
+                                      },
+                                      "required": true
+                                    },
+                                    "media_type": {
+                                      "schema": {
+                                        "kind": "prim",
+                                        "types": [
+                                          "string"
+                                        ]
+                                      },
+                                      "required": true
+                                    },
+                                    "type": {
+                                      "schema": {
+                                        "kind": "literal",
+                                        "value": "base64"
+                                      },
+                                      "required": true
+                                    }
+                                  },
+                                  "openExtras": false
+                                },
+                                "required": true
+                              },
+                              "type": {
+                                "schema": {
+                                  "kind": "literal",
+                                  "value": "image"
+                                },
+                                "required": true
+                              }
+                            },
+                            "openExtras": false
+                          },
+                          "text": {
+                            "kind": "object",
+                            "props": {
+                              "text": {
+                                "schema": {
+                                  "kind": "prim",
+                                  "types": [
+                                    "string"
+                                  ]
+                                },
+                                "required": true
+                              },
+                              "type": {
+                                "schema": {
+                                  "kind": "literal",
+                                  "value": "text"
+                                },
+                                "required": true
+                              }
+                            },
+                            "openExtras": false
+                          },
+                          "tool_result": {
+                            "kind": "object",
+                            "props": {
+                              "content": {
+                                "schema": {
+                                  "kind": "union",
+                                  "variants": [
+                                    {
+                                      "kind": "prim",
+                                      "types": [
+                                        "string"
+                                      ]
+                                    },
+                                    {
+                                      "kind": "array",
+                                      "element": {
+                                        "kind": "discUnion",
+                                        "discriminator": "type",
+                                        "variants": {
+                                          "image": {
+                                            "kind": "object",
+                                            "props": {
+                                              "source": {
+                                                "schema": {
+                                                  "kind": "object",
+                                                  "props": {
+                                                    "data": {
+                                                      "schema": {
+                                                        "kind": "prim",
+                                                        "types": [
+                                                          "string"
+                                                        ]
+                                                      },
+                                                      "required": true
+                                                    },
+                                                    "media_type": {
+                                                      "schema": {
+                                                        "kind": "prim",
+                                                        "types": [
+                                                          "string"
+                                                        ]
+                                                      },
+                                                      "required": true
+                                                    },
+                                                    "type": {
+                                                      "schema": {
+                                                        "kind": "literal",
+                                                        "value": "base64"
+                                                      },
+                                                      "required": true
+                                                    }
+                                                  },
+                                                  "openExtras": false
+                                                },
+                                                "required": true
+                                              },
+                                              "type": {
+                                                "schema": {
+                                                  "kind": "literal",
+                                                  "value": "image"
+                                                },
+                                                "required": true
+                                              }
+                                            },
+                                            "openExtras": false
+                                          },
+                                          "text": {
+                                            "kind": "object",
+                                            "props": {
+                                              "text": {
+                                                "schema": {
+                                                  "kind": "prim",
+                                                  "types": [
+                                                    "string"
+                                                  ]
+                                                },
+                                                "required": true
+                                              },
+                                              "type": {
+                                                "schema": {
+                                                  "kind": "literal",
+                                                  "value": "text"
+                                                },
+                                                "required": true
+                                              }
+                                            },
+                                            "openExtras": false
+                                          },
+                                          "tool_reference": {
+                                            "kind": "object",
+                                            "props": {
+                                              "tool_name": {
+                                                "schema": {
+                                                  "kind": "prim",
+                                                  "types": [
+                                                    "string"
+                                                  ]
+                                                },
+                                                "required": true
+                                              },
+                                              "type": {
+                                                "schema": {
+                                                  "kind": "prim",
+                                                  "types": [
+                                                    "string"
+                                                  ]
+                                                },
+                                                "required": true
+                                              }
+                                            },
+                                            "openExtras": false
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ]
+                                },
+                                "required": true
+                              },
+                              "is_error": {
+                                "schema": {
+                                  "kind": "prim",
+                                  "types": [
+                                    "boolean"
+                                  ]
+                                },
+                                "required": false
+                              },
+                              "tool_use_id": {
+                                "schema": {
+                                  "kind": "prim",
+                                  "types": [
+                                    "string"
+                                  ]
+                                },
+                                "required": true
+                              },
+                              "type": {
+                                "schema": {
+                                  "kind": "literal",
+                                  "value": "tool_result"
+                                },
+                                "required": true
+                              }
+                            },
+                            "openExtras": false
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "required": true
+              },
+              "role": {
+                "schema": {
+                  "kind": "literal",
+                  "value": "user"
+                },
+                "required": true
+              }
+            },
+            "openExtras": false
+          },
+          "required": true
+        },
+        "origin": {
+          "schema": {
+            "kind": "object",
+            "props": {
+              "kind": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              }
+            },
+            "openExtras": false
+          },
+          "required": false
+        },
+        "parentUuid": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "null",
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "permissionMode": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "planContent": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "promptId": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "sessionId": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "slug": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "sourceToolAssistantUUID": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "sourceToolUseID": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": false
+        },
+        "timestamp": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "toolUseResult": {
+          "schema": {
+            "kind": "opaque",
+            "reason": "(typed) Record<string, unknown> — opaque"
+          },
+          "required": false
+        },
+        "type": {
+          "schema": {
+            "kind": "literal",
+            "value": "user"
+          },
+          "required": true
+        },
+        "userType": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "uuid": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "version": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        }
+      },
+      "openExtras": false
+    },
+    "worktree-state": {
+      "kind": "object",
+      "props": {
+        "sessionId": {
+          "schema": {
+            "kind": "prim",
+            "types": [
+              "string"
+            ]
+          },
+          "required": true
+        },
+        "type": {
+          "schema": {
+            "kind": "literal",
+            "value": "worktree-state"
+          },
+          "required": true
+        },
+        "worktreeSession": {
+          "schema": {
+            "kind": "object",
+            "props": {
+              "originalBranch": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              },
+              "originalCwd": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              },
+              "originalHeadCommit": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              },
+              "sessionId": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              },
+              "worktreeBranch": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              },
+              "worktreeName": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              },
+              "worktreePath": {
+                "schema": {
+                  "kind": "prim",
+                  "types": [
+                    "string"
+                  ]
+                },
+                "required": true
+              }
+            },
+            "openExtras": false
+          },
+          "required": true
+        }
+      },
+      "openExtras": false
+    }
+  }
+}

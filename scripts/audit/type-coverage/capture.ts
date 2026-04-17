@@ -164,7 +164,10 @@ async function main(): Promise<void> {
   const samples = await walkSamples(opts.projectsDir);
   console.log(`[capture] scanned:      ${samples.length} entries`);
 
-  const localCorpus = captureCorpus(samples, allowlist);
+  // Need the typed schema for capture routing — same walk the CLI does.
+  const project = createProject(path.join(REPO_ROOT, "tsconfig.json"));
+  const walked = walkLogEntry(project);
+  const localCorpus = captureCorpus(samples, walked.schema, allowlist);
 
   let finalCorpus: Schema;
   if (opts.bootstrap || !existing) {
@@ -180,6 +183,36 @@ async function main(): Promise<void> {
 
   const finalSize = fs.statSync(CORPUS_PATH).size;
   console.log(`[capture] wrote ${CORPUS_PATH} (${formatBytes(finalSize)})`);
+
+  printPrivacyReminder();
+}
+
+/**
+ * Reminder about what the corpus does and doesn't capture, with one edge case
+ * (HTTP header names from API errors) that warrants a glance before committing.
+ *
+ * Printed in yellow so it stays visible at the bottom of capture output but
+ * doesn't compete with errors. Uses only basic ANSI codes for terminal safety.
+ */
+function printPrivacyReminder(): void {
+  const Y = "\x1b[33m"; // yellow
+  const B = "\x1b[1m";  // bold
+  const R = "\x1b[0m";  // reset
+
+  console.log("");
+  console.log(`${Y}${B}┌─ review corpus diff before committing ─────────────────────────────────┐${R}`);
+  console.log(`${Y}│${R} The corpus stores log SHAPE, not log CONTENT. By design it captures:    ${Y}│${R}`);
+  console.log(`${Y}│${R}   • harness-controlled type/field names (entry types, payload kinds)    ${Y}│${R}`);
+  console.log(`${Y}│${R}   • primitive type unions at each position (string | null, etc.)        ${Y}│${R}`);
+  console.log(`${Y}│${R}                                                                         ${Y}│${R}`);
+  console.log(`${Y}│${R} It does NOT capture: file paths, project names, message text, tool      ${Y}│${R}`);
+  console.log(`${Y}│${R} inputs/outputs, question text, IDs, timestamps, or HTTP header values.  ${Y}│${R}`);
+  console.log(`${Y}│${R}                                                                         ${Y}│${R}`);
+  console.log(`${Y}│${B} Edge case worth a glance:${R}${Y} HTTP response header NAMES from API errors    │${R}`);
+  console.log(`${Y}│${R} (entry[system].error.headers) land in the corpus. Standard / Cloudflare ${Y}│${R}`);
+  console.log(`${Y}│${R} / Anthropic headers are fine; if you see a header name from a corporate ${Y}│${R}`);
+  console.log(`${Y}│${R} proxy or VPN, scrub it before committing.                               ${Y}│${R}`);
+  console.log(`${Y}└─────────────────────────────────────────────────────────────────────────┘${R}`);
 }
 
 function formatBytes(n: number): string {
