@@ -5,6 +5,7 @@ import {
   applyPatches,
   describePatch,
   schemaToTsType,
+  synthesizeVariantName,
 } from "../../../scripts/audit/type-coverage/codegen.ts";
 import { createProject, walkLogEntry } from "../../../scripts/audit/type-coverage/walker.ts";
 import { captureCorpus } from "../../../scripts/audit/type-coverage/corpus.ts";
@@ -271,18 +272,82 @@ describe("synthesizePatches — widen-prim (Case C)", () => {
   });
 });
 
-describe("synthesizePatches — unsupported gap kinds", () => {
-  it("reports unknown-variant as not implemented yet", () => {
+describe("synthesizeVariantName — naming heuristics", () => {
+  it("PascalCases snake_case discriminators with the union's suffix", () => {
+    expect(synthesizeVariantName("AttachmentPayload", "task_reminder")).toBe("TaskReminderPayload");
+    expect(synthesizeVariantName("AttachmentPayload", "skill_listing")).toBe("SkillListingPayload");
+  });
+  it("PascalCases kebab-case discriminators", () => {
+    expect(synthesizeVariantName("LogEntry", "worktree-state")).toBe("WorktreeStateEntry");
+    expect(synthesizeVariantName("LogEntry", "permission-mode")).toBe("PermissionModeEntry");
+  });
+  it("handles single-word discriminators", () => {
+    expect(synthesizeVariantName("LogEntry", "user")).toBe("UserEntry");
+    expect(synthesizeVariantName("ContentBlock", "text")).toBe("TextBlock");
+  });
+});
+
+describe("synthesizePatches — unknown-variant (Case A)", () => {
+  it("synthesizes a new interface from the corpus's observed shape and appends to union", () => {
+    const project = createProject();
+    const walked = walkLogEntry(project);
+
+    // Synthetic gap: an unmodelled attachment subtype `task_reminder`.
+    const corpus = captureCorpus(
+      [
+        {
+          type: "attachment",
+          uuid: "att-1",
+          parentUuid: null,
+          timestamp: "2026-04-17T00:00:00Z",
+          sessionId: "s1",
+          attachment: {
+            type: "task_reminder",
+            taskId: "t1",
+            statusChange: "created",
+            updatedFields: ["status", "subject"],
+          },
+        },
+      ],
+      walked.schema,
+      EMPTY_AL
+    );
+
+    const gap: Gap = {
+      path: "$[attachment].attachment[task_reminder]",
+      kind: "unknown-variant",
+      detail: "discriminator type=\"task_reminder\" has no typed variant. observed properties: type, taskId, statusChange, updatedFields",
+    };
+
+    const result = synthesizePatches([gap], corpus, project);
+    expect(result.unsupported).toEqual([]);
+    expect(result.patches).toHaveLength(1);
+
+    const patch = result.patches[0];
+    expect(patch.kind).toBe("add-variant-to-union");
+    if (patch.kind !== "add-variant-to-union") return;
+    expect(patch.newInterfaceName).toBe("TaskReminderPayload");
+    expect(patch.unionAliasName).toBe("AttachmentPayload");
+    expect(patch.discriminatorValue).toBe("task_reminder");
+    // `type` excluded from members (emitted as literal in the apply step)
+    const memberNames = patch.members.map((m) => m.name).sort();
+    expect(memberNames).toEqual(["statusChange", "taskId", "updatedFields"]);
+    expect(patch.targetFile).toMatch(/attachments\.ts$/);
+  });
+
+  it("rejects unknown-variant with no corpus (no observed shape to synthesize from)", () => {
     const project = createProject();
     const result = synthesizePatches(
-      [{ path: "$[foo]", kind: "unknown-variant", detail: "..." }],
+      [{ path: "$[attachment].attachment[task_reminder]", kind: "unknown-variant", detail: "" }],
       null,
       project
     );
     expect(result.unsupported).toHaveLength(1);
-    expect(result.unsupported[0].reason).toMatch(/unknown-variant/);
+    expect(result.unsupported[0].reason).toMatch(/no corpus/);
   });
+});
 
+describe("synthesizePatches — unsupported gap kinds", () => {
   it("reports ambiguous-fit as requiring manual review (no auto-fix by design)", () => {
     const project = createProject();
     const result = synthesizePatches(
@@ -376,6 +441,59 @@ export interface UsageMetadata {
     applyPatches([patch], proj);
     const updated = proj.getSourceFileOrThrow("/types.ts").getFullText();
     expect(updated).toContain('"end_turn" | "tool_use" | null');
+  });
+
+  it("applies an add-variant-to-union patch by adding interface + extending alias", () => {
+    const proj = new Project({ useInMemoryFileSystem: true });
+    proj.createSourceFile(
+      "/payload.ts",
+      `export interface SkillListingPayload { type: "skill_listing"; content: string; }\n` +
+        `export type AttachmentPayload = SkillListingPayload;\n`
+    );
+    const patch: import("../../../scripts/audit/type-coverage/codegen.ts").Patch = {
+      kind: "add-variant-to-union",
+      targetFile: "/payload.ts",
+      newInterfaceName: "TaskReminderPayload",
+      unionAliasName: "AttachmentPayload",
+      discriminatorField: "type",
+      discriminatorValue: "task_reminder",
+      members: [
+        { name: "taskId", typeText: "string", required: true },
+        { name: "statusChange", typeText: "string", required: false },
+      ],
+      sourceGap: { path: "$[attachment].attachment[task_reminder]", kind: "unknown-variant", detail: "" },
+    };
+    applyPatches([patch], proj);
+    const updated = proj.getSourceFileOrThrow("/payload.ts").getFullText();
+    expect(updated).toContain('export interface TaskReminderPayload');
+    expect(updated).toContain('type: "task_reminder"');
+    expect(updated).toContain('taskId: string');
+    expect(updated).toContain('statusChange?: string');
+    expect(updated).toContain('SkillListingPayload | TaskReminderPayload');
+  });
+
+  it("is idempotent: re-applying the same add-variant patch is a no-op", () => {
+    const proj = new Project({ useInMemoryFileSystem: true });
+    proj.createSourceFile(
+      "/payload.ts",
+      `export interface SkillListingPayload { type: "skill_listing"; }\n` +
+        `export type AttachmentPayload = SkillListingPayload;\n`
+    );
+    const patch: import("../../../scripts/audit/type-coverage/codegen.ts").Patch = {
+      kind: "add-variant-to-union",
+      targetFile: "/payload.ts",
+      newInterfaceName: "TaskReminderPayload",
+      unionAliasName: "AttachmentPayload",
+      discriminatorField: "type",
+      discriminatorValue: "task_reminder",
+      members: [{ name: "taskId", typeText: "string", required: true }],
+      sourceGap: { path: "$[attachment].attachment[task_reminder]", kind: "unknown-variant", detail: "" },
+    };
+    applyPatches([patch], proj);
+    applyPatches([patch], proj);
+    const updated = proj.getSourceFileOrThrow("/payload.ts").getFullText();
+    expect(updated.match(/interface TaskReminderPayload/g)?.length).toBe(1);
+    expect(updated.match(/TaskReminderPayload/g)?.length).toBe(2); // interface + union member
   });
 
   it("skips properties that already exist (defensive)", () => {

@@ -56,6 +56,22 @@ export type Patch =
       /** Just the added primitives, for human-readable output. */
       addedTypes: string[];
       sourceGap: Gap;
+    }
+  | {
+      kind: "add-variant-to-union";
+      targetFile: string;
+      /** Synthesized interface name (e.g., "TaskReminderPayload"). */
+      newInterfaceName: string;
+      /** The union alias to extend (e.g., "AttachmentPayload" or "LogEntry"). */
+      unionAliasName: string;
+      /** Field that discriminates the union (typically "type"). */
+      discriminatorField: string;
+      /** Discriminator literal value (e.g., "task_reminder"). */
+      discriminatorValue: string;
+      /** Per-property entries for the new interface body, excluding the
+       *  discriminator field (which is emitted as a literal). */
+      members: Array<{ name: string; typeText: string; required: boolean }>;
+      sourceGap: Gap;
     };
 
 /** A gap that codegen can't yet auto-fix (other Cases land in later commits). */
@@ -104,6 +120,7 @@ export function applyPatches(patches: Patch[], project: Project): void {
   // the same interface batch into one declaration walk (avoids anchor drift).
   const addByInterface = new Map<string, Patch[]>();
   const widens: Patch[] = [];
+  const newVariants: Patch[] = [];
   for (const p of patches) {
     if (p.kind === "add-property") {
       const key = `${p.targetFile}::${p.interfaceName}::${p.pathWithinInterface.join(".")}`;
@@ -112,6 +129,8 @@ export function applyPatches(patches: Patch[], project: Project): void {
       addByInterface.set(key, list);
     } else if (p.kind === "widen-prim") {
       widens.push(p);
+    } else if (p.kind === "add-variant-to-union") {
+      newVariants.push(p);
     }
   }
 
@@ -120,6 +139,9 @@ export function applyPatches(patches: Patch[], project: Project): void {
   }
   for (const w of widens) {
     applyWidenPrim(w, project);
+  }
+  for (const v of newVariants) {
+    applyAddVariantToUnion(v, project);
   }
 
   project.saveSync();
@@ -141,6 +163,12 @@ export function describePatch(patch: Patch): string {
         ? patch.interfaceName
         : `${patch.interfaceName}.${patch.pathWithinInterface.join(".")}`;
     return `WIDEN-PRIM    ${target}.${patch.propName} += ${patch.addedTypes.join(" | ")}\n              new type: ${patch.newTypeText}\n              ${shortPath(patch.targetFile)}  (gap: ${patch.sourceGap.path})`;
+  }
+  if (patch.kind === "add-variant-to-union") {
+    const memberLines = patch.members
+      .map((m) => `                ${m.name}${m.required ? "" : "?"}: ${m.typeText};`)
+      .join("\n");
+    return `NEW-VARIANT   ${patch.newInterfaceName} (${patch.discriminatorField}: "${patch.discriminatorValue}") → ${patch.unionAliasName}\n              ${shortPath(patch.targetFile)}  (gap: ${patch.sourceGap.path})\n              interface body:\n${memberLines}`;
   }
   return `UNKNOWN-PATCH ${JSON.stringify(patch)}`;
 }
@@ -168,7 +196,7 @@ function synthesizeOne(
     case "widen-prim":
       return synthesizeWidenPrim(gap, project);
     case "unknown-variant":
-      return { reason: "unknown-variant codegen not implemented yet" };
+      return synthesizeUnknownVariant(gap, corpus, project);
     case "ambiguous-fit":
       return { reason: "ambiguous-fit requires manual review (no auto-fix by design)" };
     case "no-variant-match":
@@ -297,6 +325,117 @@ function applyWidenPrim(patch: Patch, project: Project): void {
   if (!target) throw new Error(`cannot drill to ${patch.pathWithinInterface.join(".")} in ${patch.interfaceName}`);
   const prop = target.getPropertyOrThrow(patch.propName);
   prop.setType(patch.newTypeText);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Case A: unknown-variant → synthesize new interface + extend union
+// ─────────────────────────────────────────────────────────────────────────────
+
+const KNOWN_UNION_SUFFIXES = ["Entry", "Payload", "Block", "Data"];
+
+/**
+ * Convert a discriminator value (e.g., "task_reminder", "worktree-state",
+ * "user") to a PascalCase interface name with the union's conventional
+ * suffix appended (e.g., "TaskReminderPayload", "WorktreeStateEntry").
+ */
+export function synthesizeVariantName(unionAliasName: string, discriminatorValue: string): string {
+  // Find the suffix from the union's name (Entry / Payload / Block / Data).
+  const suffix =
+    KNOWN_UNION_SUFFIXES.find((s) => unionAliasName.endsWith(s)) ?? "";
+  // PascalCase the discriminator: split on _ or - and capitalize.
+  const pascal = discriminatorValue
+    .split(/[-_]/)
+    .filter(Boolean)
+    .map((w) => w[0].toUpperCase() + w.slice(1))
+    .join("");
+  return pascal + suffix;
+}
+
+function synthesizeUnknownVariant(
+  gap: Gap,
+  corpus: Schema | null,
+  project: Project
+): SynthesisOutput {
+  const target = resolveTarget(gap.path, project);
+  if (target.mode !== "addVariantToUnion") {
+    return { reason: `unknown-variant resolver returned ${target.mode}: ${target.reason ?? ""}` };
+  }
+
+  if (!corpus) {
+    return { reason: "no corpus available — cannot synthesize variant body without observed shape" };
+  }
+  const observedShape = lookupCorpusAtPath(corpus, gap.path);
+  if (!observedShape) {
+    return { reason: "no observed shape in corpus at gap path" };
+  }
+  if (observedShape.kind !== "object") {
+    return {
+      reason: `observed shape at gap path is ${observedShape.kind}, expected object — likely a primitive variant; manual handling`,
+    };
+  }
+
+  const newInterfaceName = synthesizeVariantName(target.unionAliasName, target.discriminatorValue);
+
+  // Build per-property members for the new interface. Skip the discriminator
+  // field (we'll emit it separately as a literal). Also skip openExtras —
+  // synthesizing `[key: string]: unknown` would mostly defeat the audit's
+  // purpose; if needed, the maintainer can add it during review.
+  const members: Array<{ name: string; typeText: string; required: boolean }> = [];
+  for (const [name, { schema, required }] of Object.entries(observedShape.props)) {
+    if (name === "type") continue; // discriminator emitted separately
+    members.push({ name, typeText: schemaToTsType(schema), required });
+  }
+
+  return {
+    patch: {
+      kind: "add-variant-to-union",
+      targetFile: target.unionDeclFile,
+      newInterfaceName,
+      unionAliasName: target.unionAliasName,
+      discriminatorField: "type", // assumed; could derive from typed schema
+      discriminatorValue: target.discriminatorValue,
+      members,
+      sourceGap: gap,
+    },
+  };
+}
+
+function applyAddVariantToUnion(patch: Patch, project: Project): void {
+  if (patch.kind !== "add-variant-to-union") return;
+  const sourceFile = project.getSourceFile(patch.targetFile);
+  if (!sourceFile) throw new Error(`cannot find source file: ${patch.targetFile}`);
+
+  // Don't double-add if a previous run already created this interface.
+  if (!sourceFile.getInterface(patch.newInterfaceName)) {
+    sourceFile.addInterface({
+      name: patch.newInterfaceName,
+      isExported: true,
+      properties: [
+        {
+          name: patch.discriminatorField,
+          type: JSON.stringify(patch.discriminatorValue),
+        },
+        ...patch.members.map((m) => ({
+          name: m.name,
+          type: m.typeText,
+          hasQuestionToken: !m.required,
+        })),
+      ],
+    });
+  }
+
+  // Extend the union alias by appending the new interface name.
+  const aliasDecl = sourceFile.getTypeAlias(patch.unionAliasName);
+  if (!aliasDecl) {
+    throw new Error(
+      `cannot find union alias ${patch.unionAliasName} in ${patch.targetFile}`
+    );
+  }
+  const existing = aliasDecl.getTypeNode()?.getText() ?? "never";
+  // Avoid re-adding if a prior run already extended the union.
+  if (!new RegExp(`\\b${patch.newInterfaceName}\\b`).test(existing)) {
+    aliasDecl.setType(`${existing} | ${patch.newInterfaceName}`);
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
