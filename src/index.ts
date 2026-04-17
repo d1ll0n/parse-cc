@@ -93,3 +93,11 @@ export {
   readFileHistoryBlob,
 } from "./file-history.js";
 export type { FileHistoryVersion } from "./file-history.js";
+export {
+  defaultTasksDir,
+  findTasksDir,
+  listTaskSessionIds,
+  listTasks,
+  readTask,
+} from "./tasks.js";
+export type { Task } from "./tasks.js";

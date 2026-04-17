@@ -1,0 +1,8 @@
+{
+  "id": "2",
+  "subject": "Unexpected status value",
+  "description": "Fixture: coerceTask must reject unknown status values.",
+  "status": "archived",
+  "blocks": [],
+  "blockedBy": []
+}

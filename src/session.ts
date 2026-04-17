@@ -30,6 +30,7 @@ import {
   type PersistedOutputRef,
 } from "./persisted-output.js";
 import { findSubagentFiles } from "./subagents.js";
+import { listTasks, type Task } from "./tasks.js";
 import type { ContentBlock } from "./types/content.js";
 
 /**
@@ -72,6 +73,7 @@ export class Session {
   private _deferredTools?: Promise<string[]>;
   private _subagents?: Promise<Session[]>;
   private _fileHistory?: Promise<FileHistoryVersion[]>;
+  private _tasks?: Promise<Task[]>;
 
   constructor(
     /** Absolute or relative path to a session `.jsonl` file. */
@@ -364,5 +366,29 @@ export class Session {
   /** Convenience: read the content of a specific file history version. */
   async readFileHistoryContent(version: FileHistoryVersion): Promise<string | null> {
     return readFileHistoryBlob(version);
+  }
+
+  /**
+   * Read every persisted task for this session from
+   * `~/.claude/tasks/<sessionId>/`. Returns tasks sorted by numeric `id`
+   * ascending. Returns an empty array when the session has no task directory.
+   *
+   * Tasks are produced by the harness's `TaskCreate` / `TaskUpdate` tools and
+   * are stored independently of the session `.jsonl`. Tasks deleted via
+   * `TaskUpdate { status: "deleted" }` are removed from disk and therefore
+   * never appear in the result.
+   *
+   * Internally awaits `messages()` to prime the session ID. If you already
+   * know the session ID and want to skip parsing the log, call the
+   * module-level `listTasks(sessionId)` directly instead.
+   */
+  async tasks(baseDir?: string): Promise<Task[]> {
+    if (!this._tasks) {
+      this._tasks = (async () => {
+        await this.messages(); // prime sessionId
+        return listTasks(this.sessionId, baseDir);
+      })();
+    }
+    return this._tasks;
   }
 }

@@ -1,0 +1,8 @@
+{
+  "id": "10",
+  "subject": "Document the new pipeline",
+  "description": "Write up the postmortem in docs/incidents/.",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

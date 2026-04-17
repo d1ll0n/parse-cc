@@ -1,0 +1,8 @@
+{
+  "id": "4",
+  "subject": "Valid alongside the bad ones",
+  "description": "Fixture: the valid task survives even when siblings are rejected.",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}
