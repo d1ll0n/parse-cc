@@ -1,0 +1,16 @@
+{
+  "id": "1",
+  "subject": "Investigate ingest pipeline",
+  "description": "Find the source of the duplicated rows in last night's batch.",
+  "activeForm": "Investigating ingest pipeline",
+  "owner": "alice",
+  "status": "in_progress",
+  "blocks": [
+    "2"
+  ],
+  "blockedBy": [],
+  "metadata": {
+    "phase": "alpha",
+    "tag": "ingest"
+  }
+}

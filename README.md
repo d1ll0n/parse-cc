@@ -28,6 +28,7 @@ Full docs live under [`docs/`](docs/). Pick a topic by what you want to do:
 | Walk subagent work | [docs/subagents.md](docs/subagents.md) |
 | Read tool results too big to inline | [docs/persisted-output.md](docs/persisted-output.md) |
 | Read pre-edit file backups | [docs/file-history.md](docs/file-history.md) |
+| Read the per-session todo list | [docs/tasks.md](docs/tasks.md) |
 | List skills and deferred tools available to a session | [docs/skills-and-deferred-tools.md](docs/skills-and-deferred-tools.md) |
 | Look up the exact shape of any exported type | [docs/types.md](docs/types.md) |
 
@@ -104,6 +105,7 @@ src/
   subagents.ts          Subagent file locator (new + legacy layouts)
   discover.ts           Project + session discovery helpers
   file-history.ts       Pre-edit backup blob reader
+  tasks.ts              Per-session todo-list reader
   types/
     entries.ts          LogEntry discriminated union
     content.ts          ContentBlock types

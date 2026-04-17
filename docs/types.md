@@ -1690,3 +1690,54 @@ export interface TrackedFileBackup {
   "backupTime": "2026-04-10T10:00:05Z"
 }
 ```
+
+---
+
+## Task types
+
+These types relate to the per-session task store under `~/.claude/tasks/<sessionId>/`. See [tasks.md](tasks.md) for the full picture.
+
+### Task
+
+Persisted state for one entry in a session's todo list, as written by the harness's `TaskCreate` / `TaskUpdate` tools. One JSON file per task, named `<id>.json`.
+
+```ts
+export interface Task {
+  /** Numeric string assigned at creation time, monotonically increasing per session ("1", "2", ...). */
+  id: string;
+  /** Brief task title (imperative form). */
+  subject: string;
+  /** Full task body. */
+  description: string;
+  /** Lifecycle state. `"deleted"` is never persisted — the file is removed instead. */
+  status: "pending" | "in_progress" | "completed";
+  /** IDs of tasks that cannot start until this one completes. Always present; may be empty. */
+  blocks: string[];
+  /** IDs of tasks that must complete before this one can start. Always present; may be empty. */
+  blockedBy: string[];
+  /** Present-continuous label shown in the harness spinner while this task is `in_progress`. */
+  activeForm?: string;
+  /** Agent identifier that has claimed this task, if any. */
+  owner?: string;
+  /** Arbitrary user-defined JSON merged via `TaskUpdate { metadata }`. */
+  metadata?: Record<string, unknown>;
+}
+```
+
+**Produced by:** `listTasks()`, `readTask()`, and `Session.tasks()` in `src/tasks.ts`
+
+**Example:**
+
+```json
+{
+  "id": "1",
+  "subject": "Investigate ingest pipeline",
+  "description": "Find the source of the duplicated rows in last night's batch.",
+  "activeForm": "Investigating ingest pipeline",
+  "owner": "alice",
+  "status": "in_progress",
+  "blocks": ["2"],
+  "blockedBy": [],
+  "metadata": { "phase": "alpha", "tag": "ingest" }
+}
+```

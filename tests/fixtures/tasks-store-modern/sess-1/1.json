@@ -1,0 +1,8 @@
+{
+  "id": "1",
+  "subject": "Parse modern session",
+  "description": "Cross-check Session.tasks() joins sessionId correctly.",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

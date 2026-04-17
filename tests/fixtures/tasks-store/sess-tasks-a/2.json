@@ -1,0 +1,10 @@
+{
+  "id": "2",
+  "subject": "Write fix for ingest pipeline",
+  "description": "Apply the fix once the investigation lands.",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": [
+    "1"
+  ]
+}

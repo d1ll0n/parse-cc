@@ -1,0 +1,9 @@
+{
+  "id": "3",
+  "subject": "Metadata as array",
+  "description": "Fixture: metadata must be an object, not an array.",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": [],
+  "metadata": ["not", "an", "object"]
+}
