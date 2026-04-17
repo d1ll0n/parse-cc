@@ -1,0 +1,359 @@
+import { describe, it, expect } from "vitest";
+import { Project } from "ts-morph";
+import {
+  synthesizePatches,
+  applyPatches,
+  describePatch,
+  schemaToTsType,
+} from "../../../scripts/audit/type-coverage/codegen.ts";
+import { createProject, walkLogEntry } from "../../../scripts/audit/type-coverage/walker.ts";
+import { captureCorpus } from "../../../scripts/audit/type-coverage/corpus.ts";
+import type { Gap } from "../../../scripts/audit/type-coverage/comparator.ts";
+import { parseAllowlist } from "../../../scripts/audit/type-coverage/allowlist.ts";
+import {
+  prim,
+  literal,
+  array,
+  object,
+  optional,
+  record,
+} from "../../../scripts/audit/type-coverage/schema.ts";
+
+const EMPTY_AL = parseAllowlist(`entries: []`);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// schemaToTsType — observed schema → TS type expression
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("schemaToTsType", () => {
+  it("renders primitive unions", () => {
+    expect(schemaToTsType(prim("string"))).toBe("string");
+    expect(schemaToTsType(prim("string", "null"))).toBe("null | string");
+    expect(schemaToTsType(prim("number", "boolean"))).toBe("boolean | number");
+  });
+
+  it("renders literals as JSON", () => {
+    expect(schemaToTsType(literal("foo"))).toBe('"foo"');
+    expect(schemaToTsType(literal(42))).toBe("42");
+    expect(schemaToTsType(literal(true))).toBe("true");
+  });
+
+  it("renders arrays with element type", () => {
+    expect(schemaToTsType(array(prim("string")))).toBe("string[]");
+    expect(schemaToTsType(array(prim("string", "number")))).toBe("(number | string)[]");
+  });
+
+  it("renders inline objects", () => {
+    const s = object({
+      name: prim("string"),
+      age: optional(prim("number")),
+    });
+    expect(schemaToTsType(s)).toBe("{ name: string; age?: number }");
+  });
+
+  it("renders objects with openExtras as `[key: string]: unknown`", () => {
+    const s = object({ id: prim("string") }, /* openExtras */ true);
+    expect(schemaToTsType(s)).toBe("{ id: string; [key: string]: unknown }");
+  });
+
+  it("renders Record<string, T>", () => {
+    expect(schemaToTsType(record(prim("number")))).toBe("Record<string, number>");
+  });
+
+  it("renders opaque with the reason as a comment", () => {
+    expect(schemaToTsType({ kind: "opaque", reason: "per-tool" })).toBe(
+      "unknown /* per-tool */"
+    );
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// synthesizePatches — end-to-end gap → patch synthesis
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("synthesizePatches — missing-field (Case B)", () => {
+  it("produces an add-property patch for a missing field on a referenced interface", () => {
+    const project = createProject();
+    const walked = walkLogEntry(project);
+
+    // Build a corpus with a synthetic new field on UsageMetadata.
+    const corpus = captureCorpus(
+      [
+        {
+          type: "assistant",
+          uuid: "a1",
+          parentUuid: null,
+          timestamp: "2026-04-17T00:00:00Z",
+          sessionId: "s1",
+          message: {
+            role: "assistant",
+            id: "msg_1",
+            model: "claude-sonnet-4-6",
+            content: [{ type: "text", text: "hi" }],
+            stop_reason: "end_turn",
+            stop_sequence: null,
+            usage: {
+              input_tokens: 100,
+              output_tokens: 50,
+              synthetic_new_field: "value", // <-- the new field
+            },
+          },
+        },
+      ],
+      walked.schema,
+      EMPTY_AL
+    );
+
+    const gap: Gap = {
+      path: "$[assistant].message.usage.synthetic_new_field",
+      kind: "missing-field",
+      detail: "observed type: string",
+    };
+
+    const result = synthesizePatches([gap], corpus, project);
+    expect(result.unsupported).toEqual([]);
+    expect(result.patches).toHaveLength(1);
+
+    const patch = result.patches[0];
+    expect(patch.kind).toBe("add-property");
+    if (patch.kind !== "add-property") return;
+    expect(patch.interfaceName).toBe("UsageMetadata");
+    expect(patch.propName).toBe("synthetic_new_field");
+    expect(patch.propTypeText).toBe("string");
+    expect(patch.required).toBe(true);
+    expect(patch.pathWithinInterface).toEqual([]);
+    expect(patch.targetFile).toMatch(/entries\.ts$/);
+  });
+
+  it("produces an add-property patch directly on the entry interface (no TypeReference)", () => {
+    const project = createProject();
+    const corpus = captureCorpus(
+      [
+        {
+          type: "user",
+          uuid: "u1",
+          parentUuid: null,
+          timestamp: "2026-04-17T00:00:00Z",
+          sessionId: "s1",
+          message: { role: "user", content: "hi" },
+          entrypoint: "/some/path", // <-- new field directly on UserEntry
+        },
+      ],
+      walkLogEntry(project).schema,
+      EMPTY_AL
+    );
+
+    const gap: Gap = {
+      path: "$[user].entrypoint",
+      kind: "missing-field",
+      detail: "observed type: string",
+    };
+
+    const result = synthesizePatches([gap], corpus, project);
+    expect(result.patches).toHaveLength(1);
+    const patch = result.patches[0];
+    if (patch.kind !== "add-property") throw new Error("unreachable");
+    expect(patch.interfaceName).toBe("UserEntry");
+    expect(patch.propName).toBe("entrypoint");
+    expect(patch.propTypeText).toBe("string");
+  });
+
+  it("infers required=false when the property is observed in only some samples", () => {
+    const project = createProject();
+    const corpus = captureCorpus(
+      [
+        // First sample WITHOUT the new field
+        {
+          type: "user",
+          uuid: "u1",
+          parentUuid: null,
+          timestamp: "2026-04-17T00:00:00Z",
+          sessionId: "s1",
+          message: { role: "user", content: "hi" },
+        },
+        // Second sample WITH it
+        {
+          type: "user",
+          uuid: "u2",
+          parentUuid: null,
+          timestamp: "2026-04-17T00:00:01Z",
+          sessionId: "s1",
+          message: { role: "user", content: "yo" },
+          entrypoint: "/x",
+        },
+      ],
+      walkLogEntry(project).schema,
+      EMPTY_AL
+    );
+
+    const result = synthesizePatches(
+      [{ path: "$[user].entrypoint", kind: "missing-field", detail: "observed type: string" }],
+      corpus,
+      project
+    );
+    const patch = result.patches[0];
+    if (patch.kind !== "add-property") throw new Error("unreachable");
+    expect(patch.required).toBe(false);
+  });
+
+  it("falls back to gap.detail when corpus is null (renders observed-type from string)", () => {
+    const project = createProject();
+    const result = synthesizePatches(
+      [{ path: "$[user].entrypoint", kind: "missing-field", detail: "observed type: number" }],
+      null,
+      project
+    );
+    const patch = result.patches[0];
+    if (patch.kind !== "add-property") throw new Error("unreachable");
+    expect(patch.propTypeText).toBe("number");
+    expect(patch.required).toBe(false); // corpus-less: default optional
+  });
+});
+
+describe("synthesizePatches — unsupported gap kinds", () => {
+  it("reports widen-prim as not implemented yet", () => {
+    const project = createProject();
+    const result = synthesizePatches(
+      [{ path: "$[user].x", kind: "widen-prim", detail: "observed +null" }],
+      null,
+      project
+    );
+    expect(result.patches).toEqual([]);
+    expect(result.unsupported).toHaveLength(1);
+    expect(result.unsupported[0].reason).toMatch(/widen-prim/);
+  });
+
+  it("reports unknown-variant as not implemented yet", () => {
+    const project = createProject();
+    const result = synthesizePatches(
+      [{ path: "$[foo]", kind: "unknown-variant", detail: "..." }],
+      null,
+      project
+    );
+    expect(result.unsupported).toHaveLength(1);
+    expect(result.unsupported[0].reason).toMatch(/unknown-variant/);
+  });
+
+  it("reports ambiguous-fit as requiring manual review (no auto-fix by design)", () => {
+    const project = createProject();
+    const result = synthesizePatches(
+      [{ path: "$[attachment]", kind: "ambiguous-fit", detail: "..." }],
+      null,
+      project
+    );
+    expect(result.unsupported[0].reason).toMatch(/manual review/);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// applyPatches — actual ts-morph mutations
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("applyPatches — add-property", () => {
+  it("adds a property to a target interface via ts-morph", () => {
+    // Build an in-memory project with a synthetic source file we can mutate
+    // safely (don't touch real src/).
+    const proj = new Project({ useInMemoryFileSystem: true });
+    proj.createSourceFile(
+      "/types.ts",
+      `
+export interface UsageMetadata {
+  input_tokens: number;
+  output_tokens: number;
+}
+`.trimStart()
+    );
+
+    const patch: import("../../../scripts/audit/type-coverage/codegen.ts").Patch = {
+      kind: "add-property",
+      targetFile: "/types.ts",
+      interfaceName: "UsageMetadata",
+      pathWithinInterface: [],
+      propName: "cache_creation_input_tokens",
+      propTypeText: "number",
+      required: false,
+      sourceGap: {
+        path: "$[assistant].message.usage.cache_creation_input_tokens",
+        kind: "missing-field",
+        detail: "observed type: number",
+      },
+    };
+
+    applyPatches([patch], proj);
+
+    const updated = proj.getSourceFileOrThrow("/types.ts").getFullText();
+    expect(updated).toContain("cache_creation_input_tokens?: number");
+  });
+
+  it("batches multiple property-additions to the same interface into one walk", () => {
+    const proj = new Project({ useInMemoryFileSystem: true });
+    proj.createSourceFile("/types.ts", `export interface UserEntry {\n  type: "user";\n}\n`);
+
+    const mk = (name: string, type: string): import("../../../scripts/audit/type-coverage/codegen.ts").Patch => ({
+      kind: "add-property",
+      targetFile: "/types.ts",
+      interfaceName: "UserEntry",
+      pathWithinInterface: [],
+      propName: name,
+      propTypeText: type,
+      required: false,
+      sourceGap: { path: `$[user].${name}`, kind: "missing-field", detail: "" },
+    });
+
+    applyPatches([mk("entrypoint", "string"), mk("forkedFrom", "string"), mk("planContent", "string")], proj);
+
+    const updated = proj.getSourceFileOrThrow("/types.ts").getFullText();
+    expect(updated).toContain("entrypoint?: string");
+    expect(updated).toContain("forkedFrom?: string");
+    expect(updated).toContain("planContent?: string");
+  });
+
+  it("skips properties that already exist (defensive)", () => {
+    const proj = new Project({ useInMemoryFileSystem: true });
+    proj.createSourceFile(
+      "/types.ts",
+      `export interface UsageMetadata {\n  input_tokens: number;\n}\n`
+    );
+    const patch: import("../../../scripts/audit/type-coverage/codegen.ts").Patch = {
+      kind: "add-property",
+      targetFile: "/types.ts",
+      interfaceName: "UsageMetadata",
+      pathWithinInterface: [],
+      propName: "input_tokens", // already exists
+      propTypeText: "number",
+      required: true,
+      sourceGap: { path: "$[assistant].message.usage.input_tokens", kind: "missing-field", detail: "" },
+    };
+    applyPatches([patch], proj);
+    const updated = proj.getSourceFileOrThrow("/types.ts").getFullText();
+    // Still only one occurrence
+    expect(updated.match(/input_tokens/g)?.length).toBe(1);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// describePatch — --suggest output formatting
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("describePatch", () => {
+  it("renders an add-property patch in a single readable line + path context", () => {
+    const patch: import("../../../scripts/audit/type-coverage/codegen.ts").Patch = {
+      kind: "add-property",
+      targetFile: `${process.cwd()}/src/types/entries.ts`,
+      interfaceName: "UsageMetadata",
+      pathWithinInterface: [],
+      propName: "cache_creation_input_tokens",
+      propTypeText: "number",
+      required: false,
+      sourceGap: {
+        path: "$[assistant].message.usage.cache_creation_input_tokens",
+        kind: "missing-field",
+        detail: "",
+      },
+    };
+    const desc = describePatch(patch);
+    expect(desc).toContain("ADD-PROPERTY");
+    expect(desc).toContain("UsageMetadata.cache_creation_input_tokens?: number");
+    expect(desc).toContain("src/types/entries.ts");
+  });
+});
