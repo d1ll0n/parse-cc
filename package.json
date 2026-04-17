@@ -1,6 +1,6 @@
 {
   "name": "parse-cc",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Parse Claude Code session .jsonl logs into typed entries, metrics, tool calls, subagents, and more.",
   "keywords": [
     "claude",
