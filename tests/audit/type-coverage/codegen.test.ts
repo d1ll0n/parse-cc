@@ -210,19 +210,68 @@ describe("synthesizePatches — missing-field (Case B)", () => {
   });
 });
 
-describe("synthesizePatches — unsupported gap kinds", () => {
-  it("reports widen-prim as not implemented yet", () => {
+describe("synthesizePatches — widen-prim (Case C)", () => {
+  it("widens a primitive type to include null when observed +null", () => {
     const project = createProject();
     const result = synthesizePatches(
-      [{ path: "$[user].x", kind: "widen-prim", detail: "observed +null" }],
+      [
+        {
+          // ConversationalBase.gitBranch is `string | undefined` — a property
+          // that exists. Using it as a synthetic widening test target.
+          path: "$[user].gitBranch",
+          kind: "widen-prim",
+          detail: "observed +null",
+        },
+      ],
+      null,
+      project
+    );
+    expect(result.unsupported).toEqual([]);
+    expect(result.patches).toHaveLength(1);
+    const patch = result.patches[0];
+    if (patch.kind !== "widen-prim") throw new Error("unreachable");
+    expect(patch.propName).toBe("gitBranch");
+    expect(patch.addedTypes).toEqual(["null"]);
+    expect(patch.newTypeText).toMatch(/\| null/);
+  });
+
+  it("rejects widening with non-primitive extras (suggests new variant instead)", () => {
+    const project = createProject();
+    const result = synthesizePatches(
+      [
+        {
+          path: "$[user].gitBranch",
+          kind: "widen-prim",
+          detail: "observed +object",
+        },
+      ],
       null,
       project
     );
     expect(result.patches).toEqual([]);
     expect(result.unsupported).toHaveLength(1);
-    expect(result.unsupported[0].reason).toMatch(/widen-prim/);
+    expect(result.unsupported[0].reason).toMatch(/non-primitive/);
   });
 
+  it("rejects widening when path doesn't resolve to an existing property", () => {
+    const project = createProject();
+    const result = synthesizePatches(
+      [
+        {
+          path: "$[user].nonexistent_field_for_widen_test",
+          kind: "widen-prim",
+          detail: "observed +null",
+        },
+      ],
+      null,
+      project
+    );
+    expect(result.patches).toEqual([]);
+    expect(result.unsupported).toHaveLength(1);
+  });
+});
+
+describe("synthesizePatches — unsupported gap kinds", () => {
   it("reports unknown-variant as not implemented yet", () => {
     const project = createProject();
     const result = synthesizePatches(
@@ -306,6 +355,27 @@ export interface UsageMetadata {
     expect(updated).toContain("entrypoint?: string");
     expect(updated).toContain("forkedFrom?: string");
     expect(updated).toContain("planContent?: string");
+  });
+
+  it("applies a widen-prim patch by replacing the property's type expression", () => {
+    const proj = new Project({ useInMemoryFileSystem: true });
+    proj.createSourceFile(
+      "/types.ts",
+      `export interface Msg {\n  stop_reason: "end_turn" | "tool_use";\n}\n`
+    );
+    const patch: import("../../../scripts/audit/type-coverage/codegen.ts").Patch = {
+      kind: "widen-prim",
+      targetFile: "/types.ts",
+      interfaceName: "Msg",
+      pathWithinInterface: [],
+      propName: "stop_reason",
+      newTypeText: '"end_turn" | "tool_use" | null',
+      addedTypes: ["null"],
+      sourceGap: { path: "$[a].stop_reason", kind: "widen-prim", detail: "observed +null" },
+    };
+    applyPatches([patch], proj);
+    const updated = proj.getSourceFileOrThrow("/types.ts").getFullText();
+    expect(updated).toContain('"end_turn" | "tool_use" | null');
   });
 
   it("skips properties that already exist (defensive)", () => {

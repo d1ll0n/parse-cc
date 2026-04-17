@@ -44,6 +44,18 @@ export type Patch =
       required: boolean;
       /** The Gap that triggered this patch — used for --suggest context. */
       sourceGap: Gap;
+    }
+  | {
+      kind: "widen-prim";
+      targetFile: string;
+      interfaceName: string;
+      pathWithinInterface: string[];
+      propName: string;
+      /** Full new type expression text (existing union extended with new primitives). */
+      newTypeText: string;
+      /** Just the added primitives, for human-readable output. */
+      addedTypes: string[];
+      sourceGap: Gap;
     };
 
 /** A gap that codegen can't yet auto-fix (other Cases land in later commits). */
@@ -88,19 +100,26 @@ export function synthesizePatches(
  * responsible for running formatter/lint afterwards.
  */
 export function applyPatches(patches: Patch[], project: Project): void {
-  // Group patches by interface so multiple property-additions to the same
-  // interface batch into one declaration walk (avoids anchor drift).
-  const byInterface = new Map<string, Patch[]>();
+  // Group add-property patches by interface so multiple property-additions to
+  // the same interface batch into one declaration walk (avoids anchor drift).
+  const addByInterface = new Map<string, Patch[]>();
+  const widens: Patch[] = [];
   for (const p of patches) {
-    if (p.kind !== "add-property") continue;
-    const key = `${p.targetFile}::${p.interfaceName}::${p.pathWithinInterface.join(".")}`;
-    const list = byInterface.get(key) ?? [];
-    list.push(p);
-    byInterface.set(key, list);
+    if (p.kind === "add-property") {
+      const key = `${p.targetFile}::${p.interfaceName}::${p.pathWithinInterface.join(".")}`;
+      const list = addByInterface.get(key) ?? [];
+      list.push(p);
+      addByInterface.set(key, list);
+    } else if (p.kind === "widen-prim") {
+      widens.push(p);
+    }
   }
 
-  for (const [, group] of byInterface) {
+  for (const [, group] of addByInterface) {
     applyAddPropertyGroup(group, project);
+  }
+  for (const w of widens) {
+    applyWidenPrim(w, project);
   }
 
   project.saveSync();
@@ -115,6 +134,13 @@ export function describePatch(patch: Patch): string {
         : `${patch.interfaceName}.${patch.pathWithinInterface.join(".")}`;
     const opt = patch.required ? "" : "?";
     return `ADD-PROPERTY  ${target}.${patch.propName}${opt}: ${patch.propTypeText}\n              ${shortPath(patch.targetFile)}  (gap: ${patch.sourceGap.path})`;
+  }
+  if (patch.kind === "widen-prim") {
+    const target =
+      patch.pathWithinInterface.length === 0
+        ? patch.interfaceName
+        : `${patch.interfaceName}.${patch.pathWithinInterface.join(".")}`;
+    return `WIDEN-PRIM    ${target}.${patch.propName} += ${patch.addedTypes.join(" | ")}\n              new type: ${patch.newTypeText}\n              ${shortPath(patch.targetFile)}  (gap: ${patch.sourceGap.path})`;
   }
   return `UNKNOWN-PATCH ${JSON.stringify(patch)}`;
 }
@@ -140,7 +166,7 @@ function synthesizeOne(
     case "missing-field":
       return synthesizeMissingField(gap, corpus, project);
     case "widen-prim":
-      return { reason: "widen-prim codegen not implemented yet" };
+      return synthesizeWidenPrim(gap, project);
     case "unknown-variant":
       return { reason: "unknown-variant codegen not implemented yet" };
     case "ambiguous-fit":
@@ -194,6 +220,86 @@ function synthesizeMissingField(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Case C: widen-prim → widen the existing type expression
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Parse "observed +null" or "observed +null,object" from gap.detail. */
+function parseWidenExtras(detail: string): string[] {
+  const m = detail.match(/observed \+([\w,]+)/);
+  if (!m) return [];
+  return m[1].split(",").filter(Boolean);
+}
+
+const PRIM_TYPES = new Set(["string", "number", "boolean", "null"]);
+
+function synthesizeWidenPrim(gap: Gap, project: Project): SynthesisOutput {
+  const target = resolveTarget(gap.path, project);
+  if (target.mode !== "existingProperty") {
+    return { reason: `widen-prim resolver returned ${target.mode}: ${target.reason ?? ""}` };
+  }
+
+  const extras = parseWidenExtras(gap.detail);
+  if (extras.length === 0) {
+    return { reason: `could not parse extras from gap.detail: ${gap.detail}` };
+  }
+
+  // Codegen only handles primitive widening. "object" / "array" extras
+  // really mean "this is structurally a different shape" — those need
+  // a new variant or a manual decision, not a primitive widening.
+  const nonPrim = extras.filter((t) => !PRIM_TYPES.has(t));
+  if (nonPrim.length > 0) {
+    return {
+      reason: `widen-prim with non-primitive extras (${nonPrim.join(", ")}) needs manual handling — likely a missing variant`,
+    };
+  }
+
+  // Find the existing TypeNode and compute the new union text.
+  const sourceFile = project.getSourceFile(target.interfaceFile);
+  if (!sourceFile) return { reason: `cannot find source file: ${target.interfaceFile}` };
+  const iface = sourceFile.getInterface(target.interfaceName);
+  if (!iface) return { reason: `cannot find interface: ${target.interfaceName}` };
+
+  const literalNode = drillToTypeLiteral(iface, target.pathWithinInterface);
+  if (!literalNode) {
+    return {
+      reason: `cannot drill to inline path ${target.pathWithinInterface.join(".")} in ${target.interfaceName}`,
+    };
+  }
+
+  const prop = literalNode.getProperty(target.propName);
+  if (!prop) return { reason: `property ${target.propName} disappeared mid-resolve` };
+  const typeNode = prop.getTypeNode();
+  if (!typeNode) return { reason: `property ${target.propName} has no TypeNode` };
+
+  const existingText = typeNode.getText();
+  const newTypeText = `${existingText} | ${extras.join(" | ")}`;
+
+  return {
+    patch: {
+      kind: "widen-prim",
+      targetFile: target.interfaceFile,
+      interfaceName: target.interfaceName,
+      pathWithinInterface: target.pathWithinInterface,
+      propName: target.propName,
+      newTypeText,
+      addedTypes: extras,
+      sourceGap: gap,
+    },
+  };
+}
+
+function applyWidenPrim(patch: Patch, project: Project): void {
+  if (patch.kind !== "widen-prim") return;
+  const sourceFile = project.getSourceFile(patch.targetFile);
+  if (!sourceFile) throw new Error(`cannot find source file: ${patch.targetFile}`);
+  const iface = sourceFile.getInterfaceOrThrow(patch.interfaceName);
+  const target = drillToTypeLiteral(iface, patch.pathWithinInterface);
+  if (!target) throw new Error(`cannot drill to ${patch.pathWithinInterface.join(".")} in ${patch.interfaceName}`);
+  const prop = target.getPropertyOrThrow(patch.propName);
+  prop.setType(patch.newTypeText);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Gap-path → declaration resolver (production version of the spike)
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -244,6 +350,15 @@ type ResolveResult =
       unionAliasName: string;
       unionDeclFile: string;
       discriminatorValue: string;
+    }
+  | {
+      /** Path landed on an existing property — used by widen-prim to find
+       *  the type expression to widen. */
+      mode: "existingProperty";
+      interfaceName: string;
+      interfaceFile: string;
+      pathWithinInterface: string[];
+      propName: string;
     }
   | { mode: "fail"; reason: string };
 
@@ -308,6 +423,31 @@ function resolveTarget(gapPath: string, project: Project): ResolveResult {
       }
       const decl = prop.getValueDeclaration();
       if (!decl) return { mode: "fail", reason: `no value-declaration for ${seg.name}` };
+
+      // If this is the last segment AND the property exists, we've landed on
+      // a known property. Used by widen-prim to find the type expression.
+      // Follow the property's first declaration to find its ACTUAL declaring
+      // interface — for inherited members (extends ConversationalBase, etc.)
+      // the lastInterfaceDecl is the leaf type but the property lives upstream.
+      if (isLast && lastInterfaceDecl) {
+        const propDecl = prop.getDeclarations()[0];
+        const declaringIface =
+          propDecl?.getFirstAncestor(Node.isInterfaceDeclaration) ??
+          (propDecl && Node.isInterfaceDeclaration(propDecl) ? propDecl : null) ??
+          lastInterfaceDecl;
+        // pathWithinInterface only makes sense when we descended through inline
+        // literals on the leaf interface itself. If the property is inherited
+        // (declaring interface != leaf), inlinePath doesn't apply.
+        const pathWithin = declaringIface === lastInterfaceDecl ? [...inlinePath] : [];
+        return {
+          mode: "existingProperty",
+          interfaceName: declaringIface.getName(),
+          interfaceFile: declaringIface.getSourceFile().getFilePath(),
+          pathWithinInterface: pathWithin,
+          propName: seg.name,
+        };
+      }
+
       currentType = prop.getTypeAtLocation(decl);
 
       // If this property's type resolves to a referenced interface, that
