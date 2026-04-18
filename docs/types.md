@@ -75,6 +75,14 @@ export interface UserEntry extends ConversationalBase {
   toolUseResult?: ToolUseResultData;
   sourceToolUseID?: string;
   sourceToolAssistantUUID?: string;
+  entrypoint?: string;
+  forkedFrom?: { messageUuid: string; sessionId: string };
+  isVisibleInTranscriptOnly?: boolean;
+  origin?: { kind: string };
+  permissionMode?: string;
+  planContent?: string;
+  promptId?: string;
+  slug?: string;
 }
 ```
 
@@ -113,9 +121,18 @@ export interface AssistantEntry extends ConversationalBase {
     /** The actual stop-sequence string matched, or `null` if none. */
     stop_sequence: string | null;
     usage: UsageMetadata;
+    container?: null;
+    context_management?: null | { applied_edits: unknown /* empty */[] };
+    stop_details?: null;
+    type: string;
   };
   /** Unique request ID from the Anthropic API response headers. */
   requestId?: string;
+  entrypoint?: string;
+  error?: string;
+  forkedFrom?: { messageUuid: string; sessionId: string };
+  isApiErrorMessage?: boolean;
+  slug?: string;
 }
 ```
 
@@ -165,6 +182,57 @@ export interface SystemEntry extends ConversationalBase {
   content?: string;
   /** `true` for system entries that are harness bookkeeping, not user-visible events. */
   isMeta?: boolean;
+  cause?: { code: string; errno: number; path: string };
+  compactMetadata?: {
+    durationMs?: number;
+    postTokens?: number;
+    preCompactDiscoveredTools?: string[];
+    preTokens: number;
+    trigger: string;
+  };
+  entrypoint?: string;
+  error?: {
+    cause?: { code: string; errno: number; path: string };
+    error?: { error: { message: string; type: string }; request_id: string; type: string };
+    headers?: {
+      "anthropic-organization-id": string;
+      "cf-cache-status": string;
+      "cf-ray": string;
+      connection: string;
+      "content-encoding": string;
+      "content-security-policy": string;
+      "content-type": string;
+      date: string;
+      "request-id": string;
+      server: string;
+      "server-timing": string;
+      "strict-transport-security": string;
+      "transfer-encoding": string;
+      vary: string;
+      "x-envoy-upstream-service-time": string;
+      "x-robots-tag": string;
+      "x-should-retry": string;
+    };
+    requestID?: string;
+    status?: number;
+    type?: null;
+  };
+  forkedFrom?: { messageUuid: string; sessionId: string };
+  hasOutput?: boolean;
+  hookCount?: number;
+  hookErrors?: (unknown /* empty */ | string)[];
+  hookInfos?: { command: string; durationMs: number }[];
+  level?: string;
+  logicalParentUuid?: string;
+  maxRetries?: number;
+  messageCount?: number;
+  preventedContinuation?: boolean;
+  retryAttempt?: number;
+  retryInMs?: number;
+  slug?: string;
+  stopReason?: string;
+  toolUseID?: string;
+  url?: string;
 }
 ```
 
@@ -268,6 +336,7 @@ export interface QueueOperationEntry {
   operation: string;
   timestamp?: string;
   sessionId?: string;
+  content?: string;
 }
 ```
 
@@ -294,6 +363,9 @@ A structured side-channel payload attached to a conversation turn — used for s
 export interface AttachmentEntry extends ConversationalBase {
   type: "attachment";
   attachment: AttachmentPayload;
+  entrypoint: string;
+  forkedFrom?: { messageUuid: string; sessionId: string };
+  slug?: string;
 }
 ```
 
@@ -353,11 +425,37 @@ An in-flight progress notification from a running tool or subagent, emitted asyn
 ```ts
 export interface ProgressEntry extends Partial<ConversationalBase> {
   type: "progress";
-  data: { type?: string; agentId?: string; message?: unknown };
+  data: {
+    type?: string;
+    agentId?: string;
+    message?: unknown;
+    command?: string;
+    elapsedTimeMs?: number;
+    elapsedTimeSeconds?: number;
+    fullOutput?: string;
+    hookEvent?: string;
+    hookName?: string;
+    normalizedMessages?: unknown /* empty */[];
+    output?: string;
+    prompt?: string;
+    query?: string;
+    resultCount?: number;
+    serverName?: string;
+    status?: string;
+    taskDescription?: string;
+    taskId?: string;
+    taskType?: string;
+    timeoutMs?: number;
+    toolName?: string;
+    totalBytes?: number;
+    totalLines?: number;
+  };
   /** ID of the parent tool-use block this progress update belongs to. */
   parentToolUseID?: string;
   /** ID of the tool-use block directly associated with this progress event. */
   toolUseID?: string;
+  entrypoint?: string;
+  slug?: string;
 }
 ```
 
@@ -583,6 +681,25 @@ export interface UsageMetadata {
   };
   /** API service tier used for this request (e.g., `"standard"`). */
   service_tier?: string;
+  inference_geo?: null | string;
+  iterations?:
+    | (
+        | unknown /* empty */
+        | {
+            cache_creation: {
+              ephemeral_1h_input_tokens: number;
+              ephemeral_5m_input_tokens: number;
+            };
+            cache_creation_input_tokens: number;
+            cache_read_input_tokens: number;
+            input_tokens: number;
+            output_tokens: number;
+            type: string;
+          }
+      )[]
+    | null;
+  server_tool_use?: { web_fetch_requests: number; web_search_requests: number };
+  speed?: null | string;
 }
 ```
 
@@ -697,6 +814,7 @@ export interface ToolUseBlock {
   name: string;
   /** Arguments passed to the tool, keyed by parameter name. */
   input: Record<string, unknown>;
+  caller?: { type: string };
 }
 ```
 
@@ -796,7 +914,20 @@ export type AttachmentPayload =
   | CommandPermissionsPayload
   | OpenedFileInIdePayload
   | SelectedLinesInIdePayload
-  | QueuedCommandPayload;
+  | QueuedCommandPayload
+  | CompactFileReferencePayload
+  | DateChangePayload
+  | DiagnosticsPayload
+  | EditedTextFilePayload
+  | FilePayload
+  | HookNonBlockingErrorPayload
+  | InvokedSkillsPayload
+  | NestedMemoryPayload
+  | PlanFileReferencePayload
+  | PlanModeExitPayload
+  | PlanModePayload
+  | TaskReminderPayload
+  | TodoReminderPayload;
 ```
 
 **Variants:**
@@ -1688,5 +1819,223 @@ export interface TrackedFileBackup {
   "backupFileName": "abc123@v2",
   "version": 2,
   "backupTime": "2026-04-10T10:00:05Z"
+}
+```
+---
+
+### CompactFileReferencePayload
+
+Synthesized by codegen — see source JSDoc.
+
+```ts
+export interface CompactFileReferencePayload {
+  type: "compact_file_reference";
+  displayPath: string;
+  filename: string;
+}
+```
+---
+
+### DateChangePayload
+
+Synthesized by codegen — see source JSDoc.
+
+```ts
+export interface DateChangePayload {
+  type: "date_change";
+  newDate: string;
+}
+```
+---
+
+### DiagnosticsPayload
+
+Synthesized by codegen — see source JSDoc.
+
+```ts
+export interface DiagnosticsPayload {
+  type: "diagnostics";
+  files: {
+    diagnostics: {
+      code: string;
+      message: string;
+      range: {
+        end: { character: number; line: number };
+        start: { character: number; line: number };
+      };
+      severity: string;
+      source: string;
+    }[];
+    uri: string;
+  }[];
+  isNew: boolean;
+}
+```
+---
+
+### EditedTextFilePayload
+
+Synthesized by codegen — see source JSDoc.
+
+```ts
+export interface EditedTextFilePayload {
+  type: "edited_text_file";
+  filename: string;
+  snippet: string;
+}
+```
+---
+
+### FilePayload
+
+Synthesized by codegen — see source JSDoc.
+
+```ts
+export interface FilePayload {
+  type: "file";
+  content: {
+    file: {
+      content: string;
+      filePath: string;
+      numLines: number;
+      startLine: number;
+      totalLines: number;
+    };
+    type: string;
+  };
+  displayPath: string;
+  filename: string;
+}
+```
+---
+
+### HookNonBlockingErrorPayload
+
+Synthesized by codegen — see source JSDoc.
+
+```ts
+export interface HookNonBlockingErrorPayload {
+  type: "hook_non_blocking_error";
+  command: string;
+  durationMs: number;
+  exitCode: number;
+  hookEvent: string;
+  hookName: string;
+  stderr: string;
+  stdout: string;
+  toolUseID: string;
+}
+```
+---
+
+### InvokedSkillsPayload
+
+Synthesized by codegen — see source JSDoc.
+
+```ts
+export interface InvokedSkillsPayload {
+  type: "invoked_skills";
+  skills: { content: string; name: string; path: string }[];
+}
+```
+---
+
+### NestedMemoryPayload
+
+Synthesized by codegen — see source JSDoc.
+
+```ts
+export interface NestedMemoryPayload {
+  type: "nested_memory";
+  content: {
+    content: string;
+    contentDiffersFromDisk: boolean;
+    path: string;
+    rawContent?: string;
+    type: string;
+  };
+  displayPath: string;
+  path: string;
+}
+```
+---
+
+### PlanFileReferencePayload
+
+Synthesized by codegen — see source JSDoc.
+
+```ts
+export interface PlanFileReferencePayload {
+  type: "plan_file_reference";
+  planContent: string;
+  planFilePath: string;
+}
+```
+---
+
+### PlanModeExitPayload
+
+Synthesized by codegen — see source JSDoc.
+
+```ts
+export interface PlanModeExitPayload {
+  type: "plan_mode_exit";
+  planExists: boolean;
+  planFilePath: string;
+}
+```
+---
+
+### PlanModePayload
+
+Synthesized by codegen — see source JSDoc.
+
+```ts
+export interface PlanModePayload {
+  type: "plan_mode";
+  isSubAgent: boolean;
+  planExists: boolean;
+  planFilePath: string;
+  reminderType: string;
+}
+```
+---
+
+### TaskReminderPayload
+
+Synthesized by codegen — see source JSDoc.
+
+```ts
+export interface TaskReminderPayload {
+  type: "task_reminder";
+  content: (
+    | unknown /* empty */
+    | {
+        activeForm?: string;
+        blockedBy: (unknown /* empty */ | string)[];
+        blocks: (unknown /* empty */ | string)[];
+        description: string;
+        id: string;
+        metadata?: unknown /* Task.metadata is Record<string, unknown> — caller-supplied keys, not part of the harness contract.
+         */;
+        owner?: string;
+        status: string;
+        subject: string;
+      }
+  )[];
+  itemCount: number;
+}
+```
+---
+
+### TodoReminderPayload
+
+Synthesized by codegen — see source JSDoc.
+
+```ts
+export interface TodoReminderPayload {
+  type: "todo_reminder";
+  content: unknown /* empty */[];
+  itemCount: number;
 }
 ```

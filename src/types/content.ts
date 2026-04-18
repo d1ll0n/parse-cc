@@ -28,6 +28,7 @@ export interface ToolUseBlock {
   name: string;
   /** Arguments passed to the tool, keyed by parameter name. */
   input: Record<string, unknown>;
+  caller?: { type: string };
 }
 
 /**
