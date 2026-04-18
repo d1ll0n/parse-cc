@@ -106,7 +106,7 @@ Resolve the file-history directory for a given session ID. Returns the absolute 
 import { findFileHistoryDir } from "parse-cc";
 
 const dir = await findFileHistoryDir("sess-abc123");
-// "/root/.claude/file-history/sess-abc123" or null
+// "/home/user/.claude/file-history/sess-abc123" or null
 ```
 
 Pass a custom `baseDir` as the second argument to point at a non-default location.
@@ -142,7 +142,7 @@ const content = await readFileHistoryBlob(version);
 ```ts
 import { defaultFileHistoryDir } from "parse-cc";
 
-console.log(defaultFileHistoryDir()); // "/root/.claude/file-history"
+console.log(defaultFileHistoryDir()); // "/home/user/.claude/file-history"
 ```
 
 Used as the default `baseDir` argument for the other helpers.

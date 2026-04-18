@@ -18,7 +18,7 @@ Returns `~/.claude/projects`.
 ```ts
 import { defaultProjectsDir } from "parse-cc";
 
-console.log(defaultProjectsDir()); // "/root/.claude/projects"
+console.log(defaultProjectsDir()); // "/home/user/.claude/projects"
 ```
 
 All other discovery functions use this as their default `projectsDir` argument. Pass a custom path as the first argument if you want to point at a fixture directory or a different user's home.
@@ -40,7 +40,7 @@ Returns [`ProjectInfo[]`](types.md#projectinfo), sorted alphabetically by `name`
 
 ```ts
 interface ProjectInfo {
-  name: string;         // slugified dir name, e.g. "-root-d1ll0n-parse-cc"
+  name: string;         // slugified dir name, e.g. "-home-user-myproject"
   path: string;         // absolute path to the project directory
   sessionCount: number; // count of top-level .jsonl files
 }

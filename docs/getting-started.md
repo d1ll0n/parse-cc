@@ -26,7 +26,7 @@ Pick any `.jsonl` file from `~/.claude/projects/<project>/` and load it:
 ```ts
 import { Session } from "parse-cc";
 
-const sess = new Session("/root/.claude/projects/-home-username-myproject/abc123.jsonl");
+const sess = new Session("/home/user/.claude/projects/-home-user-myproject/abc123.jsonl");
 
 // Parse the file and prime scalar metadata.
 await sess.messages();

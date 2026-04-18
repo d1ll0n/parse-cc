@@ -1536,7 +1536,7 @@ Metadata for a single Claude Code project directory, returned by `listProjects()
 
 ```ts
 export interface ProjectInfo {
-  /** Slugified directory name (e.g. "-root-d1ll0n-parse-cc") */
+  /** Slugified directory name (e.g. "-home-user-myproject") */
   name: string;
   /** Absolute path to the project directory */
   path: string;
@@ -1551,8 +1551,8 @@ export interface ProjectInfo {
 
 ```json
 {
-  "name": "-root-d1ll0n-parse-cc",
-  "path": "/root/.claude/projects/-root-d1ll0n-parse-cc",
+  "name": "-home-user-myproject",
+  "path": "/home/user/.claude/projects/-home-user-myproject",
   "sessionCount": 14
 }
 ```
@@ -1588,7 +1588,7 @@ export interface SessionSummary {
 
 ```json
 {
-  "path": "/root/.claude/projects/-root-myproject/abc123.jsonl",
+  "path": "/home/user/.claude/projects/-home-user-myproject/abc123.jsonl",
   "sessionId": "sess-abc123",
   "version": "1.9.3",
   "gitBranch": "main",
@@ -1658,7 +1658,7 @@ export interface FileHistoryVersion {
   "version": 2,
   "backupTime": "2026-04-10T10:00:05Z",
   "backupFileName": "abc123@v2",
-  "blobPath": "/root/.claude/file-history/sess-fh/abc123@v2",
+  "blobPath": "/home/user/.claude/file-history/sess-fh/abc123@v2",
   "size": 2048
 }
 ```

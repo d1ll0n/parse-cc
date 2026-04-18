@@ -1,0 +1,28 @@
+# .opsec.local — machine-specific values to scan for in commits.
+# Copy to .opsec.local and fill in your values. Gitignored.
+#
+# One entry per line. Lines starting with # are comments.
+# Format: VALUE or SEVERITY:VALUE
+#   fail:  blocks commit (default if no prefix)
+#   warn:  prints warning but doesn't block
+#
+# The scanner also reads .env values automatically — no need to
+# duplicate those here.
+
+# Your usernames / identity (warn — may appear in comments legitimately)
+# warn:my-username
+
+# Your email (the scanner already catches generic emails as warn; add
+# your own as fail if you want a hard block)
+# fail:me@example.com
+
+# Machine-local paths that shouldn't appear in tracked files
+# /home/me/my-private-project
+
+# parse-cc-specific: anything you've fed into TaskCreate/TaskUpdate
+# metadata fields that shouldn't end up in the audit corpus on commit.
+# These are *property names* — the corpus stores them when the audit's
+# allowlist doesn't already collapse the metadata position. Most users
+# won't need to add anything here; entries belong here only when the
+# allowlist isn't sufficient for your workflow.
+# fail:my-private-task-tag
