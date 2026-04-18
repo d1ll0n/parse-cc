@@ -137,7 +137,7 @@ describe("synthesizePatches — missing-field (Case B)", () => {
           timestamp: "2026-04-17T00:00:00Z",
           sessionId: "s1",
           message: { role: "user", content: "hi" },
-          entrypoint: "/some/path", // <-- new field directly on UserEntry
+          __codegen_test_field__: "/some/path", // <-- synthetic field not in src/types/
         },
       ],
       walkLogEntry(project).schema,
@@ -145,7 +145,7 @@ describe("synthesizePatches — missing-field (Case B)", () => {
     );
 
     const gap: Gap = {
-      path: "$[user].entrypoint",
+      path: "$[user].__codegen_test_field__",
       kind: "missing-field",
       detail: "observed type: string",
     };
@@ -155,7 +155,7 @@ describe("synthesizePatches — missing-field (Case B)", () => {
     const patch = result.patches[0];
     if (patch.kind !== "add-property") throw new Error("unreachable");
     expect(patch.interfaceName).toBe("UserEntry");
-    expect(patch.propName).toBe("entrypoint");
+    expect(patch.propName).toBe("__codegen_test_field__");
     expect(patch.propTypeText).toBe("string");
   });
 
@@ -180,7 +180,7 @@ describe("synthesizePatches — missing-field (Case B)", () => {
           timestamp: "2026-04-17T00:00:01Z",
           sessionId: "s1",
           message: { role: "user", content: "yo" },
-          entrypoint: "/x",
+          __codegen_test_field__: "/x",
         },
       ],
       walkLogEntry(project).schema,
@@ -188,7 +188,7 @@ describe("synthesizePatches — missing-field (Case B)", () => {
     );
 
     const result = synthesizePatches(
-      [{ path: "$[user].entrypoint", kind: "missing-field", detail: "observed type: string" }],
+      [{ path: "$[user].__codegen_test_field__", kind: "missing-field", detail: "observed type: string" }],
       corpus,
       project
     );
@@ -200,7 +200,7 @@ describe("synthesizePatches — missing-field (Case B)", () => {
   it("falls back to gap.detail when corpus is null (renders observed-type from string)", () => {
     const project = createProject();
     const result = synthesizePatches(
-      [{ path: "$[user].entrypoint", kind: "missing-field", detail: "observed type: number" }],
+      [{ path: "$[user].__codegen_test_field__", kind: "missing-field", detail: "observed type: number" }],
       null,
       project
     );
@@ -292,7 +292,9 @@ describe("synthesizePatches — unknown-variant (Case A)", () => {
     const project = createProject();
     const walked = walkLogEntry(project);
 
-    // Synthetic gap: an unmodelled attachment subtype `task_reminder`.
+    // Synthetic gap: a discriminator value not present in src/types/.
+    // Uses a sentinel that won't collide with any real (or future-codegen'd)
+    // AttachmentPayload variant.
     const corpus = captureCorpus(
       [
         {
@@ -302,7 +304,7 @@ describe("synthesizePatches — unknown-variant (Case A)", () => {
           timestamp: "2026-04-17T00:00:00Z",
           sessionId: "s1",
           attachment: {
-            type: "task_reminder",
+            type: "__codegen_test_variant__",
             taskId: "t1",
             statusChange: "created",
             updatedFields: ["status", "subject"],
@@ -314,9 +316,9 @@ describe("synthesizePatches — unknown-variant (Case A)", () => {
     );
 
     const gap: Gap = {
-      path: "$[attachment].attachment[task_reminder]",
+      path: "$[attachment].attachment[__codegen_test_variant__]",
       kind: "unknown-variant",
-      detail: "discriminator type=\"task_reminder\" has no typed variant. observed properties: type, taskId, statusChange, updatedFields",
+      detail: "discriminator type=\"__codegen_test_variant__\" has no typed variant. observed properties: type, taskId, statusChange, updatedFields",
     };
 
     const result = synthesizePatches([gap], corpus, project);
@@ -326,9 +328,9 @@ describe("synthesizePatches — unknown-variant (Case A)", () => {
     const patch = result.patches[0];
     expect(patch.kind).toBe("add-variant-to-union");
     if (patch.kind !== "add-variant-to-union") return;
-    expect(patch.newInterfaceName).toBe("TaskReminderPayload");
+    expect(patch.newInterfaceName).toBe("CodegenTestVariantPayload");
     expect(patch.unionAliasName).toBe("AttachmentPayload");
-    expect(patch.discriminatorValue).toBe("task_reminder");
+    expect(patch.discriminatorValue).toBe("__codegen_test_variant__");
     // `type` excluded from members (emitted as literal in the apply step)
     const memberNames = patch.members.map((m) => m.name).sort();
     expect(memberNames).toEqual(["statusChange", "taskId", "updatedFields"]);
@@ -338,7 +340,7 @@ describe("synthesizePatches — unknown-variant (Case A)", () => {
   it("rejects unknown-variant with no corpus (no observed shape to synthesize from)", () => {
     const project = createProject();
     const result = synthesizePatches(
-      [{ path: "$[attachment].attachment[task_reminder]", kind: "unknown-variant", detail: "" }],
+      [{ path: "$[attachment].attachment[__codegen_test_variant__]", kind: "unknown-variant", detail: "" }],
       null,
       project
     );

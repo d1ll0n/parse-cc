@@ -584,7 +584,7 @@ function applyAddVariantToUnion(patch: Patch, project: Project): void {
           type: JSON.stringify(patch.discriminatorValue),
         },
         ...patch.members.map((m) => ({
-          name: m.name,
+          name: quoteIfNeeded(m.name),
           type: m.typeText,
           hasQuestionToken: !m.required,
         })),
@@ -956,7 +956,7 @@ export function schemaToTsType(s: Schema): string {
     case "object": {
       const fields = Object.entries(s.props).map(([k, v]) => {
         const opt = v.required ? "" : "?";
-        return `${k}${opt}: ${schemaToTsType(v.schema)}`;
+        return `${quoteIfNeeded(k)}${opt}: ${schemaToTsType(v.schema)}`;
       });
       const extras = s.openExtras ? "; [key: string]: unknown" : "";
       return `{ ${fields.join("; ")}${extras} }`;
@@ -1015,7 +1015,7 @@ function applyAddPropertyGroup(group: Patch[], project: Project): void {
     const existing = target.getProperty(p.propName);
     if (existing) continue;
     target.addProperty({
-      name: p.propName,
+      name: quoteIfNeeded(p.propName),
       type: p.propTypeText,
       hasQuestionToken: !p.required,
     });
@@ -1028,6 +1028,17 @@ function applyAddPropertyGroup(group: Patch[], project: Project): void {
  * Returns either the interface itself (when path is empty) or the inner
  * TypeLiteralNode.
  */
+/**
+ * Quote a property name if it contains characters that aren't valid in a
+ * TypeScript identifier (e.g., HTTP header names like `cf-cache-status`,
+ * keys with dots/spaces, or starting with a digit). Returns the name
+ * unchanged when it's already a valid identifier.
+ */
+function quoteIfNeeded(name: string): string {
+  if (/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(name)) return name;
+  return JSON.stringify(name);
+}
+
 function drillToTypeLiteral(
   iface: InterfaceDeclaration,
   path: string[]

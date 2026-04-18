@@ -135,4 +135,144 @@ export type AttachmentPayload =
   | CommandPermissionsPayload
   | OpenedFileInIdePayload
   | SelectedLinesInIdePayload
-  | QueuedCommandPayload;
+  | QueuedCommandPayload
+  | CompactFileReferencePayload
+  | DateChangePayload
+  | DiagnosticsPayload
+  | EditedTextFilePayload
+  | FilePayload
+  | HookNonBlockingErrorPayload
+  | InvokedSkillsPayload
+  | NestedMemoryPayload
+  | PlanFileReferencePayload
+  | PlanModeExitPayload
+  | PlanModePayload
+  | TaskReminderPayload
+  | TodoReminderPayload;
+
+export interface CompactFileReferencePayload {
+  type: "compact_file_reference";
+  displayPath: string;
+  filename: string;
+}
+
+export interface DateChangePayload {
+  type: "date_change";
+  newDate: string;
+}
+
+export interface DiagnosticsPayload {
+  type: "diagnostics";
+  files: {
+    diagnostics: {
+      code: string;
+      message: string;
+      range: {
+        end: { character: number; line: number };
+        start: { character: number; line: number };
+      };
+      severity: string;
+      source: string;
+    }[];
+    uri: string;
+  }[];
+  isNew: boolean;
+}
+
+export interface EditedTextFilePayload {
+  type: "edited_text_file";
+  filename: string;
+  snippet: string;
+}
+
+export interface FilePayload {
+  type: "file";
+  content: {
+    file: {
+      content: string;
+      filePath: string;
+      numLines: number;
+      startLine: number;
+      totalLines: number;
+    };
+    type: string;
+  };
+  displayPath: string;
+  filename: string;
+}
+
+export interface HookNonBlockingErrorPayload {
+  type: "hook_non_blocking_error";
+  command: string;
+  durationMs: number;
+  exitCode: number;
+  hookEvent: string;
+  hookName: string;
+  stderr: string;
+  stdout: string;
+  toolUseID: string;
+}
+
+export interface InvokedSkillsPayload {
+  type: "invoked_skills";
+  skills: { content: string; name: string; path: string }[];
+}
+
+export interface NestedMemoryPayload {
+  type: "nested_memory";
+  content: {
+    content: string;
+    contentDiffersFromDisk: boolean;
+    path: string;
+    rawContent?: string;
+    type: string;
+  };
+  displayPath: string;
+  path: string;
+}
+
+export interface PlanFileReferencePayload {
+  type: "plan_file_reference";
+  planContent: string;
+  planFilePath: string;
+}
+
+export interface PlanModeExitPayload {
+  type: "plan_mode_exit";
+  planExists: boolean;
+  planFilePath: string;
+}
+
+export interface PlanModePayload {
+  type: "plan_mode";
+  isSubAgent: boolean;
+  planExists: boolean;
+  planFilePath: string;
+  reminderType: string;
+}
+
+export interface TaskReminderPayload {
+  type: "task_reminder";
+  content: (
+    | unknown /* empty */
+    | {
+        activeForm?: string;
+        blockedBy: (unknown /* empty */ | string)[];
+        blocks: (unknown /* empty */ | string)[];
+        description: string;
+        id: string;
+        metadata?: unknown /* Task.metadata is Record<string, unknown> — caller-supplied keys, not part of the harness contract.
+         */;
+        owner?: string;
+        status: string;
+        subject: string;
+      }
+  )[];
+  itemCount: number;
+}
+
+export interface TodoReminderPayload {
+  type: "todo_reminder";
+  content: unknown /* empty */[];
+  itemCount: number;
+}

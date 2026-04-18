@@ -62,8 +62,7 @@ export type {
   CommandPermissionsPayload,
   OpenedFileInIdePayload,
   SelectedLinesInIdePayload,
-  QueuedCommandPayload,
-} from "./types/attachments.js";
+  QueuedCommandPayload, CompactFileReferencePayload, DateChangePayload, DiagnosticsPayload, EditedTextFilePayload, FilePayload, HookNonBlockingErrorPayload, InvokedSkillsPayload, NestedMemoryPayload, PlanFileReferencePayload, PlanModeExitPayload, PlanModePayload, TaskReminderPayload, TodoReminderPayload } from "./types/attachments.js";
 export type {
   ToolUseResultData,
   BashToolResultData,
